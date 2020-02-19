@@ -9,7 +9,7 @@ library(maps)
 
 rm(list = ls())
 
-period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")
+period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")[2:4]
 
 data = c("Hadl", "COBE")[2]
 
@@ -36,7 +36,7 @@ Baseline <- Baseline %>% rasterToPoints() %>% data.frame()
 
 time_step = data.frame(names(df)) #look at time steps
 
-for(p in length(period)){
+for(p in 1:length(period)){
   
   # period = period[[1]]
   
