@@ -9,7 +9,7 @@ library(maps)
 
 rm(list = ls())
 
-period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")[4]
+period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")
 
 data = c("Hadl", "COBE")[2]
 
@@ -36,66 +36,73 @@ Baseline <- Baseline %>% rasterToPoints() %>% data.frame()
 
 time_step = data.frame(names(df)) #look at time steps
 
-# set target period
-if (period == "1980-1989") Target <- df[[1321:1440]] #Jan 1980 - Dec 1989
-if (period == "1990-1999") Target <- df[[1441:1560]] #Jan 1990 - Dec 1999
-if (period == "2000-2009") Target <- df[[1561:1680]] #Jan 2000 - Dec 2009
-if (period == "2010-2018") Target <- df[[1681:1788]] #Jan 2010 - Dec 2018
-
-Target <- Target %>% rasterToPoints() %>% data.frame()
-
-ll_anom = NULL
-
-for (ll in 1:dim(Baseline)[1]) { # calculate anomalies at every lot/lon grid cell
-
-  # ll = 1
-
-  print(ll)
-
-  monthly_anom = NULL
-
-  for (m in 1:12) { # every month
-
-    # m = 8
-
-    interval = seq(m+2, dim(Baseline)[2], by = 12)
-
-    baseline = Baseline[ll, c(interval)]
-    baseline = t(baseline)
-    baseline = as.data.frame(baseline)
-    baseline = baseline[,1]
-
-    q = quantile(baseline, prob = 0.975)
-    # hist(baseline, breaks = 100, col = matlab.like(100), lty = "blank")
-    # abline(v = q)
-
-    interval = seq(m+2, dim(Target)[2], by = 12)
-
-    present = Target[ll, c(interval)]
-    present = t(present)
-    present = as.data.frame(present)
-    present = present[,1]
-    sum = sum(q < present)
-
-    monthly_anom = cbind(monthly_anom, sum)
-
+for(p in length(period)){
+  
+  # period = period[[1]]
+  
+  # set target period
+  if (period == "1980-1989") Target <- df[[1321:1440]] #Jan 1980 - Dec 1989
+  if (period == "1990-1999") Target <- df[[1441:1560]] #Jan 1990 - Dec 1999
+  if (period == "2000-2009") Target <- df[[1561:1680]] #Jan 2000 - Dec 2009
+  if (period == "2010-2018") Target <- df[[1681:1788]] #Jan 2010 - Dec 2018
+  
+  Target <- Target %>% rasterToPoints() %>% data.frame()
+  
+  ll_anom = NULL
+  
+  # calculate anomalies at every lot/lon grid cell
+  for (ll in 1:dim(Baseline)[1]) { 
+    
+    # ll = 1
+    
+    print(ll)
+    
+    monthly_anom = NULL
+    
+    for (m in 1:12) { # every month
+      
+      # m = 8
+      
+      interval = seq(m+2, dim(Baseline)[2], by = 12)
+      
+      baseline = Baseline[ll, c(interval)]
+      baseline = t(baseline)
+      baseline = as.data.frame(baseline)
+      baseline = baseline[,1]
+      
+      q = quantile(baseline, prob = 0.975)
+      # hist(baseline, breaks = 100, col = matlab.like(100), lty = "blank")
+      # abline(v = q)
+      
+      interval = seq(m+2, dim(Target)[2], by = 12)
+      
+      present = Target[ll, c(interval)]
+      present = t(present)
+      present = as.data.frame(present)
+      present = present[,1]
+      sum = sum(q < present)
+      
+      monthly_anom = cbind(monthly_anom, sum)
+      
+    }
+    
+    ll_anom = rbind(ll_anom, monthly_anom)
+    
   }
-
-  ll_anom = rbind(ll_anom, monthly_anom)
-
+  
+  colnames(ll_anom) = c("jan", "feb", "mar", "apr", "may", "jun",
+                        "jul", "aug", "sep", "oct", "nov", "dec")
+  
+  anom = cbind(Target[1:2], ll_anom)
+  
+  anom$sum = rowSums(anom[3:14])
+  
+  if (period == "1980-1989") save(anom, file = "~/extreme_normalizations/results/SST_Anomalies_1980-1989.RData")
+  if (period == "1990-1999") save(anom, file = "~/extreme_normalizations/results/SST_Anomalies_1990-1999.RData")
+  if (period == "2000-2009") save(anom, file = "~/extreme_normalizations/results/SST_Anomalies_2000-2009.RData")
+  if (period == "2010-2018") save(anom, file = "~/extreme_normalizations/results/SST_Anomalies_2010-2018.RData")
+  
 }
-
-colnames(ll_anom) = c("jan", "feb", "mar", "apr", "may", "jun",
-                      "jul", "aug", "sep", "oct", "nov", "dec")
-
-anom = cbind(Target[1:2], ll_anom)
-
-anom$sum = rowSums(anom[3:14])
-
-# if (period == "2000-2014") save(anom, file = "~/cascade_coral/data/SST_Anomalies_18701950_20002014.RData")
-# if (period == "2000-2019") save(anom, file = "~/cascade_coral/data/SST_Anomalies_18701950_20002019.RData")
-# if (period == "2000-2014") load("~/cascade_coral/data/SST_Anomalies_18701950_20002014.RData")
-# if (period == "2000-2019") load("~/cascade_coral/data/SST_Anomalies_18701950_20002019.RData")
 
 # range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 # anom$sum = range01(anom$sum)
