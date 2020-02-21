@@ -9,13 +9,14 @@ library(maps)
 
 rm(list = ls())
 
-period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")[3]
+period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")[4]
 
-data = c("Hadl", "COBE")[1]
+data = c("Hadl", "COBE", "ER")[3]
 
 #Hadley or COBE
 if (data == "Hadl") load("~/extreme_normalizations/data/Hadl_SST.RData")
-# if (data == "COBE") load("~/extreme_normalizations/data/COBE_SST.RData")
+if (data == "COBE") load("~/extreme_normalizations/data/COBE_SST.RData")
+if (data == "ER") load("~/extreme_normalizations/data/ER_SST.RData")
 
 # e = extent(-140, -100, 30, 40)
 # df = crop(df, e); rm(e)
@@ -34,11 +35,11 @@ names(Baseline)
 
 Baseline <- Baseline %>% rasterToPoints() %>% data.frame()
 
-time_step = data.frame(names(df)) #look at time steps
+View(names(df)) #look at time steps
 
 for(p in 1:length(period)){
   
-  # period = period[[p]]
+  # period = "1980-1989"
   
   # set target period
   if (period == "1980-1989") Target <- df[[1321:1440]] #Jan 1980 - Dec 1989
@@ -104,5 +105,4 @@ for(p in 1:length(period)){
   
 }
 
-# range01 <- function(x){(x-min(x))/(max(x)-min(x))}
-# anom$sum = range01(anom$sum)
+beepr::beep(2)
