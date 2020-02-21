@@ -9,37 +9,36 @@ library(maps)
 
 rm(list = ls())
 
-period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")[4]
+period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")
 
-data = c("Hadl", "COBE", "ER")[3]
+data = c("HadI", "COBE", "ER")
 
-#Hadley or COBE
-if (data == "Hadl") load("~/extreme_normalizations/data/Hadl_SST.RData")
-if (data == "COBE") load("~/extreme_normalizations/data/COBE_SST.RData")
-if (data == "ER") load("~/extreme_normalizations/data/ER_SST.RData")
-
-# e = extent(-140, -100, 30, 40)
-# df = crop(df, e); rm(e)
-
-# set baseline Jan 1870 - Dec 1929, 60 years
-Baseline <- df[[1:720]] 
-names(Baseline)
-
-# pdf(paste0("~/extreme_normalizations/figs/", data, "_Climatology_1870-1929.pdf"), height = 10, width = 8.5)
-# par(mfrow = c(2,1))
-# plot(calc(Baseline, mean), col = matlab.like(100), axes = F, main = "Mean", zlim = c(-3, 33))
-# map(add = T, lwd = 0.1, fill = T, col = "gray"); degAxis(1); degAxis(2, las = 1)
-# plot(calc(Baseline, sd), col = matlab.like(100), axes = F, main = "SD", zlim = c(0,10))
-# map(add = T, lwd = 0.1, fill = T, col = "gray"); degAxis(1); degAxis(2, las = 1)
-# dev.off()
-
-Baseline <- Baseline %>% rasterToPoints() %>% data.frame()
-
-View(names(df)) #look at time steps
-
-for(p in 1:length(period)){
+calculate_anomalies = function(period, data){
   
-  # period = "1980-1989"
+  setwd("~/Dropbox (MBA)/PAPER Kisei heat extremes")
+  
+  if (data == "HadI") load("data/HadI_SST.RData")
+  if (data == "COBE") load("data/COBE_SST.RData")
+  if (data == "ER") load("data/ER_SST.RData")
+  
+  # e = extent(-140, -100, 30, 40)
+  # df = crop(df, e); rm(e)
+  
+  # set baseline Jan 1870 - Dec 1929, 60 years
+  Baseline <- df[[1:720]] 
+  names(Baseline)
+  
+  pdf(paste0("figures/Climatologies/", data, "_Climatology_1870-1929.pdf"), height = 10, width = 8.5)
+  par(mfrow = c(2,1))
+  plot(calc(Baseline, mean), col = matlab.like(100), axes = F, main = "Mean", zlim = c(-3, 33))
+  map(add = T, lwd = 0.1, fill = T, col = "gray"); degAxis(1); degAxis(2, las = 1)
+  plot(calc(Baseline, sd), col = matlab.like(100), axes = F, main = "SD", zlim = c(0,10))
+  map(add = T, lwd = 0.1, fill = T, col = "gray"); degAxis(1); degAxis(2, las = 1)
+  dev.off()
+  
+  Baseline <- Baseline %>% rasterToPoints() %>% data.frame()
+  
+  # View(names(df)) #look at time steps
   
   # set target period
   if (period == "1980-1989") Target <- df[[1321:1440]] #Jan 1980 - Dec 1989
@@ -98,11 +97,23 @@ for(p in 1:length(period)){
   
   anom$sum = rowSums(anom[3:14])
   
-  if (period == "1980-1989") save(anom, file = "~/extreme_normalizations/results/SST_Anomalies_1980-1989.RData")
-  if (period == "1990-1999") save(anom, file = "~/extreme_normalizations/results/SST_Anomalies_1990-1999.RData")
-  if (period == "2000-2009") save(anom, file = "~/extreme_normalizations/results/SST_Anomalies_2000-2009.RData")
-  if (period == "2010-2018") save(anom, file = "~/extreme_normalizations/results/SST_Anomalies_2010-2018.RData")
+  save(anom, file = paste0("~/extreme_normalizations/results/", data, "/SST_Anomalies_", period, ".RData"))
+
+  beepr::beep(2)
   
 }
 
-beepr::beep(2)
+calculate_anomalies("1980-1989", "HadI")
+calculate_anomalies("1990-1999", "HadI")
+calculate_anomalies("2000-2009", "HadI")
+calculate_anomalies("2010-2018", "HadI")
+
+calculate_anomalies("1980-1989", "COBE")
+calculate_anomalies("1990-1999", "COBE")
+calculate_anomalies("2000-2009", "COBE")
+calculate_anomalies("2010-2018", "COBE")
+
+calculate_anomalies("1980-1989", "ER")
+calculate_anomalies("1990-1999", "ER")
+calculate_anomalies("2000-2009", "ER")
+calculate_anomalies("2010-2018", "ER")
