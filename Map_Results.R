@@ -9,7 +9,6 @@ library(maps)
 library(ggdark)
 library(ggjoy)
 
-
 rm(list = ls())
 
 period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")
@@ -50,20 +49,23 @@ map = function(mode){
     
     anom$sum = range01(anom$sum)
     
-    pdf(paste0("~/Desktop/SST_Anomalies_Annual.pdf"), height = 10, width = 10)
+    pdf(paste0("~/Desktop/SST_Anomalies_Annual.pdf"), height = 10, width = 8)
     
     p = ggplot(anom) + 
-      geom_raster(aes(x, y, color = sum, fill = sum)) + 
-      geom_sf(data = world, size = 0.15, color = "gray") +
+      geom_point(aes(x, y, color = sum, fill = sum)) + 
+      geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
+      # geom_sf(data = world, size = 0.15, color = "gray") +
       scale_fill_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+      scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
       scale_x_continuous(expand = c(-0.005, 0), "") +
       scale_y_continuous(expand = c(-0.005, 0), "") +
-      coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
-      facet_wrap(.~source + period, ncol = 3, dir = "v") + 
+      # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
+      facet_wrap(.~source + period, ncol = 3, dir = "v") +
+      theme_pubr() + 
+      coord_map("ortho", orientation = c(0, 0, 0)) + 
       theme(axis.title.x = element_blank(),
             axis.title.y = element_blank(), 
-            legend.position = "right",
-            legend.justification = c(1, 0))
+            legend.position = "right")
     
     print(p)
     dev.off()
@@ -85,20 +87,24 @@ map = function(mode){
     
     anom$sum = range01(anom$sum)
     
-    pdf(paste0("~/Desktop/SST_Anomalies_Season.pdf"), height = 8, width = 20)
+    pdf(paste0("~/Desktop/SST_Anomalies_Season.pdf"), height = 10, width = 20)
     
     p = ggplot(anom) + 
-      geom_raster(aes(x, y, color = sum, fill = sum)) + 
-      geom_sf(data = world, size = 0.15, color = "gray") +
+      geom_point(aes(x, y, color = sum, fill = sum), alpha = 0.5, size = 0.5) + 
+      geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
+      # geom_sf(data = world, size = 0.15, color = "gray") +
       scale_fill_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+      scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
       scale_x_continuous(expand = c(-0.005, 0), "") +
       scale_y_continuous(expand = c(-0.005, 0), "") +
-      coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
-      facet_wrap(.~source + period + season, ncol = 8) + 
+      # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
+      # facet_wrap(.~source + period + season, ncol = 3, dir = "v") +
+      facet_grid(source ~ period + season) +
+      theme_pubr() + 
+      coord_map("ortho", orientation = c(0, 0, 0)) + 
       theme(axis.title.x = element_blank(),
             axis.title.y = element_blank(), 
-            legend.position = "right",
-            legend.justification = c(1, 0))
+            legend.position = "right")
     
     print(p)
     dev.off()
