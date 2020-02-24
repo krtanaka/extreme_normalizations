@@ -16,7 +16,7 @@ data = c("HadI", "COBE", "ER")
 calculate_anomalies = function(period, data){
   
   period = "2010-2018"
-  data = "ER"
+  data = "COBE"
   
   setwd("~/Dropbox (MBA)/PAPER Kisei heat extremes")
   
@@ -99,7 +99,7 @@ calculate_anomalies = function(period, data){
   anom$sum = rowSums(anom[3:14])
   
   save(anom, file = paste0("~/extreme_normalizations/results/", data, "/SST_Anomalies_", period, ".RData"))
-
+  
   beepr::beep(2)
   
 }
