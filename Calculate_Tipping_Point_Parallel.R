@@ -96,7 +96,8 @@ calculate_anomalies = function(data){
   }
   
   colnames(yy_anom) = 1980:2018
-  # plot(1980:2018, colMeans(yy_anom), type = "o", pch = 20, axes = F); axis(1, at = seq(1980, 2018, 2)); axis(2, las = 2)
+  plot(1980:2018, colMeans(yy_anom), type = "o", pch = 20, axes = F, xlab = "", ylab = "month")
+  axis(1, at = seq(1980, 2018, 2)); axis(2, las = 2)
   
   save(yy_anom, file = paste0("/Users/ktanaka/extreme_normalizations/results/", data, "/SST_TippingPoints.RData"))
   
