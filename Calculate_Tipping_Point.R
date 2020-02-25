@@ -9,112 +9,98 @@ library(maps)
 
 rm(list = ls())
 
-period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")
-
 data = c("HadI", "COBE", "ER")
 
-calculate_anomalies = function(period, data){
+calculate_anomalies = function(data){
   
-  period = "2010-2018"
-  data = "COBE"
+  # data = "COBE"
   
   setwd("~/Dropbox (MBA)/PAPER Kisei heat extremes")
   
   load(paste0("data/", data, "_SST.RData"))
   
-  # e = extent(-140, -100, 30, 40)
+  # e = extent(-120, -100, 30, 40)
   # df = crop(df, e); rm(e)
   
   # set baseline Jan 1870 - Dec 1929, 60 years
   Baseline <- df[[1:720]] 
   names(Baseline)
   
-  pdf(paste0("~/Dropbox (MBA)/PAPER Kisei heat extremes/figures/Climatologies/", data, "_Climatology_1870-1929.pdf"), height = 10, width = 8.5)
-  par(mfrow = c(2,1))
-  plot(calc(Baseline, mean), col = matlab.like(100), axes = F, main = "Mean", zlim = c(-3, 33))
-  map(add = T, lwd = 0.1, fill = T, col = "gray"); degAxis(1); degAxis(2, las = 1)
-  plot(calc(Baseline, sd), col = matlab.like(100), axes = F, main = "SD", zlim = c(0,10))
-  map(add = T, lwd = 0.1, fill = T, col = "gray"); degAxis(1); degAxis(2, las = 1)
-  dev.off()
-  
   Baseline <- Baseline %>% rasterToPoints() %>% data.frame()
   
-  # View(names(df)) #look at time steps
-  
-  # set target period
-  if (period == "1980-1989") Target <- df[[1321:1440]] #Jan 1980 - Dec 1989
-  if (period == "1990-1999") Target <- df[[1441:1560]] #Jan 1990 - Dec 1999
-  if (period == "2000-2009") Target <- df[[1561:1680]] #Jan 2000 - Dec 2009
-  if (period == "2010-2018") Target <- df[[1681:1788]] #Jan 2010 - Dec 2018
-  
+  Target <- df[[1321:1788]] #Jan 1980 - Dec 2018
   Target <- Target %>% rasterToPoints() %>% data.frame()
   
-  ll_anom = NULL
+  yy_anom = NULL
   
-  # calculate anomalies at every lot/lon grid cell
-  for (ll in 1:dim(Baseline)[1]) { 
+  for (y in 1:39) { #every year between 1980-2018
     
-    # ll = 1
+    # y = 2
     
-    print(ll)
+    interval_year = seq(3, 470, by = 12) 
     
-    monthly_anom = NULL
+    first_month = interval_year[y]
+    last_month = first_month+11
     
-    for (m in 1:12) { # every month
+    target = Target[,first_month:last_month]; names(target) # target year
+    ll_anom = NULL
+    
+    for (ll in 1:dim(Baseline)[1]) { # calculate anomalies at every lot/lon grid cell
+
+      # ll = 2
       
-      # m = 8
+      print(ll)
       
-      interval = seq(m+2, dim(Baseline)[2], by = 12)
+      monthly_anom = NULL
       
-      baseline = Baseline[ll, c(interval)]
-      baseline = t(baseline)
-      baseline = as.data.frame(baseline)
-      baseline = baseline[,1]
+      for (m in 1:12) { # every month
+        
+        # m = 1
+        
+        interval_month = seq(m+2, dim(Baseline)[2], by = 12)
+        
+        baseline = Baseline[ll, c(interval_month)]; names(baseline) #pick corresponding month from every baseline year
+        baseline = t(baseline)
+        baseline = as.data.frame(baseline)
+        baseline = baseline[,1]
+        
+        q = quantile(baseline, prob = 0.975)
+        # hist(baseline, breaks = 60, col = matlab.like(60), lty = "blank")
+        # abline(v = q)
+        
+        present = target[ll, m]; present
+        sum = ifelse(q < present, 1, 0)
+        
+        monthly_anom = cbind(monthly_anom, sum)
+        
+      }
       
-      q = quantile(baseline, prob = 0.975)
-      # hist(baseline, breaks = 100, col = matlab.like(100), lty = "blank")
-      # abline(v = q)
-      
-      interval = seq(m+2, dim(Target)[2], by = 12)
-      
-      present = Target[ll, c(interval)]
-      present = t(present)
-      present = as.data.frame(present)
-      present = present[,1]
-      sum = sum(q < present)
-      
-      monthly_anom = cbind(monthly_anom, sum)
+      ll_anom = rbind(ll_anom, monthly_anom)
       
     }
     
-    ll_anom = rbind(ll_anom, monthly_anom)
+    colnames(ll_anom) = c("jan", "feb", "mar", "apr", "may", "jun",
+                          "jul", "aug", "sep", "oct", "nov", "dec")
+    
+    year_sum = rowSums(ll_anom)
+    
+    yy_anom = cbind(yy_anom, year_sum)
     
   }
   
-  colnames(ll_anom) = c("jan", "feb", "mar", "apr", "may", "jun",
-                        "jul", "aug", "sep", "oct", "nov", "dec")
+  colnames(yy_anom) = 1980:2018
   
-  anom = cbind(Target[1:2], ll_anom)
+  yy_anom = cbind(Target[1:2], yy_anom)
   
-  anom$sum = rowSums(anom[3:14])
-  
-  save(anom, file = paste0("~/extreme_normalizations/results/", data, "/SST_Anomalies_", period, ".RData"))
+  save(yy_anom, file = paste0("~/extreme_normalizations/results/", data, "/SST_TippingPoints.RData"))
   
   beepr::beep(2)
   
+  
 }
 
-calculate_anomalies("1980-1989", "HadI")
-calculate_anomalies("1990-1999", "HadI")
-calculate_anomalies("2000-2009", "HadI")
-calculate_anomalies("2010-2018", "HadI")
+calculate_anomalies("HadI")
+calculate_anomalies("COBE")
+calculate_anomalies("ER")
 
-calculate_anomalies("1980-1989", "COBE")
-calculate_anomalies("1990-1999", "COBE")
-calculate_anomalies("2000-2009", "COBE")
-calculate_anomalies("2010-2018", "COBE")
-
-calculate_anomalies("1980-1989", "ER")
-calculate_anomalies("1990-1999", "ER")
-calculate_anomalies("2000-2009", "ER")
-calculate_anomalies("2010-2018", "ER")
+plot(1980:2018, colMeans(yy_anom[3:41]), type = "o", pch = 20, axes = F); axis(1, at = seq(1980, 2018, 2)); axis(2, las = 2)
