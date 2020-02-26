@@ -15,14 +15,14 @@ data = c("HadI", "COBE", "ER")
 
 calculate_anomalies = function(data){
   
-  # data = "COBE"
+  data = "HadI"
   
   setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes")
   
   load(paste0("data/", data, "_SST.RData"))
   
-  # e = extent(-140, -100, 22.50, 47.50)
-  # df = crop(df, e); rm(e)
+  e = extent(-140, -100, 22.50, 47.50)
+  df = crop(df, e); rm(e)
   
   # set baseline Jan 1870 - Dec 1929, 60 years
   Baseline <- df[[1:720]] 
@@ -37,7 +37,7 @@ calculate_anomalies = function(data){
   
   for (y in 1:39) { #every year between 1980-2018
     
-    # y = 2
+    # y = 6
     
     interval_year = seq(3, 470, by = 12) 
     
@@ -77,9 +77,10 @@ calculate_anomalies = function(data){
         
       }
       
-      ll_anom = rbind(ll_anom, monthly_anom)
+      # ll_anom = rbind(ll_anom, monthly_anom)
       
     }
+    
     # })[3]; ptime
     
     r = as.data.frame(r)
@@ -96,8 +97,8 @@ calculate_anomalies = function(data){
   }
   
   colnames(yy_anom) = 1980:2018
-  # plot(1980:2018, colMeans(yy_anom), type = "o", pch = 20, axes = F, xlab = "", ylab = "month")
-  # axis(1, at = seq(1980, 2018, 2)); axis(2, las = 2)
+  plot(1980:2018, colMeans(yy_anom), type = "o", pch = 20, axes = F, xlab = "", ylab = "month")
+  axis(1, at = seq(1980, 2018, 2)); axis(2, las = 2)
   
   save(yy_anom, file = paste0("/Users/ktanaka/extreme_normalizations/results/", data, "/SST_TippingPoints.RData"))
   
