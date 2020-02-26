@@ -17,6 +17,14 @@ data = c("HadI", "COBE", "ER")
 
 world <- ne_countries(scale = "small", returnclass = "sf") 
 
+worldMap <- getMap()
+world.points <- fortify(worldMap)
+world.points$region <- world.points$id
+
+world.df <- world.points[,c("long","lat","group", "region")]
+
+world <- fortify(getMap())
+
 range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 
 meow <- readOGR(dsn = paste0("/Users/", Sys.info()[7], "/Downloads/MEOW"), layer = "meow_ecos")
@@ -28,18 +36,18 @@ lme <- lme %>% st_as_sf()
 
 map = function(mode){
   
-  load("~/extreme_normalizations/results/HadI/SST_Anomalies_1980-1989.RData"); hadi1 = anom; hadi1$source = "HadISST"; hadi1$period = "1980-1999"
-  load("~/extreme_normalizations/results/HadI/SST_Anomalies_1990-1999.RData"); hadi2 = anom; hadi2$source = "HadISST"; hadi2$period = "1990-1999"
-  load("~/extreme_normalizations/results/HadI/SST_Anomalies_2000-2009.RData"); hadi3 = anom; hadi3$source = "HadISST"; hadi3$period = "2000-2009"
-  load("~/extreme_normalizations/results/HadI/SST_Anomalies_2010-2018.RData"); hadi4 = anom; hadi4$source = "HadISST"; hadi4$period = "2010-2018"
-  load("~/extreme_normalizations/results/COBE/SST_Anomalies_1980-1989.RData"); cobe1 = anom; cobe1$source = "COBESST"; cobe1$period = "1980-1999"
-  load("~/extreme_normalizations/results/COBE/SST_Anomalies_1990-1999.RData"); cobe2 = anom; cobe2$source = "COBESST"; cobe2$period = "1990-1999"
-  load("~/extreme_normalizations/results/COBE/SST_Anomalies_2000-2009.RData"); cobe3 = anom; cobe3$source = "COBESST"; cobe3$period = "2000-2009"
-  load("~/extreme_normalizations/results/COBE/SST_Anomalies_2010-2018.RData"); cobe4 = anom; cobe4$source = "COBESST"; cobe4$period = "2010-2018"
-  load("~/extreme_normalizations/results/ER/SST_Anomalies_1980-1989.RData"); er1 = anom; er1$source = "ERSST"; er1$period = "1980-1999"
-  load("~/extreme_normalizations/results/ER/SST_Anomalies_1990-1999.RData"); er2 = anom; er2$source = "ERSST"; er2$period = "1990-1999"
-  load("~/extreme_normalizations/results/ER/SST_Anomalies_2000-2009.RData"); er3 = anom; er3$source = "ERSST"; er3$period = "2000-2009"
-  load("~/extreme_normalizations/results/ER/SST_Anomalies_2010-2018.RData"); er4 = anom; er4$source = "ERSST"; er4$period = "2010-2018"
+  load("~/extreme_normalizations/results/HadI/SST_Anomalies_1980-1989.RData"); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1999"
+  load("~/extreme_normalizations/results/HadI/SST_Anomalies_1990-1999.RData"); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
+  load("~/extreme_normalizations/results/HadI/SST_Anomalies_2000-2009.RData"); hadi3 = anom; hadi3$source = "HadISST v1.1"; hadi3$period = "2000-2009"
+  load("~/extreme_normalizations/results/HadI/SST_Anomalies_2010-2018.RData"); hadi4 = anom; hadi4$source = "HadISST v1.1"; hadi4$period = "2010-2018"
+  load("~/extreme_normalizations/results/COBE/SST_Anomalies_1980-1989.RData"); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1999"
+  load("~/extreme_normalizations/results/COBE/SST_Anomalies_1990-1999.RData"); cobe2 = anom; cobe2$source = "COBE v2"; cobe2$period = "1990-1999"
+  load("~/extreme_normalizations/results/COBE/SST_Anomalies_2000-2009.RData"); cobe3 = anom; cobe3$source = "COBE v2"; cobe3$period = "2000-2009"
+  load("~/extreme_normalizations/results/COBE/SST_Anomalies_2010-2018.RData"); cobe4 = anom; cobe4$source = "COBE v2"; cobe4$period = "2010-2018"
+  load("~/extreme_normalizations/results/ER/SST_Anomalies_1980-1989.RData"); er1 = anom; er1$source = "ERSST v4"; er1$period = "1980-1999"
+  load("~/extreme_normalizations/results/ER/SST_Anomalies_1990-1999.RData"); er2 = anom; er2$source = "ERSST v4"; er2$period = "1990-1999"
+  load("~/extreme_normalizations/results/ER/SST_Anomalies_2000-2009.RData"); er3 = anom; er3$source = "ERSST v4"; er3$period = "2000-2009"
+  load("~/extreme_normalizations/results/ER/SST_Anomalies_2010-2018.RData"); er4 = anom; er4$source = "ERSST v4"; er4$period = "2010-2018"
   
   anom = rbind(hadi1, hadi2, hadi3, hadi4, 
                cobe1, cobe2, cobe3, cobe4,
@@ -49,23 +57,42 @@ map = function(mode){
     
     anom$sum = range01(anom$sum)
     
-    pdf(paste0("~/Desktop/SST_Anomalies_Annual.pdf"), height = 10, width = 8)
+    pdf(paste0("~/Desktop/SST_Anomalies_Annual.pdf"), height = 8, width = 8)
     
-    p = ggplot(anom) + 
-      geom_point(aes(x, y, color = sum, fill = sum)) + 
-      geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
-      # geom_sf(data = world, size = 0.15, color = "gray") +
-      scale_fill_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+    # p = ggplot(anom) + 
+    #   geom_point(aes(x, y, color = sum, fill = sum)) + 
+    #   geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
+    #   # geom_sf(data = world, size = 0.15, color = "gray") +
+    #   scale_fill_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+    #   scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+    #   scale_x_continuous(expand = c(-0.005, 0), "") +
+    #   scale_y_continuous(expand = c(-0.005, 0), "") +
+    #   # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
+    #   facet_wrap(.~source + period, ncol = 3, dir = "v") +
+    #   theme_pubr() + 
+    #   coord_map("ortho", orientation = c(0, 0, 0)) + 
+    #   theme(axis.title.x = element_blank(),
+    #         axis.title.y = element_blank(), 
+    #         legend.position = "right")
+    
+    p =  anom %>% 
+      sample_frac(1) %>%
+      ggplot() + 
+      geom_point(aes(x = x, y = y, color = sum), size = 0.5, alpha = 0.5) +
+      geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
+               color = "black", fill = "gray", size = 0.1) + 
       scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
-      scale_x_continuous(expand = c(-0.005, 0), "") +
-      scale_y_continuous(expand = c(-0.005, 0), "") +
-      # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
+      coord_proj("+proj=wintri") +
       facet_wrap(.~source + period, ncol = 3, dir = "v") +
-      theme_pubr() + 
-      coord_map("ortho", orientation = c(0, 0, 0)) + 
+      theme_pubr()+
       theme(axis.title.x = element_blank(),
             axis.title.y = element_blank(), 
-            legend.position = "right")
+            axis.text.x = element_blank(),
+            axis.text.y = element_blank(),
+            axis.ticks.x = element_blank(),
+            axis.ticks.y = element_blank(),
+            legend.position = "right", 
+            legend.justification = c(1,0))
     
     print(p)
     dev.off()
@@ -87,24 +114,43 @@ map = function(mode){
     
     anom$sum = range01(anom$sum)
     
-    pdf(paste0("~/Desktop/SST_Anomalies_Season.pdf"), height = 10, width = 20)
+    pdf(paste0("~/Desktop/SST_Anomalies_Season.pdf"), height = 5, width = 18)
     
-    p = ggplot(anom) + 
-      geom_point(aes(x, y, color = sum, fill = sum), alpha = 0.5, size = 0.5) + 
-      geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
-      # geom_sf(data = world, size = 0.15, color = "gray") +
-      scale_fill_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+    # p = ggplot(anom) + 
+    #   geom_point(aes(x, y, color = sum, fill = sum), alpha = 0.5, size = 0.5) + 
+    #   geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
+    #   # geom_sf(data = world, size = 0.15, color = "gray") +
+    #   scale_fill_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+    #   scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+    #   scale_x_continuous(expand = c(-0.005, 0), "") +
+    #   scale_y_continuous(expand = c(-0.005, 0), "") +
+    #   # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
+    #   # facet_wrap(.~source + period + season, ncol = 3, dir = "v") +
+    #   facet_grid(source ~ period + season) +
+    #   theme_pubr() + 
+    #   coord_map("ortho", orientation = c(0, 0, 0)) + 
+    #   theme(axis.title.x = element_blank(),
+    #         axis.title.y = element_blank(), 
+    #         legend.position = "right")
+    
+    p = anom %>% 
+      sample_frac(1) %>%
+      ggplot() + 
+      geom_point(aes(x = x, y = y, color = sum), size = 0.5, alpha = 0.5) +
+      geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
+               color = "black", fill = "gray", size = 0.1) + 
       scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
-      scale_x_continuous(expand = c(-0.005, 0), "") +
-      scale_y_continuous(expand = c(-0.005, 0), "") +
-      # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
-      # facet_wrap(.~source + period + season, ncol = 3, dir = "v") +
-      facet_grid(source ~ period + season) +
-      theme_pubr() + 
-      coord_map("ortho", orientation = c(0, 0, 0)) + 
+      coord_proj("+proj=wintri") +
+      facet_grid(source ~ season + period) +
+      theme_pubr()+
       theme(axis.title.x = element_blank(),
             axis.title.y = element_blank(), 
-            legend.position = "right")
+            axis.text.x = element_blank(),
+            axis.text.y = element_blank(),
+            axis.ticks.x = element_blank(),
+            axis.ticks.y = element_blank(),
+            legend.position = "right", 
+            legend.justification = c(1,0))
     
     print(p)
     dev.off()
@@ -147,7 +193,7 @@ rank_mean = function(region){
       mutate(se = sd/sqrt(n),
              lower.ci = mean - qt(1 - (0.05 / 2), n - 1) * se,
              upper.ci = mean + qt(1 - (0.05 / 2), n - 1) * se)
-    hadi$source = "HadISST"; hadi$period = period[[i]]
+    hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
     load(paste0("~/extreme_normalizations/results/COBE/SST_Anomalies_", period[[i]], ".RData"))
     anom = anom[, c(1:2, 15)]
@@ -161,7 +207,7 @@ rank_mean = function(region){
       mutate(se = sd/sqrt(n),
              lower.ci = mean - qt(1 - (0.05 / 2), n - 1) * se,
              upper.ci = mean + qt(1 - (0.05 / 2), n - 1) * se)
-    cobe$source = "COBESST"; cobe$period = period[[i]]
+    cobe$source = "COBE v2"; cobe$period = period[[i]]
     
     load(paste0("~/extreme_normalizations/results/ER/SST_Anomalies_", period[[i]], ".RData"))
     anom = anom[, c(1:2, 15)]
@@ -175,7 +221,7 @@ rank_mean = function(region){
       mutate(se = sd/sqrt(n),
              lower.ci = mean - qt(1 - (0.05 / 2), n - 1) * se,
              upper.ci = mean + qt(1 - (0.05 / 2), n - 1) * se)
-    er$source = "ERSST"; er$period = period[[i]]
+    er$source = "ERSST v4"; er$period = period[[i]]
     
     tas = rbind(hadi, cobe, er)
     
@@ -252,7 +298,7 @@ rank_joy = function(region){
     df = subset(df, Freq > 2)
     colnames(df)[1] = "UNIT"
     hadi = merge(hadi, df)
-    hadi$source = "HadISST"; hadi$period = period[[i]]
+    hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
     load(paste0("~/extreme_normalizations/results/COBE/SST_Anomalies_", period[[i]], ".RData"))
     anom = anom[, c(1:2, 15)]
@@ -270,7 +316,7 @@ rank_joy = function(region){
     df = subset(df, Freq > 2)
     colnames(df)[1] = "UNIT"
     cobe = merge(cobe, df)
-    cobe$source = "COBESST"; cobe$period = period[[i]]
+    cobe$source = "COBE v2"; cobe$period = period[[i]]
     
     load(paste0("~/extreme_normalizations/results/ER/SST_Anomalies_", period[[i]], ".RData"))
     anom = anom[, c(1:2, 15)]
@@ -288,7 +334,7 @@ rank_joy = function(region){
     df = subset(df, Freq > 2)
     colnames(df)[1] = "UNIT"
     er = merge(er, df)
-    er$source = "ERSST"; er$period = period[[i]]
+    er$source = "ERSST v4"; er$period = period[[i]]
     
     tas = rbind(hadi, cobe, er)
     
