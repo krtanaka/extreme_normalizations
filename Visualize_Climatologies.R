@@ -68,28 +68,36 @@ sd = rbind(d4, d5, d6)
 
 world <- ne_countries(scale = "small", returnclass = "sf") 
 
-p = ggplot(mean) + 
-  geom_point(aes(x, y, color = mean, fill = mean)) + 
+p = mean %>% 
+  sample_frac(1) %>%
+  ggplot() + 
+  geom_point(aes(x, y, color = mean)) + 
   geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
-  scale_fill_gradientn(colors = matlab.like(100), "", limits = c(-2, 29.4)) +
   scale_color_gradientn(colors = matlab.like(100), "", limits = c(-2, 29.4)) +
-  scale_x_continuous(expand = c(0, 0), "") +
-  scale_y_continuous(expand = c(0, 0), "") +
-  facet_wrap(.~source, ncol = 1) + 
-  theme_pubr() + 
+  # scale_x_continuous(expand = c(-10, 0), "") +
+  # scale_y_continuous(expand = c(0, 0), "") +
+  facet_wrap(.~source) + 
   # coord_sf(xlim = range(d$x), ylim = range(d$y)) +
-  coord_map("ortho", orientation = c(0, 190, 0)) +
+  coord_map("ortho", orientation = c(10, 250, 0)) +
   # coord_map("moll") +
+  theme_pubr()+
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(), 
-        legend.position = "right")
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        legend.position = "right", 
+        legend.justification = c(1,0))
 
 print(p)
 
 world <- fortify(getMap())
 
-p1 = ggplot() + 
-  geom_point(data = mean, aes(x = x, y = y, color = mean), size = 0.5, alpha = 0.5) +
+p1 = mean %>% 
+  sample_frac(1) %>%
+  ggplot() + 
+  geom_point(aes(x = x, y = y, color = mean), size = 0.5, alpha = 0.5) +
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
            color = "black", fill = "gray", size = 0.1) + 
   scale_color_gradientn(colors = matlab.like(100), "Mean", limits = c(-2, 29.4)) +
@@ -98,22 +106,32 @@ p1 = ggplot() +
   theme_pubr()+
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(), 
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank(),
         legend.position = "bottom", 
         legend.justification = c(1,0))
 
-p2 = ggplot() + 
-  geom_point(data = sd, aes(x = x, y = y, color = sd), size = 0.5, alpha = 0.5) +
+p2 = sd %>% 
+  sample_frac(1) %>%
+  ggplot() + 
+  geom_point(aes(x = x, y = y, color = sd), size = 0.5, alpha = 0.5) +
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
            color = "black", fill = "gray", size = 0.1) + 
-  scale_color_gradientn(colors = matlab.like(100), "SD", limits = c(0, 10)) +
+  scale_color_gradientn(colors = matlab.like(100), "SD", limits = c(0, 9.1)) +
   coord_proj("+proj=wintri") +
   facet_wrap(.~ source, ncol = 3) + 
   theme_pubr()+
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(), 
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank(),
         legend.position = "bottom", 
         legend.justification = c(1,0))
 
-pdf("~/Dropbox (MBA)/PAPER Kisei heat extremes/figures/climatologies/Climatologies_1870-1929.pdf", width = 10, height = 7)
+pdf("~/Desktop/Climatologies_1870-1929.pdf", width = 10, height = 7)
 cowplot::plot_grid(p1, p2, nrow = 2)
 dev.off()
