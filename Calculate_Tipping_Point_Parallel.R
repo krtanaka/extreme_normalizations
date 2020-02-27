@@ -7,7 +7,7 @@ library(rgdal)
 library(dplyr)
 library(maps)
 library(doParallel)
-registerDoParallel(cores = 4)
+# registerDoParallel(cores = 32)
 
 rm(list = ls())
 
@@ -15,43 +15,41 @@ data = c("HadI", "COBE", "ER")
 
 calculate_anomalies = function(data){
   
-  data = "ER"
+  # data = "ER"
   
   setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes")
   
   load(paste0("data/", data, "_SST.RData"))
   
-  e = extent(-76.6, -65.4, 35.4, 44.6)
-  df = crop(df, e); rm(e)
+  # e = extent(-76.6, -65.4, 35.4, 44.6)
+  # df = crop(df, e); rm(e)
   
-  # set baseline Jan 1870 - Dec 1929, 60 years
+  # set baseline Jan 1870 - Dec 1919, 50 years
   Baseline <- df[[1:600]] 
   names(Baseline)
   
   Baseline <- Baseline %>% rasterToPoints() %>% data.frame()
   
-  Target <- df[[1321:1788]] #Jan 1980 - Dec 2018
-  Target <- df[[361:1788]] #Jan 1980 - Dec 2018
-  
+  Target <- df[[361:1788]] #Jan 1900 - Dec 2018
   Target <- Target %>% rasterToPoints() %>% data.frame()
   
   yy_anom = NULL
   
   for (y in 1:119) { #every year between 1980-2018 (39) or 1900-2018 (119)
     
-    # y = 6
+    # y = 100
     
     interval_year = seq(3, dim(Target)[2], by = 12) 
     
     first_month = interval_year[y]
     last_month = first_month + 11
     
-    target = Target[,first_month:last_month]; names(target) # target year
-    ll_anom = NULL
+    target = Target[,first_month:last_month]; names(target); dim(target) # target year
+    # ll_anom = NULL
     
     # ptime <- system.time({
     
-    r <- foreach(ll = 1:dim(Baseline)[1], .combine = rbind) %dopar% {
+    r <- foreach(ll = 1:dim(target)[1], .combine = rbind) %dopar% {
       
       # ll = 2
       
@@ -79,7 +77,9 @@ calculate_anomalies = function(data){
         
       }
       
-      ll_anom = rbind(ll_anom, monthly_anom)
+      monthly_anom
+      
+      # ll_anom = rbind(ll_anom, monthly_anom)
       
     }
     
@@ -102,8 +102,8 @@ calculate_anomalies = function(data){
     
   }
   
-  plot(yy_anom$year_sum, type = "o", axes = F, pch = 20)
-  # axis(1, at = paste0(seq(1900, 2018, 1), "-", seq(1, 12, 1)))
+  # plot(yy_anom$year_sum, type = "o", axes = F, pch = 20, ylim = c(0,1))
+  # axis(1)
   # axis(2, las = 2)
   
   save(yy_anom, file = paste0("/Users/ktanaka/extreme_normalizations/results/", data, "/SST_TippingPoints.RData"))
