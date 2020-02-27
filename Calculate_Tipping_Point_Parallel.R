@@ -15,7 +15,7 @@ data = c("HadI", "COBE", "ER")
 
 calculate_anomalies = function(data){
   
-  # data = "ER"
+  # data = "COBE"
   
   setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes")
   
@@ -102,9 +102,10 @@ calculate_anomalies = function(data){
     
   }
   
-  # plot(yy_anom$year_sum, type = "o", axes = F, pch = 20, ylim = c(0,1))
+  # plot(yy_anom$year_sum, type = "o", axes = F, pch = 20, xlab = "", ylab = "", col = 2)
   # axis(1)
-  # axis(2, las = 2)
+  # axis(2, las = 2, at = seq(0, 0.8, 0.1))
+  # abline(h = 0.5, lty = 2)
   
   save(yy_anom, file = paste0("/Users/ktanaka/extreme_normalizations/results/", data, "/SST_TippingPoints.RData"))
   
