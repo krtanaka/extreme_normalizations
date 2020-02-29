@@ -209,11 +209,13 @@ sd$month = factor(sd$month, levels=c('jan', 'feb', 'mar',
 p1 = mean %>% 
   sample_frac(1) %>%
   ggplot() + 
-  geom_point(aes(x = x, y = y, color = layer), size = 0.5, alpha = 0.5) +
+  # geom_point(aes(x = x, y = y, color = layer), size = 0.5, alpha = 0.5) +
+  geom_raster(aes(x = x, y = y, fill = layer)) +
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
            color = "black", fill = "gray", size = 0.1) +
   scale_color_gradientn(colors = matlab.like(100), "mean", limits = c(-2, 29.4)) +
-  coord_proj("+proj=wintri") +
+  scale_fill_gradientn(colors = matlab.like(100), "mean", limits = c(-2, 29.4)) +
+  # coord_proj("+proj=wintri") +
   facet_grid(source ~ month) + 
   theme_pubr(I(9)) +
   theme(axis.title.x = element_blank(),
@@ -228,11 +230,13 @@ p1 = mean %>%
 p2 = sd %>% 
   sample_frac(1) %>%
   ggplot() + 
-  geom_point(aes(x = x, y = y, color = layer), size = 0.5, alpha = 0.5) +
+  # geom_point(aes(x = x, y = y, color = layer), size = 0.5, alpha = 0.5) +
+  geom_raster(aes(x = x, y = y, fill = layer)) +
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
            color = "black", fill = "gray", size = 0.1) +
   scale_color_gradientn(colors = matlab.like(100), "sd", limits = c(0, 3.7)) +
-  coord_proj("+proj=wintri") +
+  scale_fill_gradientn(colors = matlab.like(100), "sd", limits = c(0, 3.7)) +
+  # coord_proj("+proj=wintri") +
   facet_grid(source ~ month) + 
   theme_pubr(I(9)) +
   theme(axis.title.x = element_blank(),
@@ -245,7 +249,6 @@ p2 = sd %>%
         legend.justification = c(1,0))
 
 
-compactPDF("~/Desktop/Climatologies_1870-1929.pdf", gs_quality='screen')
-# png("~/Desktop/Climatologies_1870-1929.png", res = 300, units = "in", width = 15, height = 7)
+pdf("~/Desktop/Climatologies_1870-1929.pdf", width = 15, height = 7)
 cowplot::plot_grid(p1, p2, nrow = 2)
 dev.off()
