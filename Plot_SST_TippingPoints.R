@@ -96,31 +96,47 @@ print(p2)
 
 dev.off()
 
-df$threshold = ifelse(df$year_sum < 0.5, "Yes", "No")
+# df$threshold = ifelse(df$year_sum < 0.5, "Yes", "No")
 
-cbPalette <- c(rgb(202, 0, 32, maxColorValue = 255, alpha = 255), 
-               "white")
+# cbPalette <- c(rgb(202, 0, 32, maxColorValue = 255, alpha = 255), 
+#                "white")
 
 df$source = factor(df$source, levels = c("COBEv2","HadISSTv1.1","ERSSTv4"))
 
-p1 = ggplot(data = df, aes(x = Time, y = year_sum)) +
-  geom_rect(aes(xmin = Time, xmax = Time, ymin = -Inf, ymax = Inf, color = year_sum < 0.5),
-            show.legend = FALSE) +
-  geom_line() +
-  geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
-  scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2018-12-01"), by = "10 years"), 
-               labels = scales::date_format("%Y"), expand = c(0.05, -9)) +
-  scale_y_continuous(expand = c(0,0)) + 
-  labs(x = "", y = "") +
-  theme_pubr(I(10)) +
-  facet_wrap(.~source, ncol = 3, scales = "fixed") +
-  scale_colour_manual(values = cbPalette, "") + 
-  geom_text(aes(label = source), x = -Inf, y = Inf, hjust = -0.1, vjust = 1.5, data = df %>% dplyr::distinct(source)) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1), 
-        panel.border = element_blank(),
-        strip.text = element_blank(),
-        strip.background = element_blank())
+tipped_hadi = subset(df, source == "HadISSTv1.1" & year_sum > 0.5)
+tipped_cobe = subset(df, source == "COBEv2" & year_sum > 0.5)
 
-pdf("~/Desktop/Normalized_Points.pdf", height = 3, width = 8)
+# cbPalette <- c(rgb(0, 0, 0, maxColorValue = 255, alpha = 255),
+#                rgb(112, 160, 205, maxColorValue = 255, alpha = 255),
+#                rgb(196, 121, 0, maxColorValue = 255, alpha = 255))
+
+p1 = ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = source, label = as.character(Time))) +
+  geom_vline(data = tipped_cobe, aes(xintercept = Time), color = cbPalette[1], alpha = 0.1) +
+  geom_vline(data = tipped_hadi, aes(xintercept = Time), color = cbPalette[2], alpha = 0.1) +
+  # annotate("segment", x = tipped_cobe[,6], xend = tipped_cobe[,6], y = 0, yend = 0.02, color = cbPalette[1]) +
+  # annotate("segment", x = tipped_hadi[,6], xend = tipped_hadi[,6], y = 0.03, yend = 0.05, color = cbPalette[2]) +
+  annotate("segment", x = tipped_cobe[1,6], xend = tipped_cobe[1,6], y = 0.55, yend = 0.73, color = cbPalette[1]) +
+  annotate("segment", x = tipped_hadi[1,6], xend = tipped_hadi[1,6], y = 0.62, yend = 0.77, color = cbPalette[2]) +
+  annotate("segment", x = as.Date(paste(2014, 04, 01, sep = "-")), xend = as.Date(paste(2014, 04, 01, sep = "-")), y = 0.75, yend = 0.84, 
+           color = cbPalette[1]) +
+  annotate("text", x = as.Date(paste(2014, 04, 01, sep = "-")), y = 0.86, hjust = 1, label = "2014-01, point of no return", color = cbPalette[1]) + 
+  geom_text(data = tipped_cobe[1,], 
+            aes(x = Time, label = paste0(Year, "-", Month), y = 0.75), 
+            colour = cbPalette[1], angle = 0, hjust = 1, text = element_text(size = 11)) +
+  geom_text(data = tipped_hadi[1,], 
+            aes(x = Time, label = paste0(Year, "-", Month), y = 0.8), 
+            colour = cbPalette[2], angle = 0, hjust = 1,text = element_text(size = 11)) +
+  geom_line(size = 1, alpha = 0.75) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
+  annotate("text", x = as.Date(paste(1910, 01, 01, sep = "-")), y = 0.5, vjust = -1, label = "50% threshold", color = "black") + 
+  labs(x = "", y = "Area Fraction") +
+  scale_colour_manual(values = cbPalette, "") + 
+  scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2018-12-01"), by = "20 years"), 
+               labels = scales::date_format("%Y")) +
+  theme_pubr(I(15)) +
+  theme(legend.position = c(0.15, 0.95), 
+        axis.text.x = element_text(angle = 90, hjust = 1))
+
+pdf("~/Desktop/Normalized_Points.pdf", height = 5, width = 7)
 print(p1)
 dev.off()
