@@ -6,7 +6,7 @@ library(sf)
 library(rgdal)
 library(dplyr)
 library(maps)
-library(ggdark)
+# library(ggdark)
 library(ggjoy)
 library(rworldmap)
 library(ggalt)
@@ -77,30 +77,27 @@ map = function(mode){
     anom$sum = range01(anom$sum)
     anom = subset(anom, source %in% c("COBE v2", "HadISST v1.1"))
     
-    pdf(paste0("~/Desktop/SST_Anomalies_Annual.pdf"), height = 4, width = 8)
-    
-    # p = ggplot(anom) + 
-    #   geom_point(aes(x, y, color = sum, fill = sum)) + 
-    #   geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
-    #   # geom_sf(data = world, size = 0.15, color = "gray") +
-    #   scale_fill_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
-    #   scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
-    #   scale_x_continuous(expand = c(-0.005, 0), "") +
-    #   scale_y_continuous(expand = c(-0.005, 0), "") +
-    #   # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
-    #   facet_wrap(.~source + period, ncol = 3, dir = "v") +
-    #   theme_pubr() + 
-    #   coord_map("ortho", orientation = c(0, 0, 0)) + 
-    #   theme(axis.title.x = element_blank(),
-    #         axis.title.y = element_blank(), 
-    #         legend.position = "right")
+    p = ggplot(anom) +
+      geom_point(aes(x, y, color = sum, fill = sum)) +
+      geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
+      scale_fill_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+      scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+      scale_x_continuous(expand = c(-0.005, 0), "") +
+      scale_y_continuous(expand = c(-0.005, 0), "") +
+      # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
+      facet_wrap(.~source + period, ncol = 3, dir = "v") +
+      theme_pubr() +
+      coord_map("ortho", orientation = c(0, 0, 0)) +
+      theme(axis.title.x = element_blank(),
+            axis.title.y = element_blank(),
+            legend.position = "right")
     
     p =  anom %>% 
       sample_frac(1) %>%
       ggplot() + 
       geom_point(aes(x = x, y = y, color = sum), size = 0.1, alpha = 0.5, shape = 16) +
       geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
-               color = "black", fill = "gray", size = 0.1) + 
+               color = "gray", fill = "gray", size = 0.001) + 
       # scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
       scale_color_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
       coord_proj("+proj=wintri") +
@@ -115,6 +112,21 @@ map = function(mode){
             legend.position = "bottom", 
             legend.justification = c(1,0))
     
+    p =  ggplot(anom) + 
+      geom_raster(aes(x = x, y = y, fill = sum)) +
+      geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
+               color = "gray20", fill = "gray20", size = 0.001) + 
+      scale_fill_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
+      scale_x_continuous(expand = c(-0.005, 0), "") +
+      scale_y_continuous(expand = c(-0.005, 0), "") +
+      coord_fixed() + 
+      facet_grid(source ~ period) +
+      theme_pubr(I(20)) +
+      theme(
+        legend.position = "bottom", 
+        legend.justification = c(1,0))
+    
+    pdf(paste0("~/Desktop/Fig1_", Sys.Date(), ".pdf"), height = 13, width = 18)
     print(p)
     dev.off()
     
@@ -200,7 +212,6 @@ map = function(mode){
     
     anom = subset(anom, source %in% c("COBE v2", "HadISST v1.1"))
     
-    pdf(paste0("~/Desktop/SST_97.5p_2000-2018_Seasonal.pdf"), height = 5, width = 5)
     
     # p = ggplot(anom) + 
     #   geom_point(aes(x, y, color = sum, fill = sum), alpha = 0.5, size = 0.5) + 
@@ -239,6 +250,21 @@ map = function(mode){
             legend.position = "bottom", 
             legend.justification = c(1,0))
     
+    p = ggplot(anom) + 
+      geom_raster(aes(x = x, y = y, fill = sum)) +
+      geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
+               color = "gray20", fill = "gray20", size = 0.001) + 
+      scale_fill_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
+      scale_x_continuous(expand = c(-0.005, 0), "") +
+      scale_y_continuous(expand = c(-0.005, 0), "") +
+      coord_fixed() + 
+      facet_grid(source ~ season) +
+      theme_pubr(I(20)) +
+      theme(
+        legend.position = "bottom", 
+        legend.justification = c(1,0))
+    
+    pdf(paste0("~/Desktop/Fig2_", Sys.Date(), ".pdf"), height = 10, width = 10)
     print(p)
     dev.off()
     

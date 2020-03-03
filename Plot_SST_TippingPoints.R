@@ -1,3 +1,7 @@
+library(colorRamps)
+library(ggplot2)
+library(ggpubr)
+
 rm(list = ls())
 
 load("/Users/ktanaka/extreme_normalizations/results/HadI/SST_TippingPoints.RData"); hadi = yy_anom
@@ -8,22 +12,6 @@ hadi$source = "HadISSTv1.1"
 cobe$source = "COBEv2"
 er$source = "ERSSTv4"
 
-library(colorRamps)
-
-# pdf("~/Desktop/Tipping_Posint.pdf", height = 5, width = 6)
-# par(mar = c(2,3,1,2))
-# plot(cobe$year_sum, type = "o", axes = F, pch = 20, xlab = "", ylab = "", col = matlab.like(10)[8])
-# points(hadi$year_sum, type = "o", pch = 20, xlab = "", ylab = "", ylab = "", col = matlab.like(10)[9])
-# points(er$year_sum, type = "o", pch = 20, xlab = "", ylab = "", ylab = "", col = matlab.like(10)[10])
-# axis(1)
-# axis(2, las = 2, at = seq(0, 0.8, 0.1))
-# abline(h = 0.5, lty = 2)
-# legend("topleft", c("COBEv2", "HadISSTv1.1", "ERSSTv4"), 
-#        lty = 1, col = c(matlab.like(10)[8], 
-#                         matlab.like(10)[9], 
-#                         matlab.like(10)[10]), lwd = 2,
-#        bty = "n")
-# dev.off()
 
 df = rbind(hadi, cobe, er)
 rownames(df) <- c()
@@ -40,25 +28,17 @@ cobe_date = paste(subset(df, source == "COBEv2" & year_sum > 0.5)[1,2:3], collap
 hadi_date = paste(subset(df, source == "HadISSTv1.1" & year_sum > 0.5)[1,2:3], collapse = "")
 er_date = paste(subset(df, source == "ERSSTv4" & year_sum > 0.5)[1,2:3], collapse = "")
 
-library(ggplot2)
-library(ggdark)
-library(ggpubr)
-
-# cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-cbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-# cbPalette <- c(rgb(153, 0, 2, maxColorValue = 255, alpha = 255),
-#                rgb(196, 121, 43, maxColorValue = 255, alpha = 255),
-#                rgb(0, 52, 102, maxColorValue = 255, alpha = 255))
+cbPalette <- c("#000000", "#56B4E9", "#E69F00")
 
 invert_geom_defaults()
 
-pdf("~/Desktop/Tipping_Points_Year.pdf", height = 6, width = 8)
+df$source = factor(df$source, levels = c("COBEv2","HadISSTv1.1","ERSSTv4"))
 
-p1 = ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = source)) +
+ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = source)) +
   # geom_point(alpha = 0.8) +
   geom_line(size = 1.25, alpha = 0.75) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
-  labs(x = "", y = "") +
+  labs(x = "", y = "Area Fraction") +
   scale_colour_manual(values = cbPalette, "") + 
   scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2018-12-01"), by = "10 years"), 
                labels = scales::date_format("%Y")) +
@@ -67,54 +47,34 @@ p1 = ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = sourc
   theme(legend.position = c(0.12, 0.95), 
         axis.text.x = element_text(angle = 90, hjust = 1))
 
-print(p1)
-
-dev.off()
-
-pdf("~/Desktop/Tipping_Points_Month.pdf", height = 5, width = 25)
-
-p2 = ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = source)) +
+pdf("~/Desktop/Time_Series__Month.pdf", height = 10, width = 10)
+p1 = ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = source)) +
   # geom_point(alpha = 0.8) +
-  geom_line(size = 1, alpha = 0.75) +
+  geom_line(size = 1, alpha = 0.8) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
-  labs(x = "", y = "") +
+  labs(x = "", y = "Area Fraction") +
   scale_colour_manual(values = cbPalette, "") + 
   scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2018-12-01"), by = "20 years"), 
                labels = scales::date_format("%Y")) +
-  # dark_theme_classic(I(20)) +
-  theme_bw(I(20)) +
-  facet_wrap(.~Month, ncol = 12) +
+  theme_pubr(I(20)) +
+  facet_wrap(.~Month, ncol = 4) +
   # facet_grid(source ~ Month) +
-  theme(legend.position = "bottom",
+  theme(legend.position = "top",
         legend.justification = c(1,0),
-        panel.grid.minor.x = element_blank(),
-        panel.grid.major.x = element_blank(),
+        # strip.background = element_blank(),
         axis.text.x = element_text(angle = 90, hjust = 1))
 
-# cowplot::plot_grid(p1, p2, ncol = 1)
-print(p2)
-
+print(p1)
 dev.off()
-
-# df$threshold = ifelse(df$year_sum < 0.5, "Yes", "No")
-
-# cbPalette <- c(rgb(202, 0, 32, maxColorValue = 255, alpha = 255), 
-#                "white")
-
-df$source = factor(df$source, levels = c("COBEv2","HadISSTv1.1","ERSSTv4"))
 
 tipped_hadi = subset(df, source == "HadISSTv1.1" & year_sum > 0.5)
 tipped_cobe = subset(df, source == "COBEv2" & year_sum > 0.5)
 
-# cbPalette <- c(rgb(0, 0, 0, maxColorValue = 255, alpha = 255),
-#                rgb(112, 160, 205, maxColorValue = 255, alpha = 255),
-#                rgb(196, 121, 0, maxColorValue = 255, alpha = 255))
-
-p1 = ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = source, label = as.character(Time))) +
-  geom_vline(data = tipped_cobe, aes(xintercept = Time), color = cbPalette[1], alpha = 0.1) +
-  geom_vline(data = tipped_hadi, aes(xintercept = Time), color = cbPalette[2], alpha = 0.1) +
-  # annotate("segment", x = tipped_cobe[,6], xend = tipped_cobe[,6], y = 0, yend = 0.02, color = cbPalette[1]) +
-  # annotate("segment", x = tipped_hadi[,6], xend = tipped_hadi[,6], y = 0.03, yend = 0.05, color = cbPalette[2]) +
+p1 = ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = source)) +
+  # geom_vline(data = tipped_cobe, aes(xintercept = Time), color = cbPalette[1], alpha = 0.1) +
+  # geom_vline(data = tipped_hadi, aes(xintercept = Time), color = cbPalette[2], alpha = 0.1) +
+  annotate("segment", x = tipped_cobe[,6], xend = tipped_cobe[,6], y = 0, yend = 0.02, color = cbPalette[1]) +
+  annotate("segment", x = tipped_hadi[,6], xend = tipped_hadi[,6], y = 0.03, yend = 0.05, color = cbPalette[2]) +
   annotate("segment", x = tipped_cobe[1,6], xend = tipped_cobe[1,6], y = 0.55, yend = 0.73, color = cbPalette[1]) +
   annotate("segment", x = tipped_hadi[1,6], xend = tipped_hadi[1,6], y = 0.62, yend = 0.77, color = cbPalette[2]) +
   annotate("segment", x = as.Date(paste(2014, 04, 01, sep = "-")), xend = as.Date(paste(2014, 04, 01, sep = "-")), y = 0.75, yend = 0.84, 
@@ -128,15 +88,42 @@ p1 = ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = sourc
             colour = cbPalette[2], angle = 0, hjust = 1,text = element_text(size = 11)) +
   geom_line(size = 1, alpha = 0.75) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
-  annotate("text", x = as.Date(paste(1910, 01, 01, sep = "-")), y = 0.5, vjust = -1, label = "50% threshold", color = "black") + 
+  annotate("text", x = as.Date(paste(1915, 01, 01, sep = "-")), y = 0.5, vjust = -1, label = "50% threshold", color = "black") + 
   labs(x = "", y = "Area Fraction") +
   scale_colour_manual(values = cbPalette, "") + 
-  scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2018-12-01"), by = "20 years"), 
+  scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2018-12-01"), by = "10 years"), 
                labels = scales::date_format("%Y")) +
   theme_pubr(I(15)) +
-  theme(legend.position = c(0.15, 0.95), 
+  theme(legend.position = c(0.2, 0.95), 
         axis.text.x = element_text(angle = 90, hjust = 1))
 
-pdf("~/Desktop/Normalized_Points.pdf", height = 5, width = 7)
+pdf("~/Desktop/Time_Series_V3.pdf", height = 6, width = 6)
+print(p1)
+dev.off()
+
+ipcc_temp_4_cols <- c(rgb(153, 0, 2, maxColorValue = 255, alpha = 255),
+                      rgb(196, 121, 0, maxColorValue = 255, alpha = 255),
+                      # rgb(112, 160, 205, maxColorValue = 255, alpha = 255),
+                      rgb(0, 52, 102, maxColorValue = 255, alpha = 255))
+
+p1 = ggplot(data = df, aes(x = Time, y = year_sum, group = source, color = source)) +
+  geom_vline(data = tipped_cobe, aes(xintercept = Time), color = ipcc_temp_4_cols[1], alpha = 0.2) +
+  geom_vline(data = tipped_hadi, aes(xintercept = Time), color = ipcc_temp_4_cols[2], alpha = 0.2) +
+  geom_line() +
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
+  scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2018-12-01"), by = "10 years"), 
+               labels = scales::date_format("%Y"), expand = c(0.01, -100)) +
+  scale_y_continuous(expand = c(0,0)) + 
+  labs(x = "", y = "Area Fraction") +
+  theme_pubr(I(10)) +
+  facet_wrap(.~source, ncol = 1) +
+  scale_colour_manual(values = ipcc_temp_4_cols, "") + 
+  geom_text(aes(label = source), x = -Inf, y = Inf, hjust = -0.1, vjust = 1.5, data = df %>% dplyr::distinct(source)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), 
+        strip.text = element_blank(),
+        strip.background = element_blank(),
+        legend.position = "none")
+
+pdf("~/Desktop/Time_Series_V4.pdf", height = 6, width = 5)
 print(p1)
 dev.off()
