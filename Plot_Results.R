@@ -11,6 +11,7 @@ library(ggjoy)
 library(rworldmap)
 library(ggalt)
 library(readr)
+library(lwgeom)
 
 rm(list = ls())
 
@@ -33,9 +34,13 @@ range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 meow <- readOGR(dsn = paste0("/Users/", Sys.info()[7], "/Downloads/MEOW"), layer = "meow_ecos")
 meow <- meow %>% st_as_sf()  
 
-lme <- rgdal::readOGR("/Users/ktanaka/Google Drive/Research/GIS/LME66/LMEs66.shp")
+lme <- readOGR("/Users/ktanaka/Google Drive/Research/GIS/LME66/LMEs66.shp")
 lme <- rmapshaper::ms_simplify(lme, keep = 0.01, keep_shapes = F)
 lme <- lme %>% st_as_sf()  
+
+eez <- readOGR(dsn = "/Users/ktanaka/clim_geo_disp/data/EEZ_land_union", layer = "EEZ_land_v2_201410")
+eez <- rmapshaper::ms_simplify(eez, keep = 0.01, keep_shapes = F)
+eez <- eez %>% st_as_sf()  
 
 #IPCC - Temperature -
 ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
@@ -379,7 +384,7 @@ rank_mean("meow")
 
 rank_joy = function(region){
   
-  # region = "lme"
+  region = "eez"
   
   if (region == "meow"){
     shape = meow; shape$UNIT = shape$PROVINCE
@@ -387,6 +392,10 @@ rank_joy = function(region){
   
   if (region == "lme") {
     shape = lme; shape$UNIT = shape$LME_NAME
+  } 
+  
+  if (region == "eez") {
+    shape = eez; shape$UNIT = shape$Country
   } 
   
   tas_combined = NULL
@@ -399,7 +408,9 @@ rank_joy = function(region){
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     summary(tas)
-    hadi <- st_intersection(tas, shape)
+    # hadi <- st_intersection(tas, shape)
+    hadi <- st_intersection(tas, st_make_valid(shape))
+    # hadi <- st_intersection(tas, st_buffer(shape, 0))
     hadi$sum = range01(hadi$sum)
     prov_levels <- hadi %>% # Reorder levels by mean risk by privince 
       dplyr::select(sum,UNIT) %>%
@@ -417,7 +428,9 @@ rank_joy = function(region){
     load(paste0("~/extreme_normalizations/results/COBE/SST_Anomalies_", period[[i]], ".RData"))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
-    cobe <- st_intersection(tas, shape)
+    # cobe <- st_intersection(tas, shape)
+    cobe <- st_intersection(tas, st_make_valid(shape))
+    # cobe <- st_intersection(tas, st_buffer(shape, 0))
     cobe$sum = range01(cobe$sum)
     prov_levels <- cobe %>% # Reorder levels by mean risk by privince 
       dplyr::select(sum,UNIT) %>%
@@ -435,7 +448,9 @@ rank_joy = function(region){
     load(paste0("~/extreme_normalizations/results/ER/SST_Anomalies_", period[[i]], ".RData"))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
-    er <- st_intersection(tas, shape)
+    # er <- st_intersection(tas, shape)
+    er <- st_intersection(tas, st_make_valid(shape))
+    # er <- st_intersection(tas, st_buffer(shape, 0))
     er$sum = range01(er$sum)
     prov_levels <- er %>% # Reorder levels by mean risk by privince 
       dplyr::select(sum,UNIT) %>%
@@ -473,6 +488,12 @@ rank_joy = function(region){
   if (region == "meow") {
     tas_combined_sub = subset(tas_combined, UNIT %in% c("Central Indian Ocean Islands", 
                                                         "Cold Temperate Northwest Pacific", 
+                                                        "Galapagos")) 
+  } 
+  
+  if (region == "eez") {
+    tas_combined_sub = subset(tas_combined, UNIT %in% c("United States", 
+                                                        "Greenland", 
                                                         "Galapagos")) 
   } 
   
@@ -525,7 +546,7 @@ rank_joy = function(region){
           # axis.text.x = element_text(size = 10, angle = 90, hjust = 1),
           legend.position = "none")
   
-  pdf(paste0("~/Desktop/Joy_", region, ".pdf"), height = 10, width = 10)
+  pdf(paste0("~/Desktop/Joy_", region, ".pdf"), height = 20, width = 10)
   print(p)
   dev.off()
   
@@ -535,6 +556,8 @@ rank_joy = function(region){
 
 lme = rank_joy("lme")
 meaw = rank_joy("meow")
+meaw = rank_joy("meow")
+
 
 rank_joy_bgcp = function(){
   

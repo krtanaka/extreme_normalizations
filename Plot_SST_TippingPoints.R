@@ -62,8 +62,7 @@ p1 = ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = sourc
   theme(legend.position = "top",
         legend.justification = c(1,0),
         # strip.background = element_blank(),
-        axis.text.x = element_text(angle = 90, hjust = 1))
-
+        axis.text.x = element_text(angle = 0, hjust = 1))
 print(p1)
 dev.off()
 
@@ -89,15 +88,14 @@ p1 = ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = sourc
   geom_line(size = 1, alpha = 0.75) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
   annotate("text", x = as.Date(paste(1915, 01, 01, sep = "-")), y = 0.5, vjust = -1, label = "50% threshold", color = "black") + 
-  labs(x = "", y = "Area Fraction") +
+  labs(x = "", y = "Proportion of Global Ocean") +
   scale_colour_manual(values = cbPalette, "") + 
-  scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2018-12-01"), by = "10 years"), 
+  scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2018-12-01"), by = "20 years"), 
                labels = scales::date_format("%Y")) +
   theme_pubr(I(15)) +
-  theme(legend.position = c(0.2, 0.95), 
-        axis.text.x = element_text(angle = 90, hjust = 1))
+  theme(legend.position = c(0.1, 0.95))
 
-pdf("~/Desktop/Time_Series_V3.pdf", height = 6, width = 6)
+pdf("~/Desktop/Time_Series_V3.pdf", height = 6, width = 12)
 print(p1)
 dev.off()
 
