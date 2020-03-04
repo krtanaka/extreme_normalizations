@@ -529,10 +529,12 @@ rank_joy = function(region){
   print(p)
   dev.off()
   
+  return(tas_combined)
+  
 }
 
-rank_joy("lme")
-rank_joy("meow")
+lme = rank_joy("lme")
+meaw = rank_joy("meow")
 
 rank_joy_bgcp = function(){
   
@@ -717,6 +719,9 @@ rank_joy_bgcp = function(){
   print(p)
   dev.off()
   
+  return(tas_combined)
+  
 }
 
-rank_joy_bgcp()
+bgcp = rank_joy_bgcp()
+

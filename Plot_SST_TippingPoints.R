@@ -52,7 +52,7 @@ p1 = ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = sourc
   # geom_point(alpha = 0.8) +
   geom_line(size = 1, alpha = 0.8) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
-  labs(x = "", y = "Area Fraction") +
+  labs(x = "", y = "prop of global area") +
   scale_colour_manual(values = cbPalette, "") + 
   scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2018-12-01"), by = "20 years"), 
                labels = scales::date_format("%Y")) +
