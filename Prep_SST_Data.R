@@ -17,6 +17,7 @@ save(df, file = paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei hea
 
 #Hadley
 df = stack(paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/original_files/HadISST/HadI_sst.nc"), varname = "sst")
+# df = stack(paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/original_files/HadISST/HadI_sst_ice.nc"), varname = "sic")
 df = df[[1:1788]] #trim to 1870-2018
 assign("df", df, .GlobalEnv)
 save(df, file = paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/HadI_SST.RData"))
