@@ -16,7 +16,7 @@ data = c("HadI", "COBE", "ER")
 calculate_anomalies = function(period, data){
   
   period = "2010-2018"
-  data = "ER"
+  data = "COBE"
   
   setwd("~/Dropbox (MBA)/PAPER Kisei heat extremes")
   
@@ -25,8 +25,8 @@ calculate_anomalies = function(period, data){
   # e = extent(-140, -100, 30, 40)
   # df = crop(df, e); rm(e)
   
-  # set baseline Jan 1870 - Dec 1929, 60 years
-  Baseline <- df[[1:720]] 
+  # set baseline Jan 1870 - Dec 1919, 50 years
+  Baseline <- df[[1:600]] 
   names(Baseline)
   
   # pdf(paste0("~/Dropbox (MBA)/PAPER Kisei heat extremes/figures/Climatologies/", data, "_Climatology_1870-1929.pdf"), height = 10, width = 8.5)
@@ -54,7 +54,7 @@ calculate_anomalies = function(period, data){
   # calculate anomalies at every lot/lon grid cell
   for (ll in 1:dim(Baseline)[1]) { 
     
-    # ll = 1
+    ll = 10000
     
     print(ll)
     
