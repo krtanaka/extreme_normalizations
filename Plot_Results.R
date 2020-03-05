@@ -15,6 +15,8 @@ library(lwgeom)
 
 rm(list = ls())
 
+cutoff = c(0.95, 0.975)[2]
+
 period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")
 
 data = c("HadI", "COBE", "ER")
@@ -59,18 +61,18 @@ invert_geom_defaults()
 
 map = function(mode){
   
-  load("~/extreme_normalizations/results/HadI/SST_Anomalies_1980-1989.RData"); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1999"
-  load("~/extreme_normalizations/results/HadI/SST_Anomalies_1990-1999.RData"); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
-  load("~/extreme_normalizations/results/HadI/SST_Anomalies_2000-2009.RData"); hadi3 = anom; hadi3$source = "HadISST v1.1"; hadi3$period = "2000-2009"
-  load("~/extreme_normalizations/results/HadI/SST_Anomalies_2010-2018.RData"); hadi4 = anom; hadi4$source = "HadISST v1.1"; hadi4$period = "2010-2018"
-  load("~/extreme_normalizations/results/COBE/SST_Anomalies_1980-1989.RData"); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1999"
-  load("~/extreme_normalizations/results/COBE/SST_Anomalies_1990-1999.RData"); cobe2 = anom; cobe2$source = "COBE v2"; cobe2$period = "1990-1999"
-  load("~/extreme_normalizations/results/COBE/SST_Anomalies_2000-2009.RData"); cobe3 = anom; cobe3$source = "COBE v2"; cobe3$period = "2000-2009"
-  load("~/extreme_normalizations/results/COBE/SST_Anomalies_2010-2018.RData"); cobe4 = anom; cobe4$source = "COBE v2"; cobe4$period = "2010-2018"
-  load("~/extreme_normalizations/results/ER/SST_Anomalies_1980-1989.RData"); er1 = anom; er1$source = "ERSST v4"; er1$period = "1980-1999"
-  load("~/extreme_normalizations/results/ER/SST_Anomalies_1990-1999.RData"); er2 = anom; er2$source = "ERSST v4"; er2$period = "1990-1999"
-  load("~/extreme_normalizations/results/ER/SST_Anomalies_2000-2009.RData"); er3 = anom; er3$source = "ERSST v4"; er3$period = "2000-2009"
-  load("~/extreme_normalizations/results/ER/SST_Anomalies_2010-2018.RData"); er4 = anom; er4$source = "ERSST v4"; er4$period = "2010-2018"
+  load(paste0("~/extreme_normalizations/results/", cutoff, "/HadI/SST_Anomalies_1980-1989.RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1999"
+  load(paste0("~/extreme_normalizations/results/", cutoff, "/HadI/SST_Anomalies_1990-1999.RData")); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
+  load(paste0("~/extreme_normalizations/results/", cutoff, "/HadI/SST_Anomalies_2000-2009.RData")); hadi3 = anom; hadi3$source = "HadISST v1.1"; hadi3$period = "2000-2009"
+  load(paste0("~/extreme_normalizations/results/", cutoff, "/HadI/SST_Anomalies_2010-2018.RData")); hadi4 = anom; hadi4$source = "HadISST v1.1"; hadi4$period = "2010-2018"
+  load(paste0("~/extreme_normalizations/results/", cutoff, "/COBE/SST_Anomalies_1980-1989.RData")); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1999"
+  load(paste0("~/extreme_normalizations/results/", cutoff, "/COBE/SST_Anomalies_1990-1999.RData")); cobe2 = anom; cobe2$source = "COBE v2"; cobe2$period = "1990-1999"
+  load(paste0("~/extreme_normalizations/results/", cutoff, "/COBE/SST_Anomalies_2000-2009.RData")); cobe3 = anom; cobe3$source = "COBE v2"; cobe3$period = "2000-2009"
+  load(paste0("~/extreme_normalizations/results/", cutoff, "/COBE/SST_Anomalies_2010-2018.RData")); cobe4 = anom; cobe4$source = "COBE v2"; cobe4$period = "2010-2018"
+  load(paste0("~/extreme_normalizations/results/", cutoff, "/ER/SST_Anomalies_1980-1989.RData")); er1 = anom; er1$source = "ERSST v4"; er1$period = "1980-1999"
+  load(paste0("~/extreme_normalizations/results/", cutoff, "/ER/SST_Anomalies_1990-1999.RData")); er2 = anom; er2$source = "ERSST v4"; er2$period = "1990-1999"
+  load(paste0("~/extreme_normalizations/results/", cutoff, "/ER/SST_Anomalies_2000-2009.RData")); er3 = anom; er3$source = "ERSST v4"; er3$period = "2000-2009"
+  load(paste0("~/extreme_normalizations/results/", cutoff, "/ER/SST_Anomalies_2010-2018.RData")); er4 = anom; er4$source = "ERSST v4"; er4$period = "2010-2018"
   
   #all periods
   anom = rbind(hadi1, hadi2, hadi3, hadi4, 
@@ -100,14 +102,14 @@ map = function(mode){
     p =  anom %>% 
       sample_frac(1) %>%
       ggplot() + 
-      geom_point(aes(x = x, y = y, color = sum), size = 0.1, alpha = 0.5, shape = 16) +
+      geom_point(aes(x = x, y = y, color = sum), size = 1, alpha = 0.5, shape = 16) +
       geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
-               color = "gray", fill = "gray", size = 0.001) + 
+               color = "gray20", fill = "gray20", size = 0.001) + 
       # scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
       scale_color_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
       coord_proj("+proj=wintri") +
       facet_grid(source ~ period) +
-      theme_pubr() +
+      theme_pubr(I(20)) +
       theme(axis.title.x = element_blank(),
             axis.title.y = element_blank(), 
             axis.text.x = element_blank(),
@@ -127,11 +129,16 @@ map = function(mode){
       coord_fixed() + 
       facet_grid(source ~ period) +
       theme_pubr(I(20)) +
-      theme(
-        legend.position = "bottom", 
-        legend.justification = c(1,0))
+      theme(axis.title.x = element_blank(),
+            axis.title.y = element_blank(), 
+            axis.text.x = element_blank(),
+            axis.text.y = element_blank(),
+            axis.ticks.x = element_blank(),
+            axis.ticks.y = element_blank(),
+            legend.position = "bottom", 
+            legend.justification = c(1,0))
     
-    pdf(paste0("~/Desktop/Fig1_", Sys.Date(), ".pdf"), height = 13, width = 18)
+    pdf(paste0("~/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".pdf"), height = 6, width = 15)
     print(p)
     dev.off()
     
@@ -152,7 +159,6 @@ map = function(mode){
     
     anom$sum = range01(anom$sum)
     
-    pdf(paste0("~/Desktop/SST_Anomalies_Season.pdf"), height = 5, width = 18)
     
     # p = ggplot(anom) + 
     #   geom_point(aes(x, y, color = sum, fill = sum), alpha = 0.5, size = 0.5) + 
@@ -177,10 +183,10 @@ map = function(mode){
       geom_point(aes(x = x, y = y, color = sum), size = 0.5, alpha = 0.5) +
       geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
                color = "black", fill = "gray", size = 0.1) + 
-      scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+      scale_color_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
       coord_proj("+proj=wintri") +
       facet_grid(source ~ season + period) +
-      theme_pubr() +
+      theme_pubr(I(18)) +
       theme(axis.title.x = element_blank(),
             axis.title.y = element_blank(), 
             axis.text.x = element_blank(),
@@ -190,6 +196,26 @@ map = function(mode){
             legend.position = "right", 
             legend.justification = c(1,0))
     
+    p =  ggplot(anom) + 
+      geom_raster(aes(x = x, y = y, fill = sum)) +
+      geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
+               color = "gray20", fill = "gray20", size = 0.001) + 
+      scale_fill_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
+      scale_x_continuous(expand = c(-0.005, 0), "") +
+      scale_y_continuous(expand = c(-0.005, 0), "") +
+      coord_fixed() + 
+      facet_grid(source ~ season + period) +
+      theme_pubr(I(10)) +
+      theme(axis.title.x = element_blank(),
+            axis.title.y = element_blank(), 
+            axis.text.x = element_blank(),
+            axis.text.y = element_blank(),
+            axis.ticks.x = element_blank(),
+            axis.ticks.y = element_blank(),
+            legend.position = "bottom", 
+            legend.justification = c(1,0))
+    
+    pdf(paste0("~/Desktop/", cutoff, "_SST_Anomalies_Season.pdf"), height = 5, width = 18)
     print(p)
     dev.off()
     
@@ -238,9 +264,9 @@ map = function(mode){
     p = anom %>% 
       sample_frac(1) %>%
       ggplot() + 
-      geom_point(aes(x = x, y = y, color = sum), size = 0.1, alpha = 0.5, shape = 16) +
+      geom_point(aes(x = x, y = y, color = sum), size = 1, alpha = 0.5, shape = 16) +
       geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
-               color = "black", fill = "gray", size = 0.1) + 
+               color = "gray20", fill = "gray20", size = 0.1) + 
       # scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
       scale_color_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0, 0.5, 1)) +
       coord_proj("+proj=wintri") +
@@ -266,10 +292,16 @@ map = function(mode){
       facet_grid(source ~ season) +
       theme_pubr(I(20)) +
       theme(
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(), 
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank(),
         legend.position = "bottom", 
         legend.justification = c(1,0))
     
-    pdf(paste0("~/Desktop/Fig2_", Sys.Date(), ".pdf"), height = 10, width = 10)
+    pdf(paste0("~/Desktop/", cutoff, "_Fig2_", Sys.Date(), ".pdf"), height = 10, width = 10)
     print(p)
     dev.off()
     
@@ -299,7 +331,7 @@ rank_mean = function(region){
     
     # i = 1
     
-    load(paste0("~/extreme_normalizations/results/HadI/SST_Anomalies_", period[[i]], ".RData"))
+    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/HadI/SST_Anomalies_", period[[i]], ".RData")))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     summary(tas)
@@ -314,7 +346,7 @@ rank_mean = function(region){
              upper.ci = mean + qt(1 - (0.05 / 2), n - 1) * se)
     hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
-    load(paste0("~/extreme_normalizations/results/COBE/SST_Anomalies_", period[[i]], ".RData"))
+    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/COBE/SST_Anomalies_", period[[i]], ".RData")))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     cobe <- st_intersection(tas, shape)
@@ -328,7 +360,7 @@ rank_mean = function(region){
              upper.ci = mean + qt(1 - (0.05 / 2), n - 1) * se)
     cobe$source = "COBE v2"; cobe$period = period[[i]]
     
-    load(paste0("~/extreme_normalizations/results/ER/SST_Anomalies_", period[[i]], ".RData"))
+    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/ER/SST_Anomalies_", period[[i]], ".RData")))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     er <- st_intersection(tas, shape)
@@ -373,7 +405,7 @@ rank_mean = function(region){
     dark_theme_bw() +
     theme(legend.position = "right")
   
-  pdf(paste0("~/Desktop/Mean_", region, ".pdf"), height = 15, width = 10)
+  pdf(paste0("~/Desktop/", cutoff, "_Mean_", region, ".pdf"), height = 15, width = 10)
   print(p)
   dev.off()
   
@@ -404,7 +436,7 @@ rank_joy = function(region){
     
     # i = 1
     
-    load(paste0("~/extreme_normalizations/results/HadI/SST_Anomalies_", period[[i]], ".RData"))
+    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/HadI/SST_Anomalies_", period[[i]], ".RData")))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     summary(tas)
@@ -425,7 +457,7 @@ rank_joy = function(region){
     hadi = merge(hadi, df)
     hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
-    load(paste0("~/extreme_normalizations/results/COBE/SST_Anomalies_", period[[i]], ".RData"))
+    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/COBE/SST_Anomalies_", period[[i]], ".RData")))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     # cobe <- st_intersection(tas, shape)
@@ -445,7 +477,7 @@ rank_joy = function(region){
     cobe = merge(cobe, df)
     cobe$source = "COBE v2"; cobe$period = period[[i]]
     
-    load(paste0("~/extreme_normalizations/results/ER/SST_Anomalies_", period[[i]], ".RData"))
+    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/ER/SST_Anomalies_", period[[i]], ".RData")))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     # er <- st_intersection(tas, shape)
@@ -517,7 +549,7 @@ rank_joy = function(region){
           legend.position = "bottom", 
           legend.justification = c(1,0))
   
-  pdf(paste0("~/Desktop/Joy_", region, "_selected.pdf"), height = 8, width = 8)
+  pdf(paste0("~/Desktop/", cutoff, "_Joy_", region, "_selected.pdf"), height = 8, width = 8)
   print(p)
   dev.off()
   
@@ -546,7 +578,7 @@ rank_joy = function(region){
           # axis.text.x = element_text(size = 10, angle = 90, hjust = 1),
           legend.position = "none")
   
-  pdf(paste0("~/Desktop/Joy_", region, ".pdf"), height = 20, width = 10)
+  pdf(paste0("~/Desktop/", cutoff, "_Joy_", region, ".pdf"), height = 20, width = 10)
   print(p)
   dev.off()
   
@@ -567,8 +599,8 @@ rank_joy_bgcp = function(){
     
     # i = 1
     
-    load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData")
-    load(paste0("~/extreme_normalizations/results/HadI/SST_Anomalies_", period[[i]], ".RData"))
+    load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData"))
+    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/HadI/SST_Anomalies_", period[[i]], ".RData")))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 1, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -602,8 +634,8 @@ rank_joy_bgcp = function(){
     hadi = df
     hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
-    load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData")
-    load(paste0("~/extreme_normalizations/results/COBE/SST_Anomalies_", period[[i]], ".RData"))
+    load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData"))
+    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/COBE/SST_Anomalies_", period[[i]], ".RData")))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 1, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -637,8 +669,8 @@ rank_joy_bgcp = function(){
     cobe = df
     cobe$source = "COBE v2"; cobe$period = period[[i]]
     
-    load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData")
-    load(paste0("~/extreme_normalizations/results/ER/SST_Anomalies_", period[[i]], ".RData"))
+    load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData"))
+    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/ER/SST_Anomalies_", period[[i]], ".RData")))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 2, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -738,7 +770,7 @@ rank_joy_bgcp = function(){
 
   p
   
-  pdf(paste0("~/Desktop/Joy_bgcp.pdf"), height = 10, width = 10)
+  pdf(paste0("~/Desktop/", cutoff, "_Joy_bgcp.pdf"), height = 10, width = 10)
   print(p)
   dev.off()
   
