@@ -7,11 +7,14 @@ library(rgdal)
 library(dplyr)
 library(maps)
 library(doParallel)
-# registerDoParallel(cores = 32)
+cores = detectCores()/2
+registerDoParallel(cores = cores)
 
 rm(list = ls())
 
 data = c("HadI", "COBE", "ER")
+
+p = c(0.975, 0.95)[2]
 
 calculate_anomalies = function(data){
   
@@ -66,7 +69,7 @@ calculate_anomalies = function(data){
         baseline = as.data.frame(baseline)
         baseline = baseline[,1]
         
-        q = quantile(baseline, prob = 0.975)
+        q = quantile(baseline, prob = p)
         # hist(baseline, breaks = 60, col = matlab.like(60), lty = "blank")
         # abline(v = q)
         
@@ -107,7 +110,7 @@ calculate_anomalies = function(data){
   # axis(2, las = 2, at = seq(0, 0.8, 0.1))
   # abline(h = 0.5, lty = 2)
   
-  save(yy_anom, file = paste0("/Users/ktanaka/extreme_normalizations/results/", data, "/SST_TippingPoints.RData"))
+  save(yy_anom, file = paste0("/Users/ktanaka/extreme_normalizations/results/", data, "/SST_TippingPoints_", p, ".RData"))
   
   beepr::beep(2)
   
