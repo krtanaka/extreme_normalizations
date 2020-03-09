@@ -8,19 +8,25 @@ library(dplyr)
 rm(list = ls())
 
 #COBE
-df = stack(paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/original_files/COBESST/COBE_sst.nc"), varname = "sst")
+
+
+df = stack(paste0("/Users/", Sys.info()[7], "C:/Users/bdias/Dropbox (MBA)/Kisei_files/original_files/COBESST/COBE_sst.nc"), varname = "sst")
+#df = stack(paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/original_files/COBESST/COBE_sst.nc"), varname = "sst")
 df = raster::rotate(df) #rotate to -180:180
 df = df[[241:2028]] #trim to 1870-2018
 assign("df", df, .GlobalEnv)
-save(df, file = paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/COBE_SST.RData"))
+save(df, file = paste0("/Users/", Sys.info()[7], "C:/Users/bdias/Dropbox (MBA)/Kisei_files/data/COBE_SST.RData"))
+#save(df, file = paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/COBE_SST.RData"))
 
 
 #Hadley
-df = stack(paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/original_files/HadISST/HadI_sst.nc"), varname = "sst")
+df = stack(paste0("/Users/", Sys.info()[7], "C:/Users/bdias/Dropbox (MBA)/Kisei_files/original_files/HadISST/HadI_sst.nc"), varname = "sst")
+#df = stack(paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/original_files/HadISST/HadI_sst.nc"), varname = "sst")
 # df = stack(paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/original_files/HadISST/HadI_sst_ice.nc"), varname = "sic")
 df = df[[1:1788]] #trim to 1870-2018
 assign("df", df, .GlobalEnv)
-save(df, file = paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/HadI_SST.RData"))
+save(df, file = paste0("/Users/", Sys.info()[7], "C:/Users/bdias/Dropbox (MBA)/Kisei_files/data/HadI_SST.RData"))
+#save(df, file = paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/HadI_SST.RData"))
 
 
 #ERSST
