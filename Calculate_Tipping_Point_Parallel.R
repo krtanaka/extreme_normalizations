@@ -15,16 +15,16 @@ rm(list = ls())
 data = c("HadI", "COBE", "ER")
 #load("C:/Users/bdias/Dropbox (MBA)/Kisei_files/data/COBE_SST.RData")
 
-p <- 0.95
+p = c(0.975, 0.95)[2]
 
 calculate_anomalies = function(data){
   
-  # data = "COBE"
+  # data = "ER"
   
-  setwd("C:/Users/bdias/Dropbox (MBA)/Kisei_files/")
-  #setwd("C:/Users/bdias/Dropbox (MBA)/Kisei_files/")
+  setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/")
+  # setwd("C:/Users/bdias/Dropbox (MBA)/Kisei_files/")
   
-  load(paste0("data/", data, "_SST.RData"))
+  load(paste0(data, "_SST.RData"))
   
   # e = extent(-76.6, -65.4, 35.4, 44.6)
   # df = crop(df, e); rm(e)
@@ -52,7 +52,7 @@ calculate_anomalies = function(data){
     target = Target[,first_month:last_month]; names(target); dim(target) # target year
     # ll_anom = NULL
     
-    # ptime <- system.time({
+    ptime <- system.time({
     
     r <- foreach(ll = 1:dim(target)[1], .combine = rbind) %dopar% {
       
@@ -88,7 +88,7 @@ calculate_anomalies = function(data){
       
     }
     
-    # })[3]; ptime
+    })[3]; ptime
     
     r = as.data.frame(r)
     
