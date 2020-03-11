@@ -1,3 +1,18 @@
+library(raster)
+library(colorRamps)
+library(ggpubr)
+library(rnaturalearth)
+library(sf)
+library(rgdal)
+library(dplyr)
+library(maps)
+# library(ggdark)
+library(ggjoy)
+library(rworldmap)
+library(ggalt)
+library(readr)
+library(lwgeom)
+
 ### plot historical baseines ###
 data = "COBE"
 
@@ -29,9 +44,7 @@ last_month = first_month+11
 target = Target[,first_month:last_month]; names(target) # target year
 ll_anom = NULL
 
-ll = 5000
-
-print(ll)
+ll = 20000
 
 monthly_anom = NULL
 
@@ -76,28 +89,41 @@ baseline_12 = as.data.frame(baseline_12)
 q_12 = as.data.frame(q_12)
 world <- fortify(getMap())
 
-p1 = ggplot(Baseline, aes(x, y)) + 
-  geom_point() + 
-  theme_pubr() + 
-  geom_point(data = Baseline[ll,], aes(x, y), color = "red", size = 10) + 
+Baseline$mean = rowMeans(Baseline[,3:722])
+
+p1 = ggplot(Baseline, aes(x, y, fill = mean)) + 
+  geom_raster(alpha = 0.3) + 
+  scale_fill_gradientn(colors = matlab.like(100), "") +
+  theme_void() + 
+  geom_point(data = Baseline[ll,], aes(x, y), color = "red", size = 5) +
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
-           color = "gray20", fill = "gray20", size = 0.001) + 
+           color = "gray40", fill = "gray40", size = 0.001) +
   scale_x_continuous(expand = c(-0.005, 0), "") +
-  scale_y_continuous(expand = c(-0.005, 0), "")
+  scale_y_continuous(expand = c(-0.005, 0), "") + 
+  theme(legend.position = "none", 
+        axis.title = element_blank(),
+        axis.text = element_blank(), 
+        axis.ticks = element_blank())
 
 p2 = ggplot(baseline_12, aes(baseline, fill = factor(m))) + 
   geom_density(aes(y = ..density..),position = "identity", size = 0.01) + 
   facet_wrap(~m, scales = 'free_x', nrow = 1) + 
   geom_vline(data = q_12, aes(xintercept = q)) + 
   coord_flip() + 
-  theme_pubr() + 
+theme_pubr() + 
   xlab("SST (deg C)") + 
   scale_x_reverse() + 
   theme(legend.position = "none", 
         axis.title.x = element_blank(),
         axis.text.x = element_blank(), 
-        axis.ticks.x = element_blank())
+        axis.ticks.x = element_blank(),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black")
+        )
 
-cowplot::plot_grid(p1, p2, ncol = 2)
-
+pdf(paste0("~/Desktop/Climatologies_", ll, ".pdf"), height = 5, width = 5)
+cowplot::plot_grid(p1, p2, ncol = 1)
+dev.off()
 
