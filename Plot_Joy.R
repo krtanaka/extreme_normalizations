@@ -14,7 +14,7 @@ library(lwgeom)
 
 rm(list = ls())
 
-cutoff = c(0.95, 0.975)[1]
+cutoff = c(0.95, 0.975)[2]
 
 period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")
 
@@ -45,6 +45,11 @@ ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
                rgb(67, 147, 195, maxColorValue = 255, alpha = 255),
                rgb(33, 102, 172, maxColorValue = 255, alpha = 255),
                rgb(5, 48, 97, maxColorValue = 255, alpha = 255))
+
+ipcc_temp_4_cols <- c(rgb(153, 0, 2, maxColorValue = 255, alpha = 255),
+                      rgb(196, 121, 0, maxColorValue = 255, alpha = 255),
+                      rgb(112, 160, 205, maxColorValue = 255, alpha = 255),
+                      rgb(0, 52, 102, maxColorValue = 255, alpha = 255))
 
 rank_joy = function(region){
   
@@ -136,11 +141,6 @@ rank_joy = function(region){
     
   }
   
-  ipcc_temp_4_cols <- c(rgb(153, 0, 2, maxColorValue = 255, alpha = 255),
-                        rgb(196, 121, 0, maxColorValue = 255, alpha = 255),
-                        rgb(112, 160, 205, maxColorValue = 255, alpha = 255),
-                        rgb(0, 52, 102, maxColorValue = 255, alpha = 255))
-  
   # tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
   
   if (region == "lme") {
@@ -158,27 +158,32 @@ rank_joy = function(region){
   if (region == "eez") {
     tas_combined_sub = subset(tas_combined, UNIT %in% c("United States", 
                                                         "Greenland", 
-                                                        "Maldives")) 
+                                                        "Japan")) 
   } 
   
-  p = ggplot(tas_combined_sub, aes(x = sum, y = UNIT, fill = period)) +
-    geom_joy(scale = 5, alpha = 0.8, size = 0.05) +
+  pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 5, width = 6)
+  
+  p = ggplot(tas_combined_sub) +
+    geom_density(aes(x = sum, fill = period), alpha = 0.8, size = 0.01) +
     theme_pubr() +
     scale_x_continuous(
       limits = c(0, 1),
       expand = c(0.05, 0.05),
       breaks = c(0, 0.5, 1)) +
     scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
-    facet_grid(UNIT ~ source, scales = "free_y") +
+    facet_grid(source~UNIT, scales = "free") +
+    # facet_grid(source~UNIT, scales = "free_y") +
+    # facet_wrap(.~source+UNIT, scales = "free_y") +
     ylab(NULL) + xlab(NULL) +
-    theme(axis.text.y = element_blank(),
-          axis.ticks = element_blank(),
-          axis.text.x = element_text(size = 10),
-          legend.position = "bottom", 
-          legend.justification = c(1,0))
+    theme(
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.text.x = element_text(size = 10),
+      legend.position = "bottom", 
+      legend.justification = c(1,0))
   
-  pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 5, width = 5)
   print(p)
+  
   dev.off()
   
   if (region == "eez") {
@@ -225,16 +230,15 @@ rank_joy = function(region){
   # invert_geom_defaults()
   
   p = ggplot(tas_combined, aes(x = sum, y = UNIT, fill = UNIT)) +
-    geom_joy(scale = 5, alpha = 0.8, bandwidth = 0.03, size = 0.3) +
+    geom_joy(scale = 3, bandwidth = 0.03, alpha = 0.8, size = 0.3) +
     theme_joy(grid = F) +
     scale_y_discrete(expand = c(0.01, 0)) + # will generally have to set the `expand` option
-    scale_x_continuous(limits = c(0, 1), expand = c(0.05, 0.05), breaks = c(0.25, 0.75)) +
+    scale_x_continuous(limits = c(0, 1), expand = c(0.1, 0.1), breaks = c(0, 0.5, 1)) +
     # scale_fill_cyclical(values = matlab.like(length(unique(df$UNIT))))+
     scale_fill_cyclical(values = ipcc_temp_expand)+
     facet_wrap(.~period, ncol = 4) +
     ylab(NULL) + xlab(NULL) +
     theme(axis.text.y = element_text(size = 10),
-          # axis.text.x = element_text(size = 10, angle = 90, hjust = 1),
           legend.position = "none")
   
   pdf(paste0("~/Desktop/Joy_", region, "_", cutoff, ".pdf"), height = 20, width = 10)
@@ -364,34 +368,46 @@ rank_joy_bgcp = function(){
     
   }
   
-  ipcc_temp_4_cols <- c(rgb(153, 0, 2, maxColorValue = 255, alpha = 255),
-                        rgb(196, 121, 0, maxColorValue = 255, alpha = 255),
-                        rgb(112, 160, 205, maxColorValue = 255, alpha = 255),
-                        rgb(0, 52, 102, maxColorValue = 255, alpha = 255))
-  
   # tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
   
   tas_combined_sub = subset(tas_combined, bgcp %in% c("North Atlantic Drift", 
                                                       "Coastal Californian current", 
                                                       "Indian monsoon gyre"))
   
-  p = ggplot(tas_combined_sub, aes(x = sum, y = bgcp, fill = period)) +
-    geom_joy(scale = 5, alpha = 0.8, size = 0.05) +
+  # p = ggplot(tas_combined_sub, aes(x = sum, y = bgcp, fill = period)) +
+  #   geom_joy(scale = 5, alpha = 0.8, size = 0.05) +
+  #   theme_pubr() +
+  #   scale_x_continuous(
+  #     limits = c(0, 1),
+  #     expand = c(0.05, 0.05),
+  #     breaks = c(0, 0.5, 1)) +
+  #   scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
+  #   facet_grid(bgcp ~ source, scales = "free") +
+  #   ylab(NULL) + xlab(NULL) +
+  #   theme(axis.text.y = element_blank(),
+  #         axis.ticks = element_blank(),
+  #         axis.text.x = element_text(size = 10),
+  #         legend.position = "bottom", 
+  #         legend.justification = c(1,0))
+  
+  p = ggplot(tas_combined_sub) +
+    geom_density(aes(x = sum, fill = period), alpha = 0.8, size = 0.01) +
     theme_pubr() +
     scale_x_continuous(
       limits = c(0, 1),
       expand = c(0.05, 0.05),
       breaks = c(0, 0.5, 1)) +
     scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
-    facet_grid(bgcp ~ source, scales = "free") +
+    facet_grid(source ~ bgcp, scales = "free") +
     ylab(NULL) + xlab(NULL) +
-    theme(axis.text.y = element_blank(),
-          axis.ticks = element_blank(),
-          axis.text.x = element_text(size = 10),
-          legend.position = "bottom", 
-          legend.justification = c(1,0))
+    theme(
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.text.x = element_text(size = 10),
+      legend.position = "bottom", 
+      legend.justification = c(1,0))
 
-  pdf(paste0("~/Desktop/Joy_bgcp_selected_", cutoff, ".pdf"), height = 7, width = 5)
+  pdf(paste0("~/Desktop/Joy_bgcp_selected_", cutoff, ".pdf"), height = 5, width = 6)
   print(p)
   dev.off()
   
@@ -406,21 +422,22 @@ rank_joy_bgcp = function(){
   ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
   ipcc_temp_expand = ipcc_temp_expand(length(unique(tas_combined$bgcp)))
   
-  p = ggplot(tas_combined, aes(x = sum, y = bgcp, fill = bgcp)) +
-    geom_joy(scale = 5, alpha = 0.8, bandwidth = 0.03, size = 0.3) +
+  p = tas_combined %>% 
+    mutate(bgcp = gsub("\xca", "", bgcp)) %>% 
+    ggplot(aes(x = sum, y = bgcp, fill = bgcp)) +
+    geom_joy(scale = 3, bandwidth = 0.03, alpha = 0.8, size = 0.3) +
     theme_joy(grid = F) +
     scale_y_discrete(expand = c(0.01, 0)) + # will generally have to set the `expand` option
-    scale_x_continuous(limits = c(0, 1), expand = c(0.05, 0.05), breaks = c(0.25, 0.75)) +
+    scale_x_continuous(limits = c(0, 1), expand = c(0.1, 0.1), breaks = c(0, 0.5, 1)) +
     scale_fill_cyclical(values = ipcc_temp_expand)+
     facet_wrap(.~period, ncol = 4) +
     ylab(NULL) + xlab(NULL) +
     theme(axis.text.y = element_text(size = 10),
-          # axis.text.x = element_text(size = 10, angle = 90, hjust = 1),
           legend.position = "none")
   
   p
   
-  pdf(paste0("~/Desktop/Joy_bgcp_", cutoff, ".pdf"), height = 10, width = 10)
+  pdf(paste0("~/Desktop/Joy_bgcp_", cutoff, ".pdf"), height = 20, width = 10)
   print(p)
   dev.off()
   
