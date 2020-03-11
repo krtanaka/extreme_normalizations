@@ -14,7 +14,7 @@ library(lwgeom)
 
 rm(list = ls())
 
-cutoff = c(0.95, 0.975)[2]
+cutoff = c(0.95, 0.975)[1]
 
 period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")
 
@@ -68,7 +68,7 @@ rank_joy = function(region){
     
     # i = 1
     
-    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/HadI/SST_Anomalies_", period[[i]], ".RData")))
+    load(paste0(paste0("~/extreme_normalizations/results/HadI/SST_Anomalies_", period[[i]], "_", cutoff, ".RData")))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     summary(tas)
@@ -89,7 +89,7 @@ rank_joy = function(region){
     hadi = merge(hadi, df)
     hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
-    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/COBE/SST_Anomalies_", period[[i]], ".RData")))
+    load(paste0(paste0("~/extreme_normalizations/results/COBE/SST_Anomalies_", period[[i]], "_", cutoff, ".RData")))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     # cobe <- st_intersection(tas, shape)
@@ -109,7 +109,7 @@ rank_joy = function(region){
     cobe = merge(cobe, df)
     cobe$source = "COBE v2"; cobe$period = period[[i]]
     
-    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/ER/SST_Anomalies_", period[[i]], ".RData")))
+    load(paste0(paste0("~/extreme_normalizations/results/ER/SST_Anomalies_", period[[i]], "_", cutoff, ".RData")))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     # er <- st_intersection(tas, shape)
@@ -141,12 +141,12 @@ rank_joy = function(region){
                         rgb(112, 160, 205, maxColorValue = 255, alpha = 255),
                         rgb(0, 52, 102, maxColorValue = 255, alpha = 255))
   
-  tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
+  # tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
   
   if (region == "lme") {
     tas_combined_sub = subset(tas_combined, UNIT %in% c("Scotian Shelf", 
                                                         "California Current", 
-                                                        "Southeast U.S. Continental Shelf"))
+                                                        "East Brazil Shelf"))
   } 
   
   if (region == "meow") {
@@ -158,30 +158,26 @@ rank_joy = function(region){
   if (region == "eez") {
     tas_combined_sub = subset(tas_combined, UNIT %in% c("United States", 
                                                         "Greenland", 
-                                                        "Galapagos")) 
+                                                        "Maldives")) 
   } 
   
   p = ggplot(tas_combined_sub, aes(x = sum, y = UNIT, fill = period)) +
-    geom_joy(scale = 5, alpha = 0.8, bandwidth = 0.03, size = 0.05) +
-    # theme_joy(grid = F) +
+    geom_joy(scale = 5, alpha = 0.8, size = 0.05) +
     theme_pubr() +
-    # scale_y_discrete(expand = c(0, 1)) + # will generally have to set the `expand` option
     scale_x_continuous(
       limits = c(0, 1),
-      expand = c(0.05, 0.05), 
+      expand = c(0.05, 0.05),
       breaks = c(0, 0.5, 1)) +
-    # scale_fill_cyclical(values = matlab.like(length(unique(tas_combined$UNIT))))+
     scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
     facet_grid(UNIT ~ source, scales = "free_y") +
     ylab(NULL) + xlab(NULL) +
-    # dark_theme_bw() +
     theme(axis.text.y = element_blank(),
           axis.ticks = element_blank(),
           axis.text.x = element_text(size = 10),
           legend.position = "bottom", 
           legend.justification = c(1,0))
   
-  pdf(paste0("~/Desktop/", cutoff, "_Joy_", region, "_selected.pdf"), height = 8, width = 8)
+  pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 5, width = 5)
   print(p)
   dev.off()
   
@@ -257,7 +253,7 @@ rank_joy_bgcp = function(){
     # i = 1
     
     load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData")
-    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/HadI/SST_Anomalies_", period[[i]], ".RData")))
+    load(paste0(paste0("~/extreme_normalizations/results/HadI/SST_Anomalies_", period[[i]], "_", cutoff, ".RData")))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 1, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -292,7 +288,7 @@ rank_joy_bgcp = function(){
     hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
     load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData")
-    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/COBE/SST_Anomalies_", period[[i]], ".RData")))
+    load(paste0(paste0("~/extreme_normalizations/results/COBE/SST_Anomalies_", period[[i]], "_", cutoff, ".RData")))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 1, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -327,7 +323,7 @@ rank_joy_bgcp = function(){
     cobe$source = "COBE v2"; cobe$period = period[[i]]
     
     load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData")
-    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/ER/SST_Anomalies_", period[[i]], ".RData")))
+    load(paste0(paste0("~/extreme_normalizations/results/ER/SST_Anomalies_", period[[i]], "_", cutoff, ".RData")))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 2, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -373,35 +369,31 @@ rank_joy_bgcp = function(){
                         rgb(112, 160, 205, maxColorValue = 255, alpha = 255),
                         rgb(0, 52, 102, maxColorValue = 255, alpha = 255))
   
-  tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
+  # tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
   
   tas_combined_sub = subset(tas_combined, bgcp %in% c("North Atlantic Drift", 
                                                       "Coastal Californian current", 
                                                       "Indian monsoon gyre"))
   
-  # p = ggplot(tas_combined_sub, aes(x = sum, y = bgcp, fill = period)) +
-  #   geom_joy(scale = 5, alpha = 0.8, bandwidth = 0.03, size = 0.05) +
-  #   # theme_joy(grid = F) +
-  #   # theme_pubr() +
-  #   # scale_y_discrete(expand = c(0, 1)) + # will generally have to set the `expand` option
-  #   scale_x_continuous(
-  #     limits = c(0, 1),
-  #     # expand = c(0, 0.05), 
-  #     breaks = c(0, 0.5, 1)) +
-  #   scale_y_discrete(expand = c(0, 0, 0, 0)) +
-  #   scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
-  #   facet_grid(source ~ bgcp) +
-  #   ylab(NULL) + xlab(NULL) +
-  #   # dark_theme_bw() +
-  #   theme(axis.text.y = element_blank(),
-  #         axis.ticks = element_blank(),
-  #         axis.text.x = element_text(size = 10),
-  #         legend.position = "bottom", 
-  #         legend.justification = c(1,0))
-  # 
-  # pdf("~/Desktop/Joy_bgcp_selected.pdf", height = 8, width = 8)
-  # print(p)
-  # dev.off()
+  p = ggplot(tas_combined_sub, aes(x = sum, y = bgcp, fill = period)) +
+    geom_joy(scale = 5, alpha = 0.8, size = 0.05) +
+    theme_pubr() +
+    scale_x_continuous(
+      limits = c(0, 1),
+      expand = c(0.05, 0.05),
+      breaks = c(0, 0.5, 1)) +
+    scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
+    facet_grid(bgcp ~ source, scales = "free") +
+    ylab(NULL) + xlab(NULL) +
+    theme(axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          axis.text.x = element_text(size = 10),
+          legend.position = "bottom", 
+          legend.justification = c(1,0))
+
+  pdf(paste0("~/Desktop/Joy_bgcp_selected_", cutoff, ".pdf"), height = 7, width = 5)
+  print(p)
+  dev.off()
   
   prov_levels <- subset(tas_combined, period %in% c("2010-2018")) %>% # Reorder levels by 2010-2018 
     dplyr::select(sum, bgcp) %>%
@@ -428,7 +420,7 @@ rank_joy_bgcp = function(){
   
   p
   
-  pdf(paste0("~/Desktop/", cutoff, "_Joy_bgcp.pdf"), height = 10, width = 10)
+  pdf(paste0("~/Desktop/Joy_bgcp_", cutoff, ".pdf"), height = 10, width = 10)
   print(p)
   dev.off()
   
@@ -466,22 +458,63 @@ bgcp$bgcp = as.character(bgcp$bgcp)
 # bgcp_sub = bgcp_sub %>% group_by(bgcp) %>% mutate(m = median(sum)) %>% arrange(bgcp, m)
 bgcp_sub = bgcp_sub[,c("bgcp", "sum")]; bgcp_sub = as.data.frame(bgcp_sub); colnames(bgcp_sub)[1] = "UNIT"; bgcp_sub$class = "BGCP"
 
-df = rbind(eez_sub, lme_sub, bgcp_sub)
 
 ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
 # ipcc_temp_expand = ipcc_temp_expand(60)
 # ipcc_temp_expand = paste(ipcc_temp_expand, ipcc_temp_expand)
 
-df = subset(df, class %in% c(
-  # "EEZ"
-  # ,
-  # "LME"
-  # ,
-  "BGCP"
-))
+pdf(paste0("~/Desktop/LME_Joy_", cutoff, ".pdf"), width = 4.5, height = 6)
+p = lme_sub %>% 
+  mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
+  ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
+  geom_joy(scale = 3, alpha = 0.8, size = 0.5) +
+  theme_joy(grid = F) +
+  scale_y_discrete(expand = c(0.05, 0)) + # will generally have to set the `expand` option
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0), breaks = c(0,0.5, 1)) +
+  scale_fill_cyclical(values = ipcc_temp_expand(length(unique(lme_sub$UNIT))))+
+  ylab(NULL) + xlab(NULL) +
+  theme(axis.text.y = element_text(size = 10),
+        legend.position = "none")
+print(p)
+dev.off()
 
+pdf(paste0("~/Desktop/EEZ_Joy_", cutoff, ".pdf"), width = 3, height = 6)
+p = eez_sub %>% 
+  mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
+  ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
+  geom_joy(scale = 3, alpha = 0.8, size = 0.5) +
+  theme_joy(grid = F) +
+  scale_y_discrete(expand = c(0.05, 0)) + # will generally have to set the `expand` option
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0), breaks = c(0,0.5, 1)) +
+  scale_fill_cyclical(values = ipcc_temp_expand(length(unique(eez_sub$UNIT))))+
+  ylab(NULL) + xlab(NULL) +
+  theme(axis.text.y = element_text(size = 10),
+        legend.position = "none")
+print(p)
+dev.off()
 
-df %>% 
+pdf(paste0("~/Desktop/BGCP_Joy_", cutoff, ".pdf"), width = 4.5, height = 6)
+p = bgcp_sub %>%  
+  mutate(UNIT = gsub("\xca", "", UNIT)) %>% 
+  mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
+  ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
+  geom_joy(scale = 3, alpha = 0.8, size = 0.5) +
+  theme_joy(grid = F) +
+  scale_y_discrete(expand = c(0.05, 0)) + # will generally have to set the `expand` option
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0), breaks = c(0,0.5, 1)) +
+  scale_fill_cyclical(values = ipcc_temp_expand(length(unique(bgcp_sub$UNIT))))+
+  ylab(NULL) + xlab(NULL) +
+  theme(axis.text.y = element_text(size = 10),
+        # axis.text.x = element_text(size = 10, angle = 90, hjust = 1),
+        legend.position = "none")
+print(p)
+dev.off()
+
+df = rbind(eez_sub, lme_sub, bgcp_sub)
+
+pdf(paste0("~/Desktop/Joy_", cutoff, ".pdf"), width = 5, height = 5)
+p = df %>%  
+  mutate(UNIT = gsub("\xca", "", UNIT)) %>% 
   mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
   ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
   geom_joy(scale = 3, alpha = 0.8, bandwidth = 0.02, size = 0.1) +
@@ -489,10 +522,11 @@ df %>%
   facet_wrap(.~class, scales = "free") +
   scale_y_discrete(expand = c(0.01, 0)) + # will generally have to set the `expand` option
   scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
-  scale_fill_cyclical(values = ipcc_temp_expand(length(unique(df$UNIT))))+
+  scale_fill_manual(values = ipcc_temp_expand(90))+
   ylab(NULL) + xlab(NULL) +
   theme(axis.text.y = element_text(size = 10),
-        # axis.text.x = element_text(size = 10, angle = 90, hjust = 1),
         legend.position = "none")
+print(p)
+dev.off()
 
 
