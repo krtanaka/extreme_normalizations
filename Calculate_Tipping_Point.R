@@ -47,12 +47,12 @@ calculate_anomalies = function(data){
     
     for (ll in 1:dim(Baseline)[1]) { # calculate anomalies at every lot/lon grid cell
 
-      # ll = 2
-      
+      # ll = 10000
+
       print(ll)
       
       monthly_anom = NULL
-      
+
       for (m in 1:12) { # every month
         
         # m = 1
@@ -103,4 +103,4 @@ calculate_anomalies("HadI")
 calculate_anomalies("COBE")
 calculate_anomalies("ER")
 
-plot(1980:2018, colMeans(yy_anom[3:41]), type = "o", pch = 20, axes = F); axis(1, at = seq(1980, 2018, 2)); axis(2, las = 2)
+# plot(1980:2018, colMeans(yy_anom[3:41]), type = "o", pch = 20, axes = F); axis(1, at = seq(1980, 2018, 2)); axis(2, las = 2)
