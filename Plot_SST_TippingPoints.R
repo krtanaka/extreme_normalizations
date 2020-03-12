@@ -4,7 +4,7 @@ library(ggpubr)
 
 rm(list = ls())
 
-p = c(0.975, 0.95)[1]
+p = c(0.975, 0.95, 0.9)[3]
 
 load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/SST_TippingPoints_", p, ".RData")); hadi = yy_anom
 load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/SST_TippingPoints_", p, ".RData")); cobe = yy_anom
