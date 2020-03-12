@@ -14,7 +14,7 @@ rm(list = ls())
 
 #load("C:/Users/bdias/Dropbox (MBA)/Kisei_files/data/COBE_SST.RData")
 
-p = c(0.975, 0.95)[2]
+p = c(0.975, 0.95, 0.9)[3]
 
 calculate_anomalies = function(data){
   
