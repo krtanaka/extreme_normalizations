@@ -57,11 +57,16 @@ ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
                rgb(33, 102, 172, maxColorValue = 255, alpha = 255),
                rgb(5, 48, 97, maxColorValue = 255, alpha = 255))
 
+ipcc_temp_4_cols <- c(rgb(153, 0, 2, maxColorValue = 255, alpha = 255),
+                      rgb(196, 121, 0, maxColorValue = 255, alpha = 255),
+                      rgb(112, 160, 205, maxColorValue = 255, alpha = 255),
+                      rgb(0, 52, 102, maxColorValue = 255, alpha = 255))
+
 invert_geom_defaults()
 
 rank_mean = function(region){
   
-  # region = "lme"
+  region = "eez"
   
   if (region == "meow"){
     shape = meow; shape$UNIT = shape$PROVINCE
@@ -71,17 +76,23 @@ rank_mean = function(region){
     shape = lme; shape$UNIT = shape$LME_NAME
   } 
   
+  if (region == "eez") {
+    shape = eez; shape$UNIT = shape$Country
+  } 
+  
   tas_combined = NULL
   
   for (i in 1:length(period)){
     
     # i = 1
     
-    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/HadI/SST_Anomalies_", period[[i]], ".RData")))
+    load(paste0(paste0("~/extreme_normalizations/results/HadI/SST_Anomalies_", period[[i]], "_", cutoff, ".RData")))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     summary(tas)
-    hadi <- st_intersection(tas, shape)
+    # hadi <- st_intersection(tas, shape)
+    hadi <- st_intersection(tas, st_make_valid(shape))
+    # hadi <- st_intersection(tas, st_buffer(shape, 0))    
     hadi$sum = range01(hadi$sum)
     hadi <- hadi %>% group_by(UNIT) %>% 
       summarise(mean = mean(sum, na.rm = T),
@@ -92,10 +103,12 @@ rank_mean = function(region){
              upper.ci = mean + qt(1 - (0.05 / 2), n - 1) * se)
     hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
-    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/COBE/SST_Anomalies_", period[[i]], ".RData")))
+    load(paste0(paste0("~/extreme_normalizations/results/COBE/SST_Anomalies_", period[[i]], "_", cutoff, ".RData")))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
-    cobe <- st_intersection(tas, shape)
+    # cobe <- st_intersection(tas, shape)
+    cobe <- st_intersection(tas, st_make_valid(shape))
+    # cobe <- st_intersection(tas, st_buffer(shape, 0))
     cobe$sum = range01(cobe$sum)
     cobe <- cobe %>% group_by(UNIT) %>% 
       summarise(mean = mean(sum, na.rm = T),
@@ -106,10 +119,12 @@ rank_mean = function(region){
              upper.ci = mean + qt(1 - (0.05 / 2), n - 1) * se)
     cobe$source = "COBE v2"; cobe$period = period[[i]]
     
-    load(paste0(paste0("~/extreme_normalizations/results/", cutoff, "/ER/SST_Anomalies_", period[[i]], ".RData")))
+    load(paste0(paste0("~/extreme_normalizations/results/ER/SST_Anomalies_", period[[i]], "_", cutoff, ".RData")))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
-    er <- st_intersection(tas, shape)
+    # er <- st_intersection(tas, shape)
+    er <- st_intersection(tas, st_make_valid(shape))
+    # er <- st_intersection(tas, st_buffer(shape, 0))
     er$sum = range01(er$sum)
     er <- er %>% group_by(UNIT) %>%
       summarise(mean = mean(sum, na.rm = T),
@@ -127,7 +142,58 @@ rank_mean = function(region){
     
   }
   
-  p = tas_combined %>% 
+  # tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
+  
+  if (region == "lme") {
+    tas_combined_sub = subset(tas_combined, UNIT %in% c("Scotian Shelf", 
+                                                        "California Current", 
+                                                        "East Brazil Shelf"))
+  } 
+  
+  if (region == "meow") {
+    tas_combined_sub = subset(tas_combined, UNIT %in% c("Central Indian Ocean Islands", 
+                                                        "Cold Temperate Northwest Pacific", 
+                                                        "Galapagos")) 
+  } 
+  
+  if (region == "eez") {
+    
+    exclude_list = c("Area en controversia (disputed - Peruvian point of view)", 
+                     "Area of overlap Australia/Indonesia", 
+                     "Conflict zone China/Japan/Taiwan", 
+                     "Conflict zone Japan/Russia",
+                     "Conflict zone Japan/South Korea",
+                     "Disputed Barbados/Trinidad & Tobago",
+                     "Disputed Kenya/Somalia",
+                     "Disputed Western Sahara/Mauritania",
+                     "Joint development area Australia/East Timor",
+                     "Joint regime Colombia/Jamaica",
+                     "Joint regime Japan/Korea",
+                     "Joint regime Nigeria/Sao Tome and Principe",
+                     "Protected zone Australia/Papua New Guinea", 
+                     "Spratly Islands", 
+                     "Antarctica", 
+                     "Gaza Strip")
+    
+    tas_combined = tas_combined[ ! tas_combined$UNIT %in% exclude_list, ]
+    
+    tas_combined$UNIT = gsub("&", "and", tas_combined$UNIT)
+    tas_combined$UNIT = gsub(" Is.", " Islands", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub(" I.", " Island", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("Congo, DRC", "DR Congo", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("Bonaire, Sint-Eustasius, Saba", "Netherlands", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("United States ", "US ", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("US Virgin Islands", "Virgin Islands, US", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("St. ", "Saint ", tas_combined$UNIT, fixed = T)
+    
+    tas_combined_sub = subset(tas_combined, UNIT %in% c("United States", 
+                                                        "Greenland", 
+                                                        "Japan")) 
+  } 
+  
+  pdf(paste0("~/Desktop/Mean_", region, "_selected_", cutoff, ".pdf"), height = 5, width = 6)
+  
+  p = tas_combined_sub %>% 
     mutate(unit = forcats::fct_reorder(UNIT, mean)) %>% 
     ggplot() +
     geom_segment(aes(
@@ -136,7 +202,36 @@ rank_mean = function(region){
       xend = unit,
       y = lower.ci, 
       yend = upper.ci),
-      size = 1) +
+      size = 0.1) +
+    geom_point(aes(
+      color = period,
+      x = unit,
+      y = mean),
+      size = 2) +
+    coord_flip() +
+    # facet_wrap(.~source) +
+    scale_color_manual(values = rev(ipcc_temp_4_cols), "") +
+    xlab("") +
+    ylab("") +
+    # ylim(0,1) +
+    # dark_theme_bw() +
+    theme(legend.position = "right")
+  
+  print(p)
+  
+  dev.off()
+  
+  p = tas_combined %>% 
+    mutate(unit = forcats::fct_reorder(UNIT, mean)) %>% 
+    subset(n > 100) %>% 
+    ggplot() +
+    geom_segment(aes(
+      color = period, 
+      x = unit, 
+      xend = unit,
+      y = lower.ci, 
+      yend = upper.ci),
+      size = 0.5) +
     geom_point(aes(
       color = period,
       x = unit,
@@ -144,11 +239,11 @@ rank_mean = function(region){
       size = 2) +
     coord_flip() +
     facet_wrap(.~source) +
-    scale_colour_manual(values = matlab.like(4)) +
+    scale_color_manual(values = rev(ipcc_temp_4_cols), "") +
     xlab("") +
     ylab("") +
     # ylim(0,1) +
-    dark_theme_bw() +
+    # dark_theme_bw() +
     theme(legend.position = "right")
   
   pdf(paste0("~/Desktop/", cutoff, "_Mean_", region, ".pdf"), height = 15, width = 10)
