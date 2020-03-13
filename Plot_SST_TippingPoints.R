@@ -122,3 +122,4 @@ p1 = ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = sourc
 pdf(paste0("~/Desktop/Time_Series_", p, ".pdf"), height = 5, width = 8)
 p1
 dev.off()
+
