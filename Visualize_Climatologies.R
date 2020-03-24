@@ -23,7 +23,7 @@ world.df <- world.points[,c("long","lat","group", "region")]
 
 plot_clim = function(data, mode){
   
-  # data = c("HadI", "COBE", "ER")[3]
+  # data = c("HadI", "COBE", "ER")[1]
   # mode = "mean"
   
   setwd("~/Dropbox (MBA)/PAPER Kisei heat extremes")
@@ -157,11 +157,11 @@ plot_clim = function(data, mode){
   
 }
 
-d1 = plot_clim("ER", "mean"); d1$source = "ERSST v4"
+d1 = plot_clim("ER", "mean"); d1$source = "ERSST v5"
 d2 = plot_clim("HadI", "mean"); d2$source = "HadISST v1.1"
 d3 = plot_clim("COBE", "mean"); d3$source = "COBE v2"
 
-d4 = plot_clim("ER", "sd"); d4$source = "ERSST v4"
+d4 = plot_clim("ER", "sd"); d4$source = "ERSST v5"
 d5 = plot_clim("HadI", "sd"); d5$source = "HadISST v1.1"
 d6 = plot_clim("COBE", "sd"); d6$source = "COBE v2"
 
