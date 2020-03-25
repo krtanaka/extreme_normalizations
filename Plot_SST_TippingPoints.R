@@ -6,9 +6,9 @@ rm(list = ls())
 
 p = c(0.975, 0.95, 0.9)[3]
 
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/SST_TippingPoints_", p, ".RData")); hadi = yy_anom
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/SST_TippingPoints_", p, ".RData")); cobe = yy_anom
-load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/SST_TippingPoints_", p, ".RData")); er = yy_anom
+load(paste0("/Users/Kisei/extreme_normalizations/results/HadI/SST_TippingPoints_", p, ".RData")); hadi = yy_anom
+load(paste0("/Users/Kisei/extreme_normalizations/results/COBE/SST_TippingPoints_", p, ".RData")); cobe = yy_anom
+load(paste0("/Users/Kisei/extreme_normalizations/results/ER/SST_TippingPoints_", p, ".RData")); er = yy_anom
 
 hadi$source = "HadISSTv1.1"
 cobe$source = "COBEv2"
@@ -32,6 +32,8 @@ er_date = paste(subset(df, source == "ERSSTv5" & year_sum > 0.5)[1,2:3], collaps
 cbPalette <- c("#000000", "#56B4E9", "#E69F00")
 
 df$source = factor(df$source, levels = c("COBEv2","HadISSTv1.1","ERSSTv5"))
+
+cbPalette = wes_palette("Darjeeling1")[c(1,3,5)]
 
 ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = source)) +
   # geom_point(alpha = 0.8) +
