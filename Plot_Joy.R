@@ -235,8 +235,12 @@ rank_joy = function(region){
   
   summary = as.data.frame(summary)
   summary = summary[,c('UNIT', 'period', 'mean', 'sd', 'se')]
+  summary$UNIT = as.character(summary$UNIT)
+  summary <- summary[order(summary$UNIT),]
+  summary[,3:5] = round(summary[,3:5], 2)
   summary$UNIT[duplicated(summary$UNIT)] <- ""
-  
+  colnames(summary) = c("Unit", "Period", "Mean", "SD", "SE")
+
   write_csv(summary, paste0('~/Desktop/', region, "_", cutoff, ".csv"))
   
   p = ggplot(tas_combined, aes(x = sum, y = UNIT, fill = UNIT)) +
@@ -438,7 +442,11 @@ rank_joy_bgcp = function(){
   
   summary = as.data.frame(summary)
   summary = summary[,c('bgcp', 'period', 'mean', 'sd', 'se')]
+  summary$bgcp = as.character(summary$bgcp)
+  summary <- summary[order(summary$bgcp),]
   summary$bgcp[duplicated(summary$bgcp)] <- ""
+  summary[,3:5] = round(summary[,3:5], 2)
+  colnames(summary) = c("Unit", "Period", "Mean", "SD", "SE")
   write_csv(summary, paste0("~/Desktop/bgcp_", cutoff, ".csv"))
   
   p = tas_combined %>% 
