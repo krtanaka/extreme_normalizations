@@ -235,6 +235,7 @@ rank_joy = function(region){
   
   summary = as.data.frame(summary)
   summary = summary[,c('UNIT', 'period', 'mean', 'sd', 'se')]
+  summary$UNIT[duplicated(summary$UNIT)] <- ""
   
   write_csv(summary, paste0('~/Desktop/', region, "_", cutoff, ".csv"))
   
@@ -437,6 +438,7 @@ rank_joy_bgcp = function(){
   
   summary = as.data.frame(summary)
   summary = summary[,c('bgcp', 'period', 'mean', 'sd', 'se')]
+  summary$bgcp[duplicated(summary$bgcp)] <- ""
   write_csv(summary, paste0("~/Desktop/bgcp_", cutoff, ".csv"))
   
   p = tas_combined %>% 
