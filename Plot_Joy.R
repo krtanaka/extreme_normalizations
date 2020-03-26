@@ -14,7 +14,7 @@ library(lwgeom)
 
 rm(list = ls())
 
-cutoff = c(0.95, 0.975)[2]
+cutoff = c(0.95, 0.975)[1]
 
 period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")
 
@@ -229,6 +229,15 @@ rank_joy = function(region){
   ipcc_temp_expand = ipcc_temp_expand(length(unique(tas_combined$UNIT)))
   # invert_geom_defaults()
   
+  summary = tas_combined %>% 
+    group_by(UNIT, period) %>% 
+    summarise_each(funs(mean, sd, se = sd(.)/sqrt(n())), sum)
+  
+  summary = as.data.frame(summary)
+  summary = summary[,c('UNIT', 'period', 'mean', 'sd', 'se')]
+  
+  write_csv(summary, paste0('~/Desktop/', region, "_", cutoff, ".csv"))
+  
   p = ggplot(tas_combined, aes(x = sum, y = UNIT, fill = UNIT)) +
     geom_joy(scale = 3, bandwidth = 0.03, alpha = 0.8, size = 0.3) +
     theme_joy(grid = F) +
@@ -421,6 +430,14 @@ rank_joy_bgcp = function(){
   
   ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
   ipcc_temp_expand = ipcc_temp_expand(length(unique(tas_combined$bgcp)))
+  
+  summary = tas_combined %>% 
+    group_by(bgcp, period) %>% 
+    summarise_each(funs(mean, sd, se = sd(.)/sqrt(n())), sum)
+  
+  summary = as.data.frame(summary)
+  summary = summary[,c('bgcp', 'period', 'mean', 'sd', 'se')]
+  write_csv(summary, paste0("~/Desktop/bgcp_", cutoff, ".csv"))
   
   p = tas_combined %>% 
     mutate(bgcp = gsub("\xca", "", bgcp)) %>% 
