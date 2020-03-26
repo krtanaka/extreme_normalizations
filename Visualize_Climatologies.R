@@ -285,6 +285,8 @@ p2 = sd %>%
 
 
 pdf("~/Desktop/Climatologies_1870-1919.pdf", width = 6, height = 7)
+png("~/Desktop/Climatologies_1870-1919.png", width = 6, height = 7, units = "in", res = 100)
+
 cowplot::plot_grid(p1, p2, ncol = 2)
 # p
 dev.off()
