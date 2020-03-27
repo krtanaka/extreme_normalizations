@@ -26,7 +26,7 @@ plot_clim = function(data, mode){
   # data = c("HadI", "COBE", "ER")[1]
   # mode = "mean"
   
-  setwd("~/Dropbox (MBA)/PAPER Kisei heat extremes")
+  setwd("/Users/Kisei/Dropbox/PAPER Kisei heat extremes")
   
   load(paste0("data/", data, "_SST.RData"))
   
