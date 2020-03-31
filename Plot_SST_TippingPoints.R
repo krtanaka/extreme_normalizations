@@ -4,7 +4,7 @@ library(ggpubr)
 
 rm(list = ls())
 
-p = c(0.975, 0.95, 0.9)[3]
+p = c(0.975, 0.95, 0.9)[2]
 
 load(paste0("/Users/Kisei/extreme_normalizations/results/HadI/SST_TippingPoints_", p, ".RData")); hadi = yy_anom
 load(paste0("/Users/Kisei/extreme_normalizations/results/COBE/SST_TippingPoints_", p, ".RData")); cobe = yy_anom
@@ -35,18 +35,32 @@ df$source = factor(df$source, levels = c("COBEv2","HadISSTv1.1","ERSSTv5"))
 
 cbPalette = wes_palette("Darjeeling1")[c(1,3,5)]
 
-ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = source)) +
+CI_95 = df %>%
+  group_by(source) %>% 
+  subset(Year %in% c(1900:1919)) %>% 
+  dplyr::summarise(mean = mean(year_sum, na.rm = TRUE),
+            sd = sd(year_sum, na.rm = TRUE),
+            n = n()) %>%
+  mutate(se = sd / sqrt(n),
+         lower.ci = mean - qt(1 - (0.05 / 2), n - 1) * se,
+         upper.ci = mean + qt(1 - (0.05 / 2), n - 1) * se)
+
+df %>% 
+  # subset(Year %in% c(1900:1919)) %>% 
+  ggplot(aes(x = Time, y = year_sum, color = source, group = source)) +
   # geom_point(alpha = 0.8) +
   geom_line(size = 1.25, alpha = 0.75) +
-  geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
+  # geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
+  geom_hline(data = CI_95, aes(yintercept = upper.ci, colour = source), size = 1) + 
+  geom_hline(data = CI_95, aes(yintercept = mean, colour = source), size = 2) + 
   labs(x = "", y = "Area Fraction") +
   scale_colour_manual(values = cbPalette, "") + 
   scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2018-12-01"), by = "10 years"), 
-               labels = scales::date_format("%Y")) +
-  theme_pubr(I(15)) +
-  # facet_wrap(.~Month) +
-  theme(legend.position = c(0.12, 0.95), 
-        axis.text.x = element_text(angle = 90, hjust = 1))
+               labels = scales::date_format("%Y")) 
+  # theme_pubr(I(15)) +
+  # # facet_wrap(.~Month) +
+  # theme(legend.position = c(0.12, 0.95), 
+  #       axis.text.x = element_text(angle = 90, hjust = 1))
 
 pdf("~/Desktop/Time_Series__Month.pdf", height = 10, width = 10)
 p1 = ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = source)) +

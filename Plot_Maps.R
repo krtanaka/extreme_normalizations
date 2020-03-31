@@ -61,15 +61,15 @@ invert_geom_defaults()
 
 map = function(mode){
   
-  load(paste0("/Users/Kisei/extreme_normalizations/results/HadI/SST_Anomalies_1980-1989_", cutoff, ".RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1999"
+  load(paste0("/Users/Kisei/extreme_normalizations/results/HadI/SST_Anomalies_1980-1989_", cutoff, ".RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1989"
   load(paste0("/Users/Kisei/extreme_normalizations/results/HadI/SST_Anomalies_1990-1999_", cutoff, ".RData")); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
   load(paste0("/Users/Kisei/extreme_normalizations/results/HadI/SST_Anomalies_2000-2009_", cutoff, ".RData")); hadi3 = anom; hadi3$source = "HadISST v1.1"; hadi3$period = "2000-2009"
   load(paste0("/Users/Kisei/extreme_normalizations/results/HadI/SST_Anomalies_2010-2018_", cutoff, ".RData")); hadi4 = anom; hadi4$source = "HadISST v1.1"; hadi4$period = "2010-2018"
-  load(paste0("/Users/Kisei/extreme_normalizations/results/COBE/SST_Anomalies_1980-1989_", cutoff, ".RData")); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1999"
+  load(paste0("/Users/Kisei/extreme_normalizations/results/COBE/SST_Anomalies_1980-1989_", cutoff, ".RData")); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1989"
   load(paste0("/Users/Kisei/extreme_normalizations/results/COBE/SST_Anomalies_1990-1999_", cutoff, ".RData")); cobe2 = anom; cobe2$source = "COBE v2"; cobe2$period = "1990-1999"
   load(paste0("/Users/Kisei/extreme_normalizations/results/COBE/SST_Anomalies_2000-2009_", cutoff, ".RData")); cobe3 = anom; cobe3$source = "COBE v2"; cobe3$period = "2000-2009"
   load(paste0("/Users/Kisei/extreme_normalizations/results/COBE/SST_Anomalies_2010-2018_", cutoff, ".RData")); cobe4 = anom; cobe4$source = "COBE v2"; cobe4$period = "2010-2018"
-  load(paste0("/Users/Kisei/extreme_normalizations/results/ER/SST_Anomalies_1980-1989_", cutoff, ".RData")); er1 = anom; er1$source = "ERSST v4"; er1$period = "1980-1999"
+  load(paste0("/Users/Kisei/extreme_normalizations/results/ER/SST_Anomalies_1980-1989_", cutoff, ".RData")); er1 = anom; er1$source = "ERSST v4"; er1$period = "1980-1989"
   load(paste0("/Users/Kisei/extreme_normalizations/results/ER/SST_Anomalies_1990-1999_", cutoff, ".RData")); er2 = anom; er2$source = "ERSST v4"; er2$period = "1990-1999"
   load(paste0("/Users/Kisei/extreme_normalizations/results/ER/SST_Anomalies_2000-2009_", cutoff, ".RData")); er3 = anom; er3$source = "ERSST v4"; er3$period = "2000-2009"
   load(paste0("/Users/Kisei/extreme_normalizations/results/ER/SST_Anomalies_2010-2018_", cutoff, ".RData")); er4 = anom; er4$source = "ERSST v4"; er4$period = "2010-2018"
@@ -131,7 +131,7 @@ map = function(mode){
       scale_x_continuous(expand = c(-0.005, 0), "") +
       scale_y_continuous(expand = c(-0.005, 0), "") +
       coord_fixed() + 
-      facet_grid(source ~ period) +
+      facet_grid(period ~ source) +
       theme_pubr(I(20)) +
       theme(axis.title.x = element_blank(),
             axis.title.y = element_blank(), 
@@ -142,7 +142,7 @@ map = function(mode){
             legend.position = "bottom", 
             legend.justification = c(1,0))
     
-    pdf(paste0("/Users/Kisei/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".pdf"), height = 10, width = 15)
+    pdf(paste0("/Users/Kisei/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".pdf"), height = 8, width = 8)
     print(p)
     dev.off()
     
