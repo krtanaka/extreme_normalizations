@@ -37,7 +37,7 @@ cbPalette = wes_palette("Darjeeling1")[c(1,3,5)]
 
 CI_95 = df %>%
   group_by(source) %>% 
-  subset(Year %in% c(1900:1919)) %>% 
+  subset(Year %in% c(1900:2018)) %>% 
   dplyr::summarise(mean = mean(year_sum, na.rm = TRUE),
             sd = sd(year_sum, na.rm = TRUE),
             n = n()) %>%
@@ -58,7 +58,7 @@ df %>%
   scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2018-12-01"), by = "10 years"), 
                labels = scales::date_format("%Y")) 
   # theme_pubr(I(15)) +
-  # # facet_wrap(.~Month) +
+  # facet_wrap(.~Month) +
   # theme(legend.position = c(0.12, 0.95), 
   #       axis.text.x = element_text(angle = 90, hjust = 1))
 
