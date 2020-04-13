@@ -12,6 +12,7 @@ df = stack(paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat ext
 df = raster::rotate(df) #rotate to -180:180
 df = df[[241:2028]] #trim to 1870-2018
 assign("df", df, .GlobalEnv)
+df = readAll(df)
 save(df, file = paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/COBE_SST.RData"))
 
 
@@ -20,6 +21,7 @@ df = stack(paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat ext
 # df = stack(paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/original_files/HadISST/HadI_sst_ice.nc"), varname = "sic")
 df = df[[1:1788]] #trim to 1870-2018
 assign("df", df, .GlobalEnv)
+df = readAll(df)
 save(df, file = paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/HadI_SST.RData"))
 
 
@@ -28,4 +30,5 @@ df = stack(paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat ext
 df = raster::rotate(df) #rotate to -180:180
 df = df[[193:1980]] #trim to 1870-2018
 assign("df", df, .GlobalEnv)
+df = readAll(df)
 save(df, file = paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/ER_SST.RData"))
