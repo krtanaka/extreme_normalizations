@@ -4,6 +4,18 @@ library(ggpubr)
 
 rm(list = ls())
 
+ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
+               rgb(178, 24, 43, maxColorValue = 255, alpha = 255),
+               rgb(214, 96, 77, maxColorValue = 255, alpha = 255),
+               rgb(244, 165, 130, maxColorValue = 255, alpha = 255),
+               rgb(253, 219, 199, maxColorValue = 255, alpha = 255),
+               rgb(247, 247, 247, maxColorValue = 255, alpha = 255),
+               rgb(209, 229, 240, maxColorValue = 255, alpha = 255),
+               rgb(146, 197, 222, maxColorValue = 255, alpha = 255),
+               rgb(67, 147, 195, maxColorValue = 255, alpha = 255),
+               rgb(33, 102, 172, maxColorValue = 255, alpha = 255),
+               rgb(5, 48, 97, maxColorValue = 255, alpha = 255))
+
 p = c(0.975, 0.95, 0.9)[2]
 
 load(paste0("/Users/Kisei/extreme_normalizations/results/HadI/SST_TippingPoints_", p, ".RData")); hadi = yy_anom
@@ -33,14 +45,14 @@ cbPalette <- c("#000000", "#56B4E9", "#E69F00")
 
 df$source = factor(df$source, levels = c("COBEv2","HadISSTv1.1","ERSSTv5"))
 
-cbPalette = wes_palette("Darjeeling1")[c(1,3,5)]
+# cbPalette = wes_palette("Darjeeling1")[c(1,3,5)]
 
 CI_95 = df %>%
   group_by(source) %>% 
   subset(Year %in% c(1900:2018)) %>% 
   dplyr::summarise(mean = mean(year_sum, na.rm = TRUE),
-            sd = sd(year_sum, na.rm = TRUE),
-            n = n()) %>%
+                   sd = sd(year_sum, na.rm = TRUE),
+                   n = n()) %>%
   mutate(se = sd / sqrt(n),
          lower.ci = mean - qt(1 - (0.05 / 2), n - 1) * se,
          upper.ci = mean + qt(1 - (0.05 / 2), n - 1) * se)
@@ -57,10 +69,75 @@ df %>%
   scale_colour_manual(values = cbPalette, "") + 
   scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2018-12-01"), by = "10 years"), 
                labels = scales::date_format("%Y")) 
-  # theme_pubr(I(15)) +
-  # facet_wrap(.~Month) +
-  # theme(legend.position = c(0.12, 0.95), 
-  #       axis.text.x = element_text(angle = 90, hjust = 1))
+# theme_pubr(I(15)) +
+# facet_wrap(.~Month) +
+# theme(legend.position = c(0.12, 0.95), 
+#       axis.text.x = element_text(angle = 90, hjust = 1))
+ 
+ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
+ipcc_temp_expand = ipcc_temp_expand(90)
+
+get_slope = function(s){
+  
+  slope = NULL
+  
+  pdf(paste0("/Users/Kisei/Desktop/", s, "_30yr_slope.pdf"), height = 5, width = 5)
+  
+  for (y in 1:90) {
+    
+    # y = 1
+    # s = "COBEv2"
+    
+    yy = y+1899
+    
+    dfl = df %>% 
+      mutate(
+        # year_sum = scale(year_sum, center = T),
+             Year = as.numeric(Year)) %>% 
+      subset(Year %in% c(yy:(yy+29))) %>% 
+      subset(source == s) 
+    
+    b = lm(year_sum ~ Year, data = dfl)$coefficients
+    
+    if (yy == 1900) plot(1, type = "n", xlab = "", ylab = "", xlim = c(-1, 1), ylim = c(-0.01, 0.01), axes = F)
+    
+    abline(0, b[2], col = alpha(ipcc_temp_expand[y], 0.5), lwd = 5)
+    
+    if (yy == 1989){
+      
+      axis(1); axis(2, las = 1)
+      
+      t_col = ipcc_temp_expand
+      col.labels = c("1900-1929","1989-2018")
+      plotrix::color.legend(0.4, #xl
+                            -0.01, #yb
+                            0.6, #xr
+                            -0.005, #yt
+                            col.labels,
+                            t_col,
+                            align="rb",
+                            gradient="y")
+      
+      legend("topleft", legend = s, bty = "n")
+      
+      dev.off()
+      
+    }
+    
+    b$p = paste0(yy, "-" (yy+29))
+    slope = rbind(slope, b)
+    
+  }
+  
+  slope = as.data.frame(slope)
+  
+  return(slope)
+}
+
+get_slope("COBEv2")
+get_slope("HadISSTv1.1")
+get_slope("ERSSTv5")
+
 
 pdf("~/Desktop/Time_Series__Month.pdf", height = 10, width = 10)
 p1 = ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = source)) +
