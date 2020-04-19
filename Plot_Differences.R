@@ -63,16 +63,9 @@ ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
                rgb(33, 102, 172, maxColorValue = 255, alpha = 255),
                rgb(5, 48, 97, maxColorValue = 255, alpha = 255))
 
-ipcc_temp_4_cols <- c(rgb(153, 0, 2, maxColorValue = 255, alpha = 255),
-                      rgb(196, 121, 0, maxColorValue = 255, alpha = 255),
-                      rgb(112, 160, 205, maxColorValue = 255, alpha = 255),
-                      rgb(0, 52, 102, maxColorValue = 255, alpha = 255))
-
-invert_geom_defaults()
-
 rank_mean = function(region){
   
-  region = "eez"
+  # region = "eez"
   
   if (region == "meow"){
     shape = meow; shape$UNIT = shape$PROVINCE
@@ -101,12 +94,12 @@ rank_mean = function(region){
     # hadi <- st_intersection(tas, st_buffer(shape, 0))    
     hadi$sum = range01(hadi$sum)
     hadi <- hadi %>% group_by(UNIT) %>% 
-      summarise(mean = mean(sum, na.rm = T),
+      summarise(median = median(sum, na.rm = T),
                 sd = sd(sum, na.rm = T), 
                 n = n()) %>%
       mutate(se = sd/sqrt(n),
-             lower.ci = mean - qt(1 - (0.05 / 2), n - 1) * se,
-             upper.ci = mean + qt(1 - (0.05 / 2), n - 1) * se)
+             lower.ci = median - qt(1 - (0.05 / 2), n - 1) * se,
+             upper.ci = median + qt(1 - (0.05 / 2), n - 1) * se)
     hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
     load(paste0(dir, "/extreme_normalizations/results/COBE/SST_Anomalies_", period[[i]], "_", cutoff, ".RData"))
@@ -117,12 +110,12 @@ rank_mean = function(region){
     # cobe <- st_intersection(tas, st_buffer(shape, 0))
     cobe$sum = range01(cobe$sum)
     cobe <- cobe %>% group_by(UNIT) %>% 
-      summarise(mean = mean(sum, na.rm = T),
+      summarise(median = median(sum, na.rm = T),
                 sd = sd(sum, na.rm = T), 
                 n = n()) %>%
       mutate(se = sd/sqrt(n),
-             lower.ci = mean - qt(1 - (0.05 / 2), n - 1) * se,
-             upper.ci = mean + qt(1 - (0.05 / 2), n - 1) * se)
+             lower.ci = median - qt(1 - (0.05 / 2), n - 1) * se,
+             upper.ci = median + qt(1 - (0.05 / 2), n - 1) * se)
     cobe$source = "COBE v2"; cobe$period = period[[i]]
     
     load(paste0(dir, "/extreme_normalizations/results/ER/SST_Anomalies_", period[[i]], "_", cutoff, ".RData"))
@@ -133,12 +126,12 @@ rank_mean = function(region){
     # er <- st_intersection(tas, st_buffer(shape, 0))
     er$sum = range01(er$sum)
     er <- er %>% group_by(UNIT) %>%
-      summarise(mean = mean(sum, na.rm = T),
+      summarise(median = median(sum, na.rm = T),
                 sd = sd(sum, na.rm = T),
                 n = n()) %>%
       mutate(se = sd/sqrt(n),
-             lower.ci = mean - qt(1 - (0.05 / 2), n - 1) * se,
-             upper.ci = mean + qt(1 - (0.05 / 2), n - 1) * se)
+             lower.ci = median - qt(1 - (0.05 / 2), n - 1) * se,
+             upper.ci = median + qt(1 - (0.05 / 2), n - 1) * se)
     er$source = "ERSST v4"; er$period = period[[i]]
     
     tas = rbind(hadi, cobe, er)
@@ -200,62 +193,55 @@ rank_mean = function(region){
   
   pdf(paste0("~/Desktop/Mean_", region, "_selected_", cutoff, ".pdf"), height = 5, width = 6)
   
-  p = tas_combined_sub %>% 
-    mutate(unit = forcats::fct_reorder(UNIT, mean)) %>% 
+  d1 = tas_combined %>% 
+    subset(period == "1980-1989") %>% 
+    mutate(p1 = median) %>% 
+    select("UNIT", "p1", "source")
+  
+  d2 = tas_combined %>% 
+    subset(period == "2010-2018") %>% 
+    mutate(p2 = median) %>% 
+    select("UNIT", "p2", "source")
+  
+  d = merge(d1, d2) %>% mutate(diff = p2-p1)
+  
+  d <- d %>% group_by(UNIT) %>%
+    summarise(mean = mean(diff),
+              sd = sd(diff),
+              n = n()) %>%
+    mutate(se = sd/sqrt(n),
+           lower.ci = mean - qt(1 - (0.05 / 2), n - 1) * se,
+           upper.ci = mean + qt(1 - (0.05 / 2), n - 1) * se)
+  
+  # top = d %>% top_n(10, mean)
+  # bottom = d %>% top_n(-10, mean)
+  # d = tbl_df(bind_rows(top, bottom))
+  
+  p = d %>% 
+    mutate(UNIT = forcats::fct_reorder(UNIT, mean)) %>% 
     ggplot() +
     geom_segment(aes(
-      color = period, 
-      y = period, 
-      yend = period,
-      x = lower.ci, 
-      xend = upper.ci),
-      size = 0.1) +
-    geom_point(aes(
-      color = period,
-      y = period,
-      x = mean),
-      size = 2) +
-    coord_flip() +
-    facet_grid(source ~ UNIT, scales = "free") +
-    scale_color_manual(values = rev(ipcc_temp_4_cols), "") +
-    xlab("") +
-    ylab("") +
-    # ylim(0,1) +
-    theme(legend.position = "bottom",
-          axis.title.x=element_blank(),
-          axis.text.x=element_blank(),
-          axis.ticks.x=element_blank())
-  
-  print(p)
-  
-  dev.off()
-  
-  p = tas_combined %>% 
-    mutate(unit = forcats::fct_reorder(UNIT, mean)) %>% 
-    subset(n > 10) %>% 
-    ggplot() +
-    geom_segment(aes(
-      color = period, 
-      x = unit, 
-      xend = unit,
+      color = mean,
+      x = UNIT, 
+      xend = UNIT,
       y = lower.ci, 
       yend = upper.ci),
       size = 0.5) +
     geom_point(aes(
-      color = period,
-      x = unit,
-      y = mean),
+      color = mean,
+      y = mean,
+      x = UNIT),
       size = 2) +
     coord_flip() +
-    facet_wrap(.~source) +
-    scale_color_manual(values = rev(ipcc_temp_4_cols), "") +
+    scale_color_gradientn(colors = rev(ipcc_temp), "", values = scales::rescale(c(-0.5, -0.1, 0, 0.1, 0.5))) +
     xlab("") +
     ylab("") +
-    ylim(0,1) +
-    # dark_theme_bw() +
-    theme(legend.position = "right")
+    theme_pubr(I(10)) +
+    theme(legend.position = c(0.1, 0.9))
   
-  pdf(paste0("~/Desktop/", cutoff, "_Mean_", region, ".pdf"), height = 15, width = 10)
+  print(p)
+  
+  pdf(paste0(dir, "/Desktop/", cutoff, "_Difference_", region, ".pdf"), height = 18, width = 8)
   print(p)
   dev.off()
   
