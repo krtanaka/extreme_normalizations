@@ -172,14 +172,13 @@ ElNino = subset(df, Year %in% c(1905, 1906,
                                 1991, 1992, 1997, 1998, 
                                 2015, 2016))
 
-
 p1 = ggplot(data = df, aes(x = Time, y = year_sum, color = source, group = source)) +
   
   # geom_vline(data = tipped_cobe, aes(xintercept = Time), color = cbPalette[1], alpha = 0.1) +
   # geom_vline(data = tipped_hadi, aes(xintercept = Time), color = cbPalette[2], alpha = 0.1) +
   
   # geom_vline(data = ElNino, aes(xintercept = Time), color = "red", alpha = 0.1) + 
-
+  
   annotate("segment", x = tipped_cobe[,6], xend = tipped_cobe[,6], y = -0.15, yend = -0.2, color = cbPalette[1]) +
   annotate("segment", x = tipped_hadi[,6], xend = tipped_hadi[,6], y = -0.1, yend = -0.15, color = cbPalette[2]) +
   annotate("segment", x = tipped_er[,6], xend = tipped_er[,6], y = -0.05, yend = -0.1, color = cbPalette[3]) + 
