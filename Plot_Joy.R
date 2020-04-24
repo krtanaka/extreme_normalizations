@@ -22,16 +22,20 @@ data = c("HadI", "COBE", "ER")
 
 range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 
-meow <- readOGR(dsn = paste0("/Users/", Sys.info()[7], "/Downloads/MEOW"), layer = "meow_ecos")
-meow <- meow %>% st_as_sf()  
-
-lme <- readOGR("/Users/ktanaka/Google Drive/Research/GIS/LME66/LMEs66.shp")
-lme <- rmapshaper::ms_simplify(lme, keep = 0.001, keep_shapes = F)
-lme <- lme %>% st_as_sf()  
-
-eez <- readOGR(dsn = "/Users/ktanaka/clim_geo_disp/data/EEZ_land_union", layer = "EEZ_land_v2_201410")
-eez <- rmapshaper::ms_simplify(eez, keep = 0.001, keep_shapes = F)
-eez <- eez %>% st_as_sf()  
+# meow <- readOGR(dsn = paste0("/Users/", Sys.info()[7], "/Downloads/MEOW"), layer = "meow_ecos")
+# meow <- meow %>% st_as_sf()  
+# 
+# lme <- readOGR("/Users/ktanaka/Google Drive/Research/GIS/LME66/LMEs66.shp")
+# lme <- rmapshaper::ms_simplify(lme, keep = 0.001, keep_shapes = F)
+# lme <- lme %>% st_as_sf()  
+# 
+# eez <- readOGR(dsn = "/Users/ktanaka/clim_geo_disp/data/EEZ_land_union", layer = "EEZ_land_v2_201410")
+# eez <- rmapshaper::ms_simplify(eez, keep = 0.001, keep_shapes = F)
+# eez <- eez %>% st_as_sf()  
+ 
+load('/Users/Kisei/extreme_normalizations/eez_sf_dataframe_0.001.RData') 
+load('/Users/Kisei/extreme_normalizations/lme_sf_dataframe_0.001.RData') 
+load('/Users/Kisei/extreme_normalizations/meow_sf_dataframe.RData') 
 
 #IPCC - Temperature -
 ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
