@@ -92,10 +92,10 @@ world <- fortify(getMap())
 Baseline$mean = rowMeans(Baseline[,3:722])
 
 p1 = ggplot(Baseline, aes(x, y, fill = mean)) + 
-  geom_raster(alpha = 0.3) + 
+  geom_raster(alpha = 1) + 
   scale_fill_gradientn(colors = matlab.like(100), "") +
   theme_void() + 
-  geom_point(data = Baseline[ll,], aes(x, y), color = "red", size = 5, shape = 15) +
+  # geom_point(data = Baseline[ll,], aes(x, y), color = "red", size = 5, shape = 15) +
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
            color = "gray40", fill = "gray40", size = 0.001) +
   # scale_x_continuous(expand = c(-0.005, 0), "") +
@@ -110,7 +110,8 @@ p2 = ggplot(baseline_12, aes(baseline, fill = factor(m))) +
   facet_wrap(~m, scales = 'free_x', nrow = 1) + 
   geom_vline(data = q_12, aes(xintercept = q)) + 
   coord_flip() + 
-  theme_pubr() + 
+  # theme_pubr() + 
+  dark_theme_bw(I(20)) +
   xlab("SST (deg C)") + 
   scale_x_reverse() + 
   theme(legend.position = "none", 
@@ -119,12 +120,18 @@ p2 = ggplot(baseline_12, aes(baseline, fill = factor(m))) +
         axis.ticks.x = element_blank(),
         strip.background = element_blank(),
         strip.placement = "inside",
-        # panel.grid.major = element_blank(), 
-        # panel.grid.minor = element_blank(),
-        # panel.background = element_blank(),
-        axis.line = element_line(colour = "black"))
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "white"))
 
-pdf(paste0("~/Desktop/Climatologies_", ll, ".pdf"), height = 5, width = 4)
-cowplot::plot_grid(p1, p2, ncol = 1)
+pdf(paste0("~/Desktop/Climatologies_", ll, ".pdf"), height = 6, width = 6)
+# cowplot::plot_grid(p1, p2, ncol = 1)
+p1
+dev.off()
+
+pdf(paste0("~/Desktop/Climatologies_", ll, ".pdf"), height = 2, width = 6)
+# cowplot::plot_grid(p1, p2, ncol = 1)
+p2
 dev.off()
 
