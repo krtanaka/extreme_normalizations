@@ -18,9 +18,9 @@ ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
 
 p = c(0.975, 0.95, 0.9)[2]
 
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/SST_TippingPoints_", p, ".RData")); hadi = yy_anom
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/SST_TippingPoints_", p, ".RData")); cobe = yy_anom
-load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/SST_TippingPoints_", p, ".RData")); er = yy_anom
+load(paste0("/Users/kisei/extreme_normalizations/results/HadI/SST_TippingPoints_", p, ".RData")); hadi = yy_anom
+load(paste0("/Users/kisei/extreme_normalizations/results/COBE/SST_TippingPoints_", p, ".RData")); cobe = yy_anom
+load(paste0("/Users/kisei/extreme_normalizations/results/ER/SST_TippingPoints_", p, ".RData")); er = yy_anom
 
 hadi$source = "HadISSTv1.1"
 cobe$source = "COBEv2"
@@ -82,7 +82,7 @@ get_slope = function(s){
   
   slope = NULL
   
-  pdf(paste0("/Users/ktanaka/Desktop/", s, "_30yr_slope.pdf"), height = 5, width = 5)
+  pdf(paste0("/Users/kisei/Desktop/", s, "_30yr_slope.pdf"), height = 5, width = 5)
   
   for (y in 1:90) {
     
@@ -120,7 +120,7 @@ get_slope = function(s){
                             align="rb",
                             gradient="y")
       
-      legend("topleft", legend = s, bty = "n")
+      # legend("topleft", legend = s, bty = "n")
       
       dev.off()
       
