@@ -100,9 +100,12 @@ map = function(mode){
       facet_wrap(.~period, ncol = 4) +
       dark_theme_bw() +
       coord_map("ortho", orientation = c(0, 0, 0)) +
-      theme(axis.title.x = element_blank(),
-            axis.title.y = element_blank(),
-            legend.position = "right")
+      theme(
+        panel.grid = element_blank(),
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+            legend.position = "none")
     
     # p = anom %>% 
     #   sample_frac(0.1) %>% 

@@ -18,9 +18,9 @@ ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
 
 p = c(0.975, 0.95, 0.9)[2]
 
-load(paste0("/Users/Kisei/extreme_normalizations/results/HadI/SST_TippingPoints_", p, ".RData")); hadi = yy_anom
-load(paste0("/Users/Kisei/extreme_normalizations/results/COBE/SST_TippingPoints_", p, ".RData")); cobe = yy_anom
-load(paste0("/Users/Kisei/extreme_normalizations/results/ER/SST_TippingPoints_", p, ".RData")); er = yy_anom
+load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/SST_TippingPoints_", p, ".RData")); hadi = yy_anom
+load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/SST_TippingPoints_", p, ".RData")); cobe = yy_anom
+load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/SST_TippingPoints_", p, ".RData")); er = yy_anom
 
 hadi$source = "HadISSTv1.1"
 cobe$source = "COBEv2"
@@ -76,12 +76,13 @@ df %>%
  
 ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
 ipcc_temp_expand = ipcc_temp_expand(90)
+ipcc_temp_expand = matlab.like(90)
 
 get_slope = function(s){
   
   slope = NULL
   
-  pdf(paste0("/Users/Kisei/Desktop/", s, "_30yr_slope.pdf"), height = 5, width = 5)
+  pdf(paste0("/Users/ktanaka/Desktop/", s, "_30yr_slope.pdf"), height = 5, width = 5)
   
   for (y in 1:90) {
     
@@ -94,12 +95,13 @@ get_slope = function(s){
       mutate(
         # year_sum = scale(year_sum, center = T),
              Year = as.numeric(Year)) %>% 
-      subset(Year %in% c(yy:(yy+29))) %>% 
-      subset(source == s) 
+      subset(Year %in% c(yy:(yy+29))) 
+    # %>% 
+    #   subset(source == s) 
     
     b = lm(year_sum ~ Year, data = dfl)$coefficients
     
-    if (yy == 1900) plot(1, type = "n", xlab = "", ylab = "", xlim = c(-1, 1), ylim = c(-0.01, 0.01), axes = F)
+    if (yy == 1900) plot(1, type = "n", xlab = "", ylab = "", xlim = c(-1, 1), ylim = c(-0.01, 0.01), axes = F, col.axis = "white")
     
     abline(0, b[2], col = alpha(ipcc_temp_expand[y], 0.5), lwd = 5)
     
