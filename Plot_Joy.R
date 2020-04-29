@@ -160,12 +160,17 @@ rank_joy = function(region){
   } 
   
   if (region == "eez") {
-    tas_combined_sub = subset(tas_combined, UNIT %in% c("United States", 
-                                                        "China", 
-                                                        "Japan")) 
+    
+    country = tas_combined %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 950)
+    
+    country = as.data.frame(country)
+    country = country[, 1, drop=FALSE]
+    country = as.character(country)
+    
+    tas_combined_sub = subset(tas_combined, UNIT %in% country$UNIT)
   } 
   
-  pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 4, width = 8)
+  pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 10, width = 12)
   
   p = ggplot(tas_combined_sub) +
     geom_density(aes(x = sum, fill = period), alpha = 0.8, size = 0.01) +
