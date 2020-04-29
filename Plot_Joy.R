@@ -33,9 +33,9 @@ range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 # eez <- rmapshaper::ms_simplify(eez, keep = 0.001, keep_shapes = F)
 # eez <- eez %>% st_as_sf()  
  
-load('/Users/ktanaka/extreme_normalizations/eez_sf_dataframe_0.001.RData') 
-load('/Users/ktanaka/extreme_normalizations/lme_sf_dataframe_0.001.RData') 
-load('/Users/ktanaka/extreme_normalizations/meow_sf_dataframe.RData') 
+load('/Users/Kisei/extreme_normalizations/eez_sf_dataframe_0.001.RData') 
+load('/Users/Kisei/extreme_normalizations/lme_sf_dataframe_0.001.RData') 
+load('/Users/Kisei/extreme_normalizations/meow_sf_dataframe.RData') 
 
 #IPCC - Temperature -
 ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
@@ -171,30 +171,31 @@ rank_joy = function(region){
   } 
   
   pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 10, width = 12)
+
+      tas_combined_sub = subset(tas_combined, UNIT %in% c("United States", 
+                                                        "Greenland", 
+                                                        "Japan")) 
+  } 
   
+  pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 5, width = 6)
+
   p = ggplot(tas_combined_sub) +
     geom_density(aes(x = sum, fill = period), alpha = 0.8, size = 0.01) +
-    # theme_pubr() +
+    theme_pubr() +
     scale_x_continuous(
       limits = c(0, 1),
       expand = c(0.05, 0.05),
       breaks = c(0, 0.5, 1)) +
-    # scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
-    scale_fill_manual(values = matlab.like(4), "") +
-    
-    # facet_grid(source~UNIT, scales = "free") +
+    scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
+    facet_grid(source~UNIT, scales = "free") +
     # facet_grid(source~UNIT, scales = "free_y") +
-    facet_wrap(.~UNIT, scales = "free_y") +
-    dark_theme_bw(I(20)) + 
-    ylab(NULL) + xlab("Proportion of extremes") +
+    # facet_wrap(.~source+UNIT, scales = "free_y") +
+    ylab(NULL) + xlab(NULL) +
     theme(
       axis.text.y = element_blank(),
       axis.ticks = element_blank(),
       axis.text.x = element_text(size = 10),
       legend.position = "bottom", 
-      panel.grid.major = element_blank(),
-      panel.grid.minor = element_blank(),
-      panel.background = element_blank(),
       legend.justification = c(1,0))
   
   print(p)
@@ -492,24 +493,24 @@ lme = rank_joy("lme")
 eez = rank_joy("eez")
 bgcp = rank_joy_bgcp()
 
-df1 = lme %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n())  %>% filter(freq > 200) %>% top_n(25, m)
-df2 = lme %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n())  %>% filter(freq > 200) %>% top_n(-25, m)
+df1 = lme %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n())  %>% filter(freq > 100) %>% top_n(15, m)
+df2 = lme %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n())  %>% filter(freq > 100) %>% top_n(-15, m)
 sub = rbind(df1, df2)
 sub = as.vector(sub$UNIT)
 lme_sub = subset(lme, UNIT %in% sub & period %in% c("2000-2009", "2010-2018"))
 lme_sub = lme_sub %>% group_by(UNIT) %>% mutate(m = median(sum)) %>% arrange(UNIT, m)
 lme_sub = lme_sub[,c("UNIT", "sum")]; lme_sub = as.data.frame(lme_sub); lme_sub = lme_sub[1:2]; lme_sub$class = "LME"
 
-df1 = eez %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 950) %>% top_n(25, m)
-df2 = eez %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n())  %>% filter(freq > 950) %>% top_n(-25, m)
+df1 = eez %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 100) %>% top_n(15, m)
+df2 = eez %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n())  %>% filter(freq > 100) %>% top_n(-15, m)
 sub = rbind(df1, df2)
 sub = as.vector(sub$UNIT)
 eez_sub = subset(eez, UNIT %in% sub & period %in% c("2000-2009", "2010-2018"))
 # eez_sub = lme_sub %>% group_by(UNIT) %>% mutate(m = median(sum)) %>% arrange(UNIT, m)
 eez_sub = eez_sub[,c("UNIT", "sum")]; eez_sub = as.data.frame(eez_sub); eez_sub = eez_sub[1:2]; eez_sub$class = "EEZ"
 
-df1 = bgcp %>% group_by(bgcp) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 100) %>% top_n(25, m); df1 = df1 %>% top_n(25)
-df2 = bgcp %>% group_by(bgcp) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 100) %>% top_n(-25, m)
+df1 = bgcp %>% group_by(bgcp) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 100) %>% top_n(15, m); df1 = df1 %>% top_n(15)
+df2 = bgcp %>% group_by(bgcp) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 100) %>% top_n(-15, m)
 sub = rbind(df1, df2)
 sub = as.vector(sub$bgcp)
 bgcp_sub = subset(bgcp, bgcp %in% sub & period %in% c("2000-2009", "2010-2018"))
@@ -537,22 +538,17 @@ p = lme_sub %>%
 print(p)
 dev.off()
 
-pdf(paste0("~/Desktop/EEZ_Joy_", cutoff, ".pdf"), width = 6, height = 6)
+pdf(paste0("~/Desktop/EEZ_Joy_", cutoff, ".pdf"), width = 3, height = 6)
 p = eez_sub %>% 
   mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
   ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
-  geom_joy(scale = 3, alpha = 0.8, size = 0.1) +
+  geom_joy(scale = 3, alpha = 0.8, size = 0.5) +
   theme_joy(grid = F) +
-  dark_theme_bw() + 
   scale_y_discrete(expand = c(0.05, 0)) + # will generally have to set the `expand` option
   scale_x_continuous(limits = c(0, 1), expand = c(0, 0), breaks = c(0,0.5, 1)) +
-  # scale_fill_cyclical(values = ipcc_temp_expand(length(unique(eez_sub$UNIT))))+
-  scale_fill_cyclical(values = matlab.like(length(unique(eez_sub$UNIT))))+
+  scale_fill_cyclical(values = ipcc_temp_expand(length(unique(eez_sub$UNIT))))+
   ylab(NULL) + xlab(NULL) +
-  theme(axis.text.y = element_text(size = 15),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank(),
+  theme(axis.text.y = element_text(size = 10),
         legend.position = "none")
 print(p)
 dev.off()
