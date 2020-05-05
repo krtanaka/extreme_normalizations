@@ -82,7 +82,7 @@ get_slope = function(s){
   
   slope = NULL
   
-  pdf(paste0("/Users/kisei/Desktop/", s, "_30yr_slope.pdf"), height = 5, width = 5)
+  png(paste0("/Users/kisei/Desktop/", s, "_30yr_slope.png"), height = 5, width = 5, res = 300, units = "in")
   
   for (y in 1:90) {
     
