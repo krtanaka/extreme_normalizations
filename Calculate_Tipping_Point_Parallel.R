@@ -24,8 +24,8 @@ calculate_anomalies = function(data){
 
   load(paste0(data, "_SST.RData"))
   
-  # e = extent(-76.6, -65.4, 35.4, 44.6)
-  # df = crop(df, e); rm(e)
+  e = extent(-132, -110, 22.5, 47.5)
+  df = crop(df, e); rm(e)
   
   # set baseline Jan 1870 - Dec 1919, 50 years
   Baseline <- df[[1:600]] 
