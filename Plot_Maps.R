@@ -86,25 +86,25 @@ map = function(mode){
   if (mode == "annual") {
     
     anom$sum = range01(anom$sum)
-    anom = subset(anom, source %in% c("COBE v2", "HadISST v1.1"))
+    # anom = subset(anom, source %in% c("COBE v2", "HadISST v1.1"))
     
-    p = ggplot(anom) +
-      geom_point(aes(x, y, color = sum, fill = sum)) +
-      geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
-      scale_fill_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
-      scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
-      scale_x_continuous(expand = c(-0.005, 0), "") +
-      scale_y_continuous(expand = c(-0.005, 0), "") +
-      # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
-      facet_wrap(.~source + period, ncol = 3, dir = "v") +
-      theme_pubr() +
-      coord_map("ortho", orientation = c(0, 0, 0)) +
-      theme(axis.title.x = element_blank(),
-            axis.title.y = element_blank(),
-            legend.position = "right")
+    # p = ggplot(anom) +
+    #   geom_point(aes(x, y, color = sum, fill = sum)) +
+    #   geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
+    #   scale_fill_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+    #   scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+    #   scale_x_continuous(expand = c(-0.005, 0), "") +
+    #   scale_y_continuous(expand = c(-0.005, 0), "") +
+    #   # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
+    #   facet_wrap(.~source + period, ncol = 3, dir = "v") +
+    #   theme_pubr() +
+    #   coord_map("ortho", orientation = c(0, 0, 0)) +
+    #   theme(axis.title.x = element_blank(),
+    #         axis.title.y = element_blank(),
+    #         legend.position = "right")
     
     p = anom %>% 
-      sample_frac(0.1) %>% 
+      sample_frac(1) %>% 
       ggplot() + 
       geom_point(aes(x = x, y = y, color = sum), size = 1, alpha = 0.5, shape = 16) +
       geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
@@ -123,26 +123,28 @@ map = function(mode){
             legend.position = "bottom", 
             legend.justification = c(1,0))
     
-    p = ggplot(anom) + 
-      geom_raster(aes(x = x, y = y, fill = sum)) +
-      geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
-               color = "gray20", fill = "gray20", size = 0.001) + 
-      scale_fill_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
-      scale_x_continuous(expand = c(-0.005, 0), "") +
-      scale_y_continuous(expand = c(-0.005, 0), "") +
-      coord_fixed() + 
-      facet_grid(period ~ source) +
-      theme_pubr(I(20)) +
-      theme(axis.title.x = element_blank(),
-            axis.title.y = element_blank(), 
-            axis.text.x = element_blank(),
-            axis.text.y = element_blank(),
-            axis.ticks.x = element_blank(),
-            axis.ticks.y = element_blank(),
-            legend.position = "bottom", 
-            legend.justification = c(1,0))
+    # p = ggplot(anom) +
+    #   geom_raster(aes(x = x, y = y, fill = sum)) +
+    #   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
+    #            color = "gray20", fill = "gray20", size = 0.001) +
+    #   scale_fill_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
+    #   scale_x_continuous(expand = c(-0.005, 0), "") +
+    #   scale_y_continuous(expand = c(-0.005, 0), "") +
+    #   coord_fixed() +
+    #   facet_grid(period ~ source) +
+    #   theme_pubr(I(20)) +
+    #   theme(axis.title.x = element_blank(),
+    #         axis.title.y = element_blank(),
+    #         axis.text.x = element_blank(),
+    #         axis.text.y = element_blank(),
+    #         axis.ticks.x = element_blank(),
+    #         axis.ticks.y = element_blank(),
+    #         legend.position = "bottom",
+    #         legend.justification = c(1,0))
     
-    pdf(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".pdf"), height = 8, width = 8)
+    # pdf(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".pdf"), height = 12, width = 12)
+    png(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".png"), height = 12, width = 12, units = "in", res = 100)
+    
     print(p)
     dev.off()
     
