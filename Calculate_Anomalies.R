@@ -18,7 +18,7 @@ cutoff = c(0.95, 0.975)[1]
 calculate_anomalies = function(period, data){
   
   # period = "2010-2018"
-  # data = "COBE"
+  # data = "HadI"
   
   setwd("~/Dropbox (MBA)/PAPER Kisei heat extremes")
   
@@ -40,6 +40,7 @@ calculate_anomalies = function(period, data){
   # dev.off()
   
   Baseline <- Baseline %>% rasterToPoints() %>% data.frame()
+  if (data == "HadI") Baseline[Baseline == -1000] <- -1.8
   
   # View(names(df)) #look at time steps
   
@@ -50,6 +51,7 @@ calculate_anomalies = function(period, data){
   if (period == "2010-2018") Target <- df[[1681:1788]] #Jan 2010 - Dec 2018
   
   Target <- Target %>% rasterToPoints() %>% data.frame()
+  if (data == "HadI") Target[Target == -1000] <- -1.8
   
   ll_anom = NULL
   
