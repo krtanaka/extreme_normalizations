@@ -32,7 +32,7 @@ range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 # eez <- readOGR(dsn = "/Users/ktanaka/clim_geo_disp/data/EEZ_land_union", layer = "EEZ_land_v2_201410")
 # eez <- rmapshaper::ms_simplify(eez, keep = 0.001, keep_shapes = F)
 # eez <- eez %>% st_as_sf()  
-
+ 
 load('/Users/ktanaka/extreme_normalizations/eez_sf_dataframe_0.001.RData') 
 load('/Users/ktanaka/extreme_normalizations/lme_sf_dataframe_0.001.RData') 
 load('/Users/ktanaka/extreme_normalizations/meow_sf_dataframe.RData') 
@@ -171,112 +171,112 @@ rank_joy = function(region){
   } 
   
   pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 10, width = 12)
+
+      tas_combined_sub = subset(tas_combined, UNIT %in% c("United States", 
+                                                        "Greenland", 
+                                                        "Japan")) 
+  } 
   
-  tas_combined_sub = subset(tas_combined, UNIT %in% c("United States", 
-                                                      "Greenland", 
-                                                      "Japan")) 
-} 
+  pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 5, width = 6)
 
-pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 5, width = 6)
-
-p = ggplot(tas_combined_sub) +
-  geom_density(aes(x = sum, fill = period), alpha = 0.8, size = 0.01) +
-  theme_pubr() +
-  scale_x_continuous(
-    limits = c(0, 1),
-    expand = c(0.05, 0.05),
-    breaks = c(0, 0.5, 1)) +
-  scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
-  facet_grid(source~UNIT, scales = "free") +
-  # facet_grid(source~UNIT, scales = "free_y") +
-  # facet_wrap(.~source+UNIT, scales = "free_y") +
-  ylab(NULL) + xlab(NULL) +
-  theme(
-    axis.text.y = element_blank(),
-    axis.ticks = element_blank(),
-    axis.text.x = element_text(size = 10),
-    legend.position = "bottom", 
-    legend.justification = c(1,0))
-
-print(p)
-
-dev.off()
-
-if (region == "eez") {
+  p = ggplot(tas_combined_sub) +
+    geom_density(aes(x = sum, fill = period), alpha = 0.8, size = 0.01) +
+    theme_pubr() +
+    scale_x_continuous(
+      limits = c(0, 1),
+      expand = c(0.05, 0.05),
+      breaks = c(0, 0.5, 1)) +
+    scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
+    facet_grid(source~UNIT, scales = "free") +
+    # facet_grid(source~UNIT, scales = "free_y") +
+    # facet_wrap(.~source+UNIT, scales = "free_y") +
+    ylab(NULL) + xlab(NULL) +
+    theme(
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      axis.text.x = element_text(size = 10),
+      legend.position = "bottom", 
+      legend.justification = c(1,0))
   
-  exclude_list = c("Area en controversia (disputed - Peruvian point of view)", 
-                   "Area of overlap Australia/Indonesia", 
-                   "Conflict zone China/Japan/Taiwan", 
-                   "Conflict zone Japan/Russia",
-                   "Conflict zone Japan/South Korea",
-                   "Disputed Barbados/Trinidad & Tobago",
-                   "Disputed Kenya/Somalia",
-                   "Disputed Western Sahara/Mauritania",
-                   "Joint development area Australia/East Timor",
-                   "Joint regime Colombia/Jamaica",
-                   "Joint regime Japan/Korea",
-                   "Joint regime Nigeria/Sao Tome and Principe",
-                   "Protected zone Australia/Papua New Guinea", 
-                   "Spratly Islands", 
-                   "Antarctica", 
-                   "Gaza Strip")
+  print(p)
   
-  tas_combined = tas_combined[ ! tas_combined$UNIT %in% exclude_list, ]
+  dev.off()
   
-  tas_combined$UNIT = gsub("&", "and", tas_combined$UNIT)
-  tas_combined$UNIT = gsub(" Is.", " Islands", tas_combined$UNIT, fixed = T)
-  tas_combined$UNIT = gsub(" I.", " Island", tas_combined$UNIT, fixed = T)
-  tas_combined$UNIT = gsub("Congo, DRC", "DR Congo", tas_combined$UNIT, fixed = T)
-  tas_combined$UNIT = gsub("Bonaire, Sint-Eustasius, Saba", "Netherlands", tas_combined$UNIT, fixed = T)
-  tas_combined$UNIT = gsub("United States ", "US ", tas_combined$UNIT, fixed = T)
-  tas_combined$UNIT = gsub("US Virgin Islands", "Virgin Islands, US", tas_combined$UNIT, fixed = T)
-  tas_combined$UNIT = gsub("St. ", "Saint ", tas_combined$UNIT, fixed = T)
-} 
+  if (region == "eez") {
+    
+    exclude_list = c("Area en controversia (disputed - Peruvian point of view)", 
+                     "Area of overlap Australia/Indonesia", 
+                     "Conflict zone China/Japan/Taiwan", 
+                     "Conflict zone Japan/Russia",
+                     "Conflict zone Japan/South Korea",
+                     "Disputed Barbados/Trinidad & Tobago",
+                     "Disputed Kenya/Somalia",
+                     "Disputed Western Sahara/Mauritania",
+                     "Joint development area Australia/East Timor",
+                     "Joint regime Colombia/Jamaica",
+                     "Joint regime Japan/Korea",
+                     "Joint regime Nigeria/Sao Tome and Principe",
+                     "Protected zone Australia/Papua New Guinea", 
+                     "Spratly Islands", 
+                     "Antarctica", 
+                     "Gaza Strip")
+    
+    tas_combined = tas_combined[ ! tas_combined$UNIT %in% exclude_list, ]
+    
+    tas_combined$UNIT = gsub("&", "and", tas_combined$UNIT)
+    tas_combined$UNIT = gsub(" Is.", " Islands", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub(" I.", " Island", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("Congo, DRC", "DR Congo", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("Bonaire, Sint-Eustasius, Saba", "Netherlands", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("United States ", "US ", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("US Virgin Islands", "Virgin Islands, US", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("St. ", "Saint ", tas_combined$UNIT, fixed = T)
+  } 
+  
+  prov_levels <- subset(tas_combined, period %in% c("2010-2018")) %>% # Reorder levels by 2010-2018 
+    dplyr::select(sum, UNIT) %>%
+    group_by(UNIT) %>%
+    mutate(mean_of_mean = mean(sum, na.rm = T))
+  
+  levels <- unique(prov_levels$UNIT[order(prov_levels$mean_of_mean)])
+  tas_combined$UNIT <- factor(tas_combined$UNIT, levels = levels, ordered = TRUE)
+  
+  ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
+  ipcc_temp_expand = ipcc_temp_expand(length(unique(tas_combined$UNIT)))
+  # invert_geom_defaults()
+  
+  summary = tas_combined %>% 
+    group_by(UNIT, period) %>% 
+    summarise_each(funs(mean, sd, se = sd(.)/sqrt(n())), sum)
+  
+  summary = as.data.frame(summary)
+  summary = summary[,c('UNIT', 'period', 'mean', 'sd', 'se')]
+  summary$UNIT = as.character(summary$UNIT)
+  summary <- summary[order(summary$UNIT),]
+  summary[,3:5] = round(summary[,3:5], 2)
+  summary$UNIT[duplicated(summary$UNIT)] <- ""
+  colnames(summary) = c("Unit", "Period", "Mean", "SD", "SE")
 
-prov_levels <- subset(tas_combined, period %in% c("2010-2018")) %>% # Reorder levels by 2010-2018 
-  dplyr::select(sum, UNIT) %>%
-  group_by(UNIT) %>%
-  mutate(mean_of_mean = mean(sum, na.rm = T))
-
-levels <- unique(prov_levels$UNIT[order(prov_levels$mean_of_mean)])
-tas_combined$UNIT <- factor(tas_combined$UNIT, levels = levels, ordered = TRUE)
-
-ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
-ipcc_temp_expand = ipcc_temp_expand(length(unique(tas_combined$UNIT)))
-# invert_geom_defaults()
-
-summary = tas_combined %>% 
-  group_by(UNIT, period) %>% 
-  summarise_each(funs(mean, sd, se = sd(.)/sqrt(n())), sum)
-
-summary = as.data.frame(summary)
-summary = summary[,c('UNIT', 'period', 'mean', 'sd', 'se')]
-summary$UNIT = as.character(summary$UNIT)
-summary <- summary[order(summary$UNIT),]
-summary[,3:5] = round(summary[,3:5], 2)
-summary$UNIT[duplicated(summary$UNIT)] <- ""
-colnames(summary) = c("Unit", "Period", "Mean", "SD", "SE")
-
-write_csv(summary, paste0('~/Desktop/', region, "_", cutoff, ".csv"))
-
-p = ggplot(tas_combined, aes(x = sum, y = UNIT, fill = UNIT)) +
-  geom_joy(scale = 3, bandwidth = 0.03, alpha = 0.8, size = 0.3) +
-  theme_joy(grid = F) +
-  scale_y_discrete(expand = c(0.01, 0)) + # will generally have to set the `expand` option
-  scale_x_continuous(limits = c(0, 1), expand = c(0.1, 0.1), breaks = c(0, 0.5, 1)) +
-  # scale_fill_cyclical(values = matlab.like(length(unique(df$UNIT))))+
-  scale_fill_cyclical(values = ipcc_temp_expand)+
-  facet_wrap(.~period, ncol = 4) +
-  ylab(NULL) + xlab(NULL) +
-  theme(axis.text.y = element_text(size = 10),
-        legend.position = "none")
-
-pdf(paste0("~/Desktop/Joy_", region, "_", cutoff, ".pdf"), height = 20, width = 10)
-print(p)
-dev.off()
-
-return(tas_combined)
-
+  write_csv(summary, paste0('~/Desktop/', region, "_", cutoff, ".csv"))
+  
+  p = ggplot(tas_combined, aes(x = sum, y = UNIT, fill = UNIT)) +
+    geom_joy(scale = 3, bandwidth = 0.03, alpha = 0.8, size = 0.3) +
+    theme_joy(grid = F) +
+    scale_y_discrete(expand = c(0.01, 0)) + # will generally have to set the `expand` option
+    scale_x_continuous(limits = c(0, 1), expand = c(0.1, 0.1), breaks = c(0, 0.5, 1)) +
+    # scale_fill_cyclical(values = matlab.like(length(unique(df$UNIT))))+
+    scale_fill_cyclical(values = ipcc_temp_expand)+
+    facet_wrap(.~period, ncol = 4) +
+    ylab(NULL) + xlab(NULL) +
+    theme(axis.text.y = element_text(size = 10),
+          legend.position = "none")
+  
+  pdf(paste0("~/Desktop/Joy_", region, "_", cutoff, ".pdf"), height = 20, width = 10)
+  print(p)
+  dev.off()
+  
+  return(tas_combined)
+  
 }
 rank_joy_bgcp = function(){
   
@@ -436,7 +436,7 @@ rank_joy_bgcp = function(){
       axis.text.x = element_text(size = 10),
       legend.position = "bottom", 
       legend.justification = c(1,0))
-  
+
   pdf(paste0("~/Desktop/Joy_bgcp_selected_", cutoff, ".pdf"), height = 5, width = 6)
   print(p)
   dev.off()

@@ -391,7 +391,7 @@ map = function(mode){
             legend.justification = c(1,0))
     
     pdf(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".pdf"), height = 10, width = 10)
-    # png(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".png"), height = 10, width = 10, units = "in", res = 100)
+    png(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".png"), height = 10, width = 10, units = "in", res = 100)
     print(p)
     dev.off()
     
