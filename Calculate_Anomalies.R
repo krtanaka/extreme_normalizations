@@ -17,8 +17,8 @@ cutoff = c(0.95, 0.975)[1]
 
 calculate_anomalies = function(period, data){
   
-  # period = "2010-2018"
-  # data = "COBE"
+  period = "2010-2018"
+  data = "HadI"
   
   setwd("~/Dropbox (MBA)/PAPER Kisei heat extremes")
   
@@ -31,7 +31,7 @@ calculate_anomalies = function(period, data){
   Baseline <- df[[1:600]] 
   names(Baseline)
   
-  # pdf(paste0("~/Dropbox (MBA)/PAPER Kisei heat extremes/figures/Climatologies/", data, "_Climatology_1870-1929.pdf"), height = 10, width = 8.5)
+  # pdf(paste0("~/Desktop/", data, "_Climatology_1870-1929.pdf"), height = 10, width = 8.5)
   # par(mfrow = c(2,1))
   # plot(calc(Baseline, mean), col = matlab.like(100), axes = F, main = "Mean", zlim = c(-3, 33))
   # map(add = T, lwd = 0.1, fill = T, col = "gray"); degAxis(1); degAxis(2, las = 1)
@@ -40,6 +40,7 @@ calculate_anomalies = function(period, data){
   # dev.off()
   
   Baseline <- Baseline %>% rasterToPoints() %>% data.frame()
+  if (data == "HadI") Baseline[Baseline == -1000] <- -1.8
   
   # View(names(df)) #look at time steps
   
@@ -50,6 +51,7 @@ calculate_anomalies = function(period, data){
   if (period == "2010-2018") Target <- df[[1681:1788]] #Jan 2010 - Dec 2018
   
   Target <- Target %>% rasterToPoints() %>% data.frame()
+  if (data == "HadI") Target[Target == -1000] <- -1.8
   
   ll_anom = NULL
   

@@ -91,9 +91,22 @@ world <- fortify(getMap())
 
 Baseline$mean = rowMeans(Baseline[,3:722])
 
+#IPCC - Temperature -
+ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
+               rgb(178, 24, 43, maxColorValue = 255, alpha = 255),
+               rgb(214, 96, 77, maxColorValue = 255, alpha = 255),
+               rgb(244, 165, 130, maxColorValue = 255, alpha = 255),
+               rgb(253, 219, 199, maxColorValue = 255, alpha = 255),
+               rgb(247, 247, 247, maxColorValue = 255, alpha = 255),
+               rgb(209, 229, 240, maxColorValue = 255, alpha = 255),
+               rgb(146, 197, 222, maxColorValue = 255, alpha = 255),
+               rgb(67, 147, 195, maxColorValue = 255, alpha = 255),
+               rgb(33, 102, 172, maxColorValue = 255, alpha = 255),
+               rgb(5, 48, 97, maxColorValue = 255, alpha = 255))
+
 p1 = ggplot(Baseline, aes(x, y, fill = mean)) + 
   geom_raster(alpha = 1) + 
-  scale_fill_gradientn(colors = matlab.like(100), "") +
+  scale_fill_gradientn(colors = ipcc_temp(100), "") +
   theme_void() + 
   # geom_point(data = Baseline[ll,], aes(x, y), color = "red", size = 5, shape = 15) +
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),

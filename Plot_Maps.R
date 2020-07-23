@@ -81,39 +81,43 @@ map = function(mode){
   
   anom[anom=="ERSST v4"]<-"ERSST v5"
   
-  anom$source = factor(anom$source, levels=c("HadISST v1.1","COBE v2",  "ERSST v5"))
+  anom$source = factor(anom$source, levels = c("HadISST v1.1", "COBE v2",  "ERSST v5"))
   
   if (mode == "annual") {
     
     anom$sum = range01(anom$sum)
-    anom = subset(anom, source %in% c("COBE v2", "HadISST v1.1"))
+    # anom = subset(anom, source %in% c("COBE v2", "HadISST v1.1"))
     
-    p = ggplot(anom) +
-      geom_point(aes(x, y, color = sum, fill = sum)) +
-      geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
-      scale_fill_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
-      scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
-      scale_x_continuous(expand = c(-0.005, 0), "") +
-      scale_y_continuous(expand = c(-0.005, 0), "") +
-      # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
-      facet_wrap(.~source + period, ncol = 3, dir = "v") +
-      theme_pubr() +
-      coord_map("ortho", orientation = c(0, 0, 0)) +
-      theme(axis.title.x = element_blank(),
-            axis.title.y = element_blank(),
-            legend.position = "right")
+    # p = ggplot(anom) +
+    #   geom_point(aes(x, y, color = sum, fill = sum)) +
+    #   geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
+    #   scale_fill_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+    #   scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+    #   scale_x_continuous(expand = c(-0.005, 0), "") +
+    #   scale_y_continuous(expand = c(-0.005, 0), "") +
+    #   # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
+    #   facet_wrap(.~source + period, ncol = 3, dir = "v") +
+    #   theme_minimal() +
+    #   coord_map("ortho", orientation = c(0, 0, 0)) +
+    #   theme(axis.title.x = element_blank(),
+    #         axis.title.y = element_blank(),
+    #         legend.position = "right")
     
     p = anom %>% 
-      sample_frac(0.1) %>% 
-      ggplot() + 
+      sample_frac(1) %>% 
+      subset(source %in% c("HadISST v1.1", "COBE v2")) %>% 
+      group_by(x, y, period) %>% 
+      summarise(sum = median(sum)) %>% 
+      ggplot(size = 5, alpha = 0.8) + 
       geom_point(aes(x = x, y = y, color = sum), size = 1, alpha = 0.5, shape = 16) +
       geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
                color = "gray20", fill = "gray20", size = 0.001) + 
       scale_color_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
       coord_proj("+proj=wintri") +
       # coord_fixed() + 
-      facet_grid(source ~ period) +
-      theme_pubr(I(20)) +
+      # facet_grid(source ~ period) +
+      facet_grid(~ period) +
+      theme_minimal(I(20)) +
       theme(axis.title.x = element_blank(),
             axis.title.y = element_blank(), 
             axis.text.x = element_blank(),
@@ -123,26 +127,27 @@ map = function(mode){
             legend.position = "bottom", 
             legend.justification = c(1,0))
     
-    p = ggplot(anom) + 
+    p = ggplot(anom) +
       geom_raster(aes(x = x, y = y, fill = sum)) +
       geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
-               color = "gray20", fill = "gray20", size = 0.001) + 
+               color = "gray20", fill = "gray20", size = 0.001) +
       scale_fill_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
       scale_x_continuous(expand = c(-0.005, 0), "") +
       scale_y_continuous(expand = c(-0.005, 0), "") +
-      coord_fixed() + 
+      coord_fixed() +
       facet_grid(period ~ source) +
-      theme_pubr(I(20)) +
+      theme_minimal(I(20)) +
       theme(axis.title.x = element_blank(),
-            axis.title.y = element_blank(), 
+            axis.title.y = element_blank(),
             axis.text.x = element_blank(),
             axis.text.y = element_blank(),
             axis.ticks.x = element_blank(),
             axis.ticks.y = element_blank(),
-            legend.position = "bottom", 
+            legend.position = "bottom",
             legend.justification = c(1,0))
     
-    pdf(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".pdf"), height = 8, width = 8)
+    # pdf(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".pdf"), height = 12, width = 12)
+    png(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".png"), height = 12, width = 12, units = "in", res = 100)
     print(p)
     dev.off()
     
@@ -175,22 +180,26 @@ map = function(mode){
     #   # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
     #   # facet_wrap(.~source + period + season, ncol = 3, dir = "v") +
     #   facet_grid(source ~ period + season) +
-    #   theme_pubr() + 
-    #   coord_map("ortho", orientation = c(0, 0, 0)) + 
+    # theme_minimal(I(20)) +
+      #   coord_map("ortho", orientation = c(0, 0, 0)) + 
     #   theme(axis.title.x = element_blank(),
     #         axis.title.y = element_blank(), 
     #         legend.position = "right")
     
     p = anom %>% 
-      sample_frac(1) %>%
+      # sample_frac(0.01) %>%
+      subset(source %in% c("HadISST v1.1", "COBE v2")) %>% 
+      group_by(x, y, period, season) %>% 
+      summarise(sum = median(sum)) %>% 
       ggplot() + 
       geom_point(aes(x = x, y = y, color = sum), size = 0.5, alpha = 0.5) +
       geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
                color = "black", fill = "gray", size = 0.1) + 
       scale_color_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
       coord_proj("+proj=wintri") +
-      facet_grid(source ~ season + period) +
-      theme_pubr(I(18)) +
+      # facet_grid(source ~ season + period) +
+      facet_grid(season ~ period) +
+      theme_minimal(I(18)) +
       theme(axis.title.x = element_blank(),
             axis.title.y = element_blank(), 
             axis.text.x = element_blank(),
@@ -209,7 +218,7 @@ map = function(mode){
       scale_y_continuous(expand = c(-0.005, 0), "") +
       coord_fixed() + 
       facet_grid(source ~ season + period) +
-      theme_pubr(I(10)) +
+      theme_minimal(I(10)) +
       theme(axis.title.x = element_blank(),
             axis.title.y = element_blank(), 
             axis.text.x = element_blank(),
@@ -219,7 +228,9 @@ map = function(mode){
             legend.position = "bottom", 
             legend.justification = c(1,0))
     
-    pdf(paste0("/Users/ktanaka/Desktop/SST_Anomalies_Season_", cutoff, ".pdf"), height = 5, width = 18)
+    # pdf(paste0("/Users/ktanaka/Desktop/SST_Anomalies_Season_", cutoff, ".pdf"), height = 5, width = 18)
+    png(paste0("/Users/ktanaka/Desktop/Fig2_", Sys.Date(), "_", cutoff, ".png"), height = 12, width = 12, units = "in", res = 100)
+    
     print(p)
     dev.off()
     
@@ -247,23 +258,22 @@ map = function(mode){
     
     anom = subset(anom, source %in% c("COBE v2", "HadISST v1.1"))
     
-    
-    # p = ggplot(anom) + 
-    #   geom_point(aes(x, y, color = sum, fill = sum), alpha = 0.5, size = 0.5) + 
-    #   geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
-    #   # geom_sf(data = world, size = 0.15, color = "gray") +
-    #   scale_fill_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
-    #   scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
-    #   scale_x_continuous(expand = c(-0.005, 0), "") +
-    #   scale_y_continuous(expand = c(-0.005, 0), "") +
-    #   # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
-    #   # facet_wrap(.~source + period + season, ncol = 3, dir = "v") +
-    #   facet_grid(source ~ period + season) +
-    #   theme_pubr() + 
-    #   coord_map("ortho", orientation = c(0, 0, 0)) + 
-    #   theme(axis.title.x = element_blank(),
-    #         axis.title.y = element_blank(), 
-    #         legend.position = "right")
+    p = ggplot(anom) +
+      geom_point(aes(x, y, color = sum, fill = sum), alpha = 0.5, size = 2) +
+      geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
+      # geom_sf(data = world, size = 0.15, color = "gray") +
+      scale_fill_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+      scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+      scale_x_continuous(expand = c(-0.005, 0), "") +
+      scale_y_continuous(expand = c(-0.005, 0), "") +
+      # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
+      # facet_wrap(.~source + period + season, ncol = 3, dir = "v") +
+      facet_grid(~ season) +
+      theme_minimal(I(18)) +
+      coord_map("ortho", orientation = c(0, 0, 0)) +
+      theme(axis.title.x = element_blank(),
+            axis.title.y = element_blank(),
+            legend.position = "right")
     
     p = anom %>% 
       sample_frac(1) %>%
@@ -285,16 +295,21 @@ map = function(mode){
             legend.position = "bottom", 
             legend.justification = c(1,0))
     
-    p = ggplot(anom) + 
-      geom_raster(aes(x = x, y = y, fill = sum)) +
+    p = anom %>% 
+      # sample_frac(0.01) %>%
+      subset(source %in% c("HadISST v1.1", "COBE v2")) %>% 
+      group_by(x, y, season) %>% 
+      summarise(sum = mean(sum, na.rm = T)) %>% 
+      ggplot() + 
+      geom_raster(aes(x = x, y = y, fill = sum, interpolate = T)) +
       geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
                color = "gray20", fill = "gray20", size = 0.001) + 
       scale_fill_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
       scale_x_continuous(expand = c(-0.005, 0), "") +
       scale_y_continuous(expand = c(-0.005, 0), "") +
       coord_fixed() + 
-      facet_grid(source ~ season) +
-      theme_pubr(I(20)) +
+      facet_grid(~ season) +
+      theme_minimal(I(20)) +
       theme(
         axis.title.x = element_blank(),
         axis.title.y = element_blank(), 
@@ -311,8 +326,81 @@ map = function(mode){
     
   }
   
+  if (mode == "combine") {
+    
+    #all periods
+    annual = rbind(hadi1, hadi2, hadi3, hadi4, cobe1, cobe2, cobe3, cobe4)
+    annual$sum = range01(annual$sum)
+    annual$season = "Annual"
+    annual = annual[, c("x", "y", "sum", "source", "period", "season")]
+    
+    #seasonals
+    anom = rbind(hadi1, hadi2, hadi3, hadi4, cobe1, cobe2, cobe3, cobe4)
+    season_1 = anom[,c("x", "y", "jan", "feb", "mar", "source", "period")]; season_1$season = "Jan-Mar"
+    season_2 = anom[,c("x", "y", "jul", "aug", "sep", "source", "period")]; season_2$season = "Jul-Sep"
+    season_1$sum = rowSums(season_1[3:5])
+    season_2$sum = rowSums(season_2[3:5])
+    season_1 = season_1[,c(1,2, 6:9)]
+    season_2 = season_2[,c(1,2, 6:9)]
+    season = rbind(season_1, season_2)
+    season$sum = range01(season$sum)
+    season = season[, c("x", "y", "sum", "source", "period", "season")]
+    
+    anom = rbind(annual, season) %>% group_by(x, y, period, season) %>% summarise(sum = mean(sum))
+    
+    p = anom %>% 
+      sample_frac(1) %>%
+      ggplot(size = 5, alpha = 0.8) + 
+      geom_point(aes(x = x, y = y, color = sum), size = 1, alpha = 0.5, shape = 16) +
+      geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
+               color = "gray20", fill = "gray20", size = 0.1) + 
+      # scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+      scale_color_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0, 0.5, 1)) +
+      # coord_proj("+proj=wintri") +
+      scale_x_continuous(expand = c(-0.005, 0), "") +
+      scale_y_continuous(expand = c(-0.005, 0), "") +
+      coord_fixed() +
+      facet_grid(season ~ period) +
+      theme_minimal(I(20)) +
+      theme(axis.title.x = element_blank(),
+            axis.title.y = element_blank(), 
+            axis.text.x = element_blank(),
+            axis.text.y = element_blank(),
+            axis.ticks.x = element_blank(),
+            axis.ticks.y = element_blank(),
+            legend.position = "bottom", 
+            legend.justification = c(1,0))
+    
+    p = ggplot(anom) +
+      geom_raster(aes(x = x, y = y, fill = sum), interpolate = T) +
+      geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
+               color = "gray20", fill = "gray20", size = 0.001) +
+      scale_fill_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
+      scale_x_continuous(expand = c(-0.005, 0), "") +
+      scale_y_continuous(expand = c(-0.005, 0), "") +
+      coord_fixed() +
+      facet_grid(season ~ period) +
+      theme_minimal(I(20)) +
+      theme(axis.title.x = element_blank(),
+            axis.title.y = element_blank(),
+            axis.text.x = element_blank(),
+            axis.text.y = element_blank(),
+            axis.ticks.x = element_blank(),
+            axis.ticks.y = element_blank(),
+            legend.position = "bottom",
+            legend.justification = c(1,0))
+    
+    pdf(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".pdf"), height = 10, width = 10)
+    png(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".png"), height = 10, width = 10, units = "in", res = 100)
+    print(p)
+    dev.off()
+    
+  }
+  
+  
 }
 
 map("annual")
 map("seasonal")
 map("seasonal_2000-2018")
+map("combine")

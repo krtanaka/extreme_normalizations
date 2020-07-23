@@ -33,9 +33,9 @@ range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 # eez <- rmapshaper::ms_simplify(eez, keep = 0.001, keep_shapes = F)
 # eez <- eez %>% st_as_sf()  
  
-load('/Users/Kisei/extreme_normalizations/eez_sf_dataframe_0.001.RData') 
-load('/Users/Kisei/extreme_normalizations/lme_sf_dataframe_0.001.RData') 
-load('/Users/Kisei/extreme_normalizations/meow_sf_dataframe.RData') 
+load('/Users/ktanaka/extreme_normalizations/eez_sf_dataframe_0.001.RData') 
+load('/Users/ktanaka/extreme_normalizations/lme_sf_dataframe_0.001.RData') 
+load('/Users/ktanaka/extreme_normalizations/meow_sf_dataframe.RData') 
 
 #IPCC - Temperature -
 ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),

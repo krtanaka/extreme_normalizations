@@ -12,13 +12,20 @@ registerDoParallel(cores = cores)
 
 rm(list = ls())
 
+<<<<<<< HEAD
 #load("C:/Users/bdias/Dropbox (MBA)/Kisei_files/data/COBE_SST.RData")
 
+=======
+>>>>>>> 5b6c41adb1e55f0cb6d203583ad5eeaf21402324
 p = c(0.975, 0.95, 0.9)[2]
 
 calculate_anomalies = function(data){
   
+<<<<<<< HEAD
   # data = c("HadI", "COBE", "ER")[1]
+=======
+  # data = c("HadI", "COBE", "ER")[2]
+>>>>>>> 5b6c41adb1e55f0cb6d203583ad5eeaf21402324
   
   setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/")
 
