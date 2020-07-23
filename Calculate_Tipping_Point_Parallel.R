@@ -14,11 +14,11 @@ rm(list = ls())
 
 #load("C:/Users/bdias/Dropbox (MBA)/Kisei_files/data/COBE_SST.RData")
 
-p = c(0.975, 0.95, 0.9)[3]
+p = c(0.975, 0.95, 0.9)[2]
 
 calculate_anomalies = function(data){
   
-  data = c("HadI", "COBE", "ER")[2]
+  # data = c("HadI", "COBE", "ER")[1]
   
   setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/")
 
@@ -110,7 +110,9 @@ calculate_anomalies = function(data){
   # axis(2, las = 2, at = seq(0, 0.8, 0.1))
   # abline(h = 0.5, lty = 2)
   
-  save(yy_anom, file = paste0("/Users/ktanaka/extreme_normalizations/results/", data, "/SST_TippingPoints_", p, ".RData"))
+  # save(yy_anom, file = paste0("/Users/ktanaka/extreme_normalizations/results/", data, "/SST_TippingPoints_", p, ".RData"))
+  save(yy_anom, file = paste0("/Users/ktanaka/Desktop/SST_TippingPoints_", data, "_", p, ".RData"))
+  
   
   # beepr::beep(2)
   
