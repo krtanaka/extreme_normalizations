@@ -9,7 +9,7 @@ library(maps)
 
 rm(list = ls())
 
-period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")
+period = c("1980-1989", "1990-1999", "2000-2009", "2010-2019")
 
 data = c("HadI", "COBE", "ER")
 
@@ -17,10 +17,10 @@ cutoff = c(0.95, 0.975)[1]
 
 calculate_anomalies = function(period, data){
   
-  period = "2010-2018"
-  data = "HadI"
+  # period = "2010-2019"
+  # data = "COBE"
   
-  setwd("~/Dropbox (MBA)/PAPER Kisei heat extremes")
+  setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes")
   
   load(paste0("data/", data, "_SST.RData"))
   
@@ -48,7 +48,7 @@ calculate_anomalies = function(period, data){
   if (period == "1980-1989") Target <- df[[1321:1440]] #Jan 1980 - Dec 1989
   if (period == "1990-1999") Target <- df[[1441:1560]] #Jan 1990 - Dec 1999
   if (period == "2000-2009") Target <- df[[1561:1680]] #Jan 2000 - Dec 2009
-  if (period == "2010-2018") Target <- df[[1681:1788]] #Jan 2010 - Dec 2018
+  if (period == "2010-2019") Target <- df[[1681:1800]] #Jan 2010 - Dec 2019
   
   Target <- Target %>% rasterToPoints() %>% data.frame()
   if (data == "HadI") Target[Target == -1000] <- -1.8
@@ -102,7 +102,8 @@ calculate_anomalies = function(period, data){
   
   anom$sum = rowSums(anom[3:14])
   
-  save(anom, file = paste0("~/extreme_normalizations/results/", data, "/SST_Anomalies_", period, ".RData"))
+  save(anom, file = paste0("/Users/", Sys.info()[7], 
+                           "/extreme_normalizations/results/", data, "/SST_Anomalies_", period, ".RData"))
 
   beepr::beep(2)
   
@@ -111,12 +112,12 @@ calculate_anomalies = function(period, data){
 calculate_anomalies("1980-1989", "HadI")
 calculate_anomalies("1990-1999", "HadI")
 calculate_anomalies("2000-2009", "HadI")
-calculate_anomalies("2010-2018", "HadI")
+calculate_anomalies("2010-2019", "HadI")
 
 calculate_anomalies("1980-1989", "COBE")
 calculate_anomalies("1990-1999", "COBE")
 calculate_anomalies("2000-2009", "COBE")
-calculate_anomalies("2010-2018", "COBE")
+calculate_anomalies("2010-2019", "COBE")
 
 calculate_anomalies("1980-1989", "ER")
 calculate_anomalies("1990-1999", "ER")
