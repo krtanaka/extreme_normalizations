@@ -12,27 +12,20 @@ registerDoParallel(cores = cores)
 
 rm(list = ls())
 
-<<<<<<< HEAD
 #load("C:/Users/bdias/Dropbox (MBA)/Kisei_files/data/COBE_SST.RData")
 
-=======
->>>>>>> 5b6c41adb1e55f0cb6d203583ad5eeaf21402324
 p = c(0.975, 0.95, 0.9)[2]
 
 calculate_anomalies = function(data){
   
-<<<<<<< HEAD
-  # data = c("HadI", "COBE", "ER")[1]
-=======
-  # data = c("HadI", "COBE", "ER")[2]
->>>>>>> 5b6c41adb1e55f0cb6d203583ad5eeaf21402324
-  
+  data = c("HadI", "COBE", "ER")[1]
+
   setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/")
 
   load(paste0(data, "_SST.RData"))
   
-  e = extent(-132, -110, 22.5, 47.5)
-  df = crop(df, e); rm(e)
+  # e = extent(-132, -110, 22.5, 47.5)
+  # df = crop(df, e); rm(e)
   
   # set baseline Jan 1870 - Dec 1919, 50 years
   Baseline <- df[[1:600]] 
@@ -40,12 +33,12 @@ calculate_anomalies = function(data){
   
   Baseline <- Baseline %>% rasterToPoints() %>% data.frame()
   
-  Target <- df[[361:1788]] #Jan 1900 - Dec 2018
+  Target <- df[[361:1800]] #Jan 1900 - Dec 2019
   Target <- Target %>% rasterToPoints() %>% data.frame()
   
   yy_anom = NULL
   
-  for (y in 1:119) { #every year between 1980-2018 (39) or 1900-2018 (119)
+  for (y in 1:120) { #every year between 1980-2018 (39) or 1900-2018 (119)
     
     # y = 100
     
