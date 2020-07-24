@@ -17,16 +17,11 @@ p = c(0.975, 0.95, 0.9)[2]
 
 setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/")
 
-
-load("/major_oceans.RData")
+load("major_oceans.RData")
 
 data = c("HadI", "COBE", "ER")[1]
 
-
 load(paste0(data, "_SST.RData"))
-
-# e = extent(-132, -110, 22.5, 47.5)
-# df = crop(df, e); rm(e)
 
 # set baseline Jan 1870 - Dec 1919, 50 years
 Baseline <- df[[1:600]] 
@@ -52,13 +47,13 @@ area <- over(latlon,statarea)
 colnames(area)[1] = "area"
 area = as.data.frame(area[,1])
 
-major_oceans = table(area) %>%
-  as.data.frame() %>%
-  arrange(desc(Freq)) %>%
-  top_n(7) %>%
-  select(area)
-
-major_oceans = as.character(major_oceans[,1])
+# major_oceans = table(area) %>%
+#   as.data.frame() %>%
+#   arrange(desc(Freq)) %>%
+#   top_n(7) %>%
+#   select(area)
+# 
+# major_oceans = as.character(major_oceans[,1])
 
 Baseline = cbind(area, Baseline)
 Target = cbind(area, Target)
@@ -66,88 +61,93 @@ Target = cbind(area, Target)
 colnames(Baseline)[1] = "area"
 colnames(Target)[1] = "area"
 
-Baseline = subset(Baseline, area == major_oceans[7])
-Target = subset(Target, area ==  major_oceans[7])
-
-Baseline = Baseline[,c(2:603)]
-Target = Target[,c(2:1443)]
-
-yy_anom = NULL
-
-for (y in 1:120) { #every year between 1980-2018 (39) or 1900-2018 (119)
+for (i in 1:7) {
   
-  # y = 100
+  i = 2
   
-  interval_year = seq(3, dim(Target)[2], by = 12) 
+  Baseline_n = subset(Baseline, area == major_oceans[i])
+  Target_n = subset(Target, area ==  major_oceans[i])
   
-  first_month = interval_year[y]
-  last_month = first_month + 11
+  Baseline_n = Baseline_n[,c(2:603)]
+  Target_n = Target_n[,c(2:1443)]
   
-  target = Target[,first_month:last_month]; names(target); dim(target) # target year
-  # ll_anom = NULL
+  yy_anom = NULL
   
-  # ptime <- system.time({
-  
-  r <- foreach(ll = 1:dim(target)[1], .combine = rbind) %dopar% {
+  for (y in 1:120) { #every year between 1980-2018 (39) or 1900-2018 (119)
     
-    # ll = 2
+    # y = 100
     
-    monthly_anom = NULL
+    interval_year = seq(3, dim(Target_n)[2], by = 12) 
     
-    for (m in 1:12) { # every month
+    first_month = interval_year[y]
+    last_month = first_month + 11
+    
+    target = Target_n[,first_month:last_month]; names(target); dim(target) # target year
+    # ll_anom = NULL
+    
+    # ptime <- system.time({
+    
+    r <- foreach(ll = 1:dim(target)[1], .combine = rbind) %dopar% {
       
-      # m = 1
+      # ll = 2
       
-      interval_month = seq(m+2, dim(Baseline)[2], by = 12)
+      monthly_anom = NULL
       
-      baseline = Baseline[ll, c(interval_month)]; names(baseline) #pick corresponding month from every baseline year
-      baseline = t(baseline)
-      baseline = as.data.frame(baseline)
-      baseline = baseline[,1]
+      for (m in 1:12) { # every month
+        
+        # m = 1
+        
+        interval_month = seq(m+2, dim(Baseline_n)[2], by = 12)
+        
+        baseline = Baseline_n[ll, c(interval_month)]; names(baseline) #pick corresponding month from every baseline year
+        baseline = t(baseline)
+        baseline = as.data.frame(baseline)
+        baseline = baseline[,1]
+        
+        q = quantile(baseline, prob = p)
+        # hist(baseline, breaks = 60, col = matlab.like(60), lty = "blank")
+        # abline(v = q)
+        
+        present = target[ll, m]; present
+        sum = ifelse(q < present, 1, 0)
+        
+        monthly_anom = cbind(monthly_anom, sum)
+        
+      }
       
-      q = quantile(baseline, prob = p)
-      # hist(baseline, breaks = 60, col = matlab.like(60), lty = "blank")
-      # abline(v = q)
+      monthly_anom
       
-      present = target[ll, m]; present
-      sum = ifelse(q < present, 1, 0)
-      
-      monthly_anom = cbind(monthly_anom, sum)
+      # ll_anom = rbind(ll_anom, monthly_anom)
       
     }
     
-    monthly_anom
+    # })[3]; ptime
     
-    # ll_anom = rbind(ll_anom, monthly_anom)
+    r = as.data.frame(r)
+    
+    colnames(r) = c("jan", "feb", "mar", "apr", "may", "jun",
+                    "jul", "aug", "sep", "oct", "nov", "dec")
+    
+    # year_sum = rowSums(r)
+    year_sum = colSums(r) #sum number of grid above monthly baseline 
+    year_sum = colSums(r)/dim(Baseline_n)[1] #divide by total grid cell
+    year_sum = as.data.frame(year_sum)
+    year_sum$time = paste0(1899+y, "-", seq(1, 12, 1))
+    
+    yy_anom = rbind(yy_anom, year_sum)
+    
+    print(y)
     
   }
   
-  # })[3]; ptime
+  plot(yy_anom$year_sum, type = "o", axes = F, pch = ".", xlab = "", ylab = "")
+  axis(1)
+  axis(2, las = 2, at = seq(0, 0.8, 0.1))
+  abline(h = 0.5, lty = 2)
   
-  r = as.data.frame(r)
-  
-  colnames(r) = c("jan", "feb", "mar", "apr", "may", "jun",
-                  "jul", "aug", "sep", "oct", "nov", "dec")
-  
-  # year_sum = rowSums(r)
-  year_sum = colSums(r) #sum number of grid above monthly baseline 
-  year_sum = colSums(r)/dim(Baseline)[1] #divide by total grid cell
-  year_sum = as.data.frame(year_sum)
-  year_sum$time = paste0(1899+y, "-", seq(1, 12, 1))
-  
-  yy_anom = rbind(yy_anom, year_sum)
-  
-  print(y)
-  
+  save(yy_anom, file = paste0("/Users/ktanaka/Desktop/SST_TippingPoints_", data, "_", p, "_", major_oceans[i], ".RData"))
+
 }
-
-plot(yy_anom$year_sum, type = "o", axes = F, pch = ".", xlab = "", ylab = "")
-axis(1)
-axis(2, las = 2, at = seq(0, 0.8, 0.1))
-abline(h = 0.5, lty = 2)
-
-# save(yy_anom, file = paste0("/Users/ktanaka/extreme_normalizations/results/", data, "/SST_TippingPoints_", p, ".RData"))
-save(yy_anom, file = paste0("/Users/ktanaka/Desktop/SST_TippingPoints_", data, "_", p, ".RData"))
 
 # beepr::beep(2)
 
