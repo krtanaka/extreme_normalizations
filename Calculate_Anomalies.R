@@ -17,8 +17,8 @@ cutoff = c(0.95, 0.975)[1]
 
 calculate_anomalies = function(period, data){
   
-  # period = "2010-2019"
-  # data = "COBE"
+  period = "2010-2019"
+  data = "ER"
   
   setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes")
   

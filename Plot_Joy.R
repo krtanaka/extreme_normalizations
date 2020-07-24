@@ -16,7 +16,7 @@ rm(list = ls())
 
 cutoff = c(0.95, 0.975)[1]
 
-period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")
+period = c("1980-1989", "1990-1999", "2000-2009", "2010-2019")
 
 data = c("HadI", "COBE", "ER")
 
@@ -57,7 +57,7 @@ ipcc_temp_4_cols <- c(rgb(153, 0, 2, maxColorValue = 255, alpha = 255),
 
 rank_joy = function(region){
   
-  # region = "eez"
+  # region = "lme"
   
   if (region == "meow"){
     shape = meow; shape$UNIT = shape$PROVINCE
@@ -145,8 +145,6 @@ rank_joy = function(region){
     
   }
   
-  # tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
-  
   if (region == "lme") {
     tas_combined_sub = subset(tas_combined, UNIT %in% c("Scotian Shelf", 
                                                         "California Current", 
@@ -167,27 +165,29 @@ rank_joy = function(region){
     country = country[, 1, drop=FALSE]
     country = as.character(country)
     
-    tas_combined_sub = subset(tas_combined, UNIT %in% country$UNIT)
+    # tas_combined_sub = subset(tas_combined, UNIT %in% country$UNIT)
+    
+    tas_combined_sub = subset(tas_combined, UNIT %in% c("United States", 
+                                                        "Greenland", 
+                                                        "Japan"))
   } 
   
   pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 10, width = 12)
 
-      tas_combined_sub = subset(tas_combined, UNIT %in% c("United States", 
-                                                        "Greenland", 
-                                                        "Japan")) 
-  } 
-  
-  pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 5, width = 6)
-
-  p = ggplot(tas_combined_sub) +
+  p = tas_combined_sub %>% 
+    subset(source %in% c("HadISST v1.1", "COBE v2")) %>% 
+    # group_by(UNIT, period) %>% 
+    # summarise(sum = mean(sum)) %>% 
+    ggplot() +
     geom_density(aes(x = sum, fill = period), alpha = 0.8, size = 0.01) +
-    theme_pubr() +
+    theme_minimal() +
     scale_x_continuous(
       limits = c(0, 1),
       expand = c(0.05, 0.05),
       breaks = c(0, 0.5, 1)) +
     scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
-    facet_grid(source~UNIT, scales = "free") +
+    # facet_grid(source~UNIT, scales = "free") +
+    facet_grid(~UNIT, scales = "free") +
     # facet_grid(source~UNIT, scales = "free_y") +
     # facet_wrap(.~source+UNIT, scales = "free_y") +
     ylab(NULL) + xlab(NULL) +
@@ -233,7 +233,10 @@ rank_joy = function(region){
     tas_combined$UNIT = gsub("St. ", "Saint ", tas_combined$UNIT, fixed = T)
   } 
   
-  prov_levels <- subset(tas_combined, period %in% c("2010-2018")) %>% # Reorder levels by 2010-2018 
+  tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
+  tas_combined = subset(tas_combined, period %in% c("2010-2019"))
+  
+  prov_levels <- subset(tas_combined, period %in% c("2010-2019")) %>% # Reorder levels by 2010-2019
     dplyr::select(sum, UNIT) %>%
     group_by(UNIT) %>%
     mutate(mean_of_mean = mean(sum, na.rm = T))
@@ -270,6 +273,8 @@ rank_joy = function(region){
     ylab(NULL) + xlab(NULL) +
     theme(axis.text.y = element_text(size = 10),
           legend.position = "none")
+  
+  p
   
   pdf(paste0("~/Desktop/Joy_", region, "_", cutoff, ".pdf"), height = 20, width = 10)
   print(p)
@@ -398,37 +403,24 @@ rank_joy_bgcp = function(){
     
   }
   
-  # tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
-  
   tas_combined_sub = subset(tas_combined, bgcp %in% c("North Atlantic Drift", 
                                                       "Coastal Californian current", 
                                                       "Indian monsoon gyre"))
   
-  # p = ggplot(tas_combined_sub, aes(x = sum, y = bgcp, fill = period)) +
-  #   geom_joy(scale = 5, alpha = 0.8, size = 0.05) +
-  #   theme_pubr() +
-  #   scale_x_continuous(
-  #     limits = c(0, 1),
-  #     expand = c(0.05, 0.05),
-  #     breaks = c(0, 0.5, 1)) +
-  #   scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
-  #   facet_grid(bgcp ~ source, scales = "free") +
-  #   ylab(NULL) + xlab(NULL) +
-  #   theme(axis.text.y = element_blank(),
-  #         axis.ticks = element_blank(),
-  #         axis.text.x = element_text(size = 10),
-  #         legend.position = "bottom", 
-  #         legend.justification = c(1,0))
+  # tas_combined_sub = subset(tas_combined, bgcp %in% c("Coastal Californian current"))
   
-  p = ggplot(tas_combined_sub) +
+  p = tas_combined_sub %>% 
+    group_by(x, y, bgcp, period) %>% 
+    summarise(sum = mean(sum)) %>% 
+    ggplot() +
     geom_density(aes(x = sum, fill = period), alpha = 0.8, size = 0.01) +
-    theme_pubr() +
+    ggthemes::theme_few(I(15)) +
     scale_x_continuous(
       limits = c(0, 1),
       expand = c(0.05, 0.05),
       breaks = c(0, 0.5, 1)) +
     scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
-    facet_grid(source ~ bgcp, scales = "free") +
+    facet_grid(~ bgcp, scales = "free") +
     ylab(NULL) + xlab(NULL) +
     theme(
       axis.text.y = element_blank(),
@@ -441,7 +433,12 @@ rank_joy_bgcp = function(){
   print(p)
   dev.off()
   
-  prov_levels <- subset(tas_combined, period %in% c("2010-2018")) %>% # Reorder levels by 2010-2018 
+  tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
+  tas_combined = subset(tas_combined, period %in% c("2010-2019")) 
+  tas_combined = tas_combined %>% mutate(bgcp = gsub("\xca", "", bgcp)) 
+  tas_combined = tas_combined %>% group_by(x, y, bgcp, period) %>% summarise(sum = mean(sum))
+  
+  prov_levels <- subset(tas_combined, period %in% c("2010-2019")) %>% # Reorder levels by 2010-2019
     dplyr::select(sum, bgcp) %>%
     group_by(bgcp) %>%
     mutate(mean_of_mean = mean(sum, na.rm = T))
@@ -466,7 +463,7 @@ rank_joy_bgcp = function(){
   write_csv(summary, paste0("~/Desktop/bgcp_", cutoff, ".csv"))
   
   p = tas_combined %>% 
-    mutate(bgcp = gsub("\xca", "", bgcp)) %>% 
+    # mutate(bgcp = gsub("\xca", "", bgcp)) %>% 
     ggplot(aes(x = sum, y = bgcp, fill = bgcp)) +
     geom_joy(scale = 3, bandwidth = 0.03, alpha = 0.8, size = 0.3) +
     theme_joy(grid = F) +
@@ -497,7 +494,7 @@ df1 = lme %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n())  %>% fil
 df2 = lme %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n())  %>% filter(freq > 100) %>% top_n(-15, m)
 sub = rbind(df1, df2)
 sub = as.vector(sub$UNIT)
-lme_sub = subset(lme, UNIT %in% sub & period %in% c("2000-2009", "2010-2018"))
+lme_sub = subset(lme, UNIT %in% sub & period %in% c("2010-2019"))
 lme_sub = lme_sub %>% group_by(UNIT) %>% mutate(m = median(sum)) %>% arrange(UNIT, m)
 lme_sub = lme_sub[,c("UNIT", "sum")]; lme_sub = as.data.frame(lme_sub); lme_sub = lme_sub[1:2]; lme_sub$class = "LME"
 
@@ -505,7 +502,7 @@ df1 = eez %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n()) %>% filt
 df2 = eez %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n())  %>% filter(freq > 100) %>% top_n(-15, m)
 sub = rbind(df1, df2)
 sub = as.vector(sub$UNIT)
-eez_sub = subset(eez, UNIT %in% sub & period %in% c("2000-2009", "2010-2018"))
+eez_sub = subset(eez, UNIT %in% sub & period %in% c("2010-2019"))
 # eez_sub = lme_sub %>% group_by(UNIT) %>% mutate(m = median(sum)) %>% arrange(UNIT, m)
 eez_sub = eez_sub[,c("UNIT", "sum")]; eez_sub = as.data.frame(eez_sub); eez_sub = eez_sub[1:2]; eez_sub$class = "EEZ"
 
@@ -513,7 +510,7 @@ df1 = bgcp %>% group_by(bgcp) %>% summarise(m = median(sum), freq = n()) %>% fil
 df2 = bgcp %>% group_by(bgcp) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 100) %>% top_n(-15, m)
 sub = rbind(df1, df2)
 sub = as.vector(sub$bgcp)
-bgcp_sub = subset(bgcp, bgcp %in% sub & period %in% c("2000-2009", "2010-2018"))
+bgcp_sub = subset(bgcp, bgcp %in% sub & period %in% c("2010-2019"))
 bgcp$bgcp = as.character(bgcp$bgcp)
 # bgcp_sub = bgcp_sub %>% group_by(bgcp) %>% mutate(m = median(sum)) %>% arrange(bgcp, m)
 bgcp_sub = bgcp_sub[,c("bgcp", "sum")]; bgcp_sub = as.data.frame(bgcp_sub); colnames(bgcp_sub)[1] = "UNIT"; bgcp_sub$class = "BGCP"
@@ -523,7 +520,7 @@ ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
 # ipcc_temp_expand = ipcc_temp_expand(60)
 # ipcc_temp_expand = paste(ipcc_temp_expand, ipcc_temp_expand)
 
-pdf(paste0("~/Desktop/LME_Joy_", cutoff, ".pdf"), width = 4.5, height = 6)
+pdf(paste0("~/Desktop/Fig2_LME.", cutoff, ".pdf"), width = 4.5, height = 6)
 p = lme_sub %>% 
   mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
   ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
@@ -538,7 +535,7 @@ p = lme_sub %>%
 print(p)
 dev.off()
 
-pdf(paste0("~/Desktop/EEZ_Joy_", cutoff, ".pdf"), width = 3, height = 6)
+pdf(paste0("~/Desktop/Fig2_EEZ.", cutoff, ".pdf"), width = 4, height = 6)
 p = eez_sub %>% 
   mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
   ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
@@ -553,7 +550,7 @@ p = eez_sub %>%
 print(p)
 dev.off()
 
-pdf(paste0("~/Desktop/BGCP_Joy_", cutoff, ".pdf"), width = 4.5, height = 6)
+pdf(paste0("~/Desktop/Fig2_BGCP.", cutoff, ".pdf"), width = 4.5, height = 6)
 p = bgcp_sub %>%  
   mutate(UNIT = gsub("\xca", "", UNIT)) %>% 
   mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
