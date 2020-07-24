@@ -32,7 +32,7 @@ range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 # eez <- readOGR(dsn = "/Users/ktanaka/clim_geo_disp/data/EEZ_land_union", layer = "EEZ_land_v2_201410")
 # eez <- rmapshaper::ms_simplify(eez, keep = 0.001, keep_shapes = F)
 # eez <- eez %>% st_as_sf()  
- 
+
 load('/Users/ktanaka/extreme_normalizations/eez_sf_dataframe_0.001.RData') 
 load('/Users/ktanaka/extreme_normalizations/lme_sf_dataframe_0.001.RData') 
 load('/Users/ktanaka/extreme_normalizations/meow_sf_dataframe.RData') 
@@ -57,7 +57,7 @@ ipcc_temp_4_cols <- c(rgb(153, 0, 2, maxColorValue = 255, alpha = 255),
 
 rank_joy = function(region){
   
-  # region = "lme"
+  # region = "eez"
   
   if (region == "meow"){
     shape = meow; shape$UNIT = shape$PROVINCE
@@ -173,7 +173,7 @@ rank_joy = function(region){
   } 
   
   pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 10, width = 12)
-
+  
   p = tas_combined_sub %>% 
     subset(source %in% c("HadISST v1.1", "COBE v2")) %>% 
     # group_by(UNIT, period) %>% 
@@ -259,7 +259,7 @@ rank_joy = function(region){
   summary[,3:5] = round(summary[,3:5], 2)
   summary$UNIT[duplicated(summary$UNIT)] <- ""
   colnames(summary) = c("Unit", "Period", "Mean", "SD", "SE")
-
+  
   write_csv(summary, paste0('~/Desktop/', region, "_", cutoff, ".csv"))
   
   p = ggplot(tas_combined, aes(x = sum, y = UNIT, fill = UNIT)) +
@@ -428,7 +428,7 @@ rank_joy_bgcp = function(){
       axis.text.x = element_text(size = 10),
       legend.position = "bottom", 
       legend.justification = c(1,0))
-
+  
   pdf(paste0("~/Desktop/Joy_bgcp_selected_", cutoff, ".pdf"), height = 5, width = 6)
   print(p)
   dev.off()
@@ -490,24 +490,24 @@ lme = rank_joy("lme")
 eez = rank_joy("eez")
 bgcp = rank_joy_bgcp()
 
-df1 = lme %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n())  %>% filter(freq > 100) %>% top_n(15, m)
-df2 = lme %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n())  %>% filter(freq > 100) %>% top_n(-15, m)
+df1 = lme %>% group_by(UNIT) %>% summarise(m = mean(sum), freq = n())  %>% filter(freq > 20) %>% top_n(15, m)
+df2 = lme %>% group_by(UNIT) %>% summarise(m = mean(sum), freq = n())  %>% filter(freq > 20) %>% top_n(-15, m)
 sub = rbind(df1, df2)
 sub = as.vector(sub$UNIT)
 lme_sub = subset(lme, UNIT %in% sub & period %in% c("2010-2019"))
 lme_sub = lme_sub %>% group_by(UNIT) %>% mutate(m = median(sum)) %>% arrange(UNIT, m)
 lme_sub = lme_sub[,c("UNIT", "sum")]; lme_sub = as.data.frame(lme_sub); lme_sub = lme_sub[1:2]; lme_sub$class = "LME"
 
-df1 = eez %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 100) %>% top_n(15, m)
-df2 = eez %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n())  %>% filter(freq > 100) %>% top_n(-15, m)
+df1 = eez %>% group_by(UNIT) %>% summarise(m = mean(sum), freq = n()) %>% filter(freq > 20) %>% top_n(15, m)
+df2 = eez %>% group_by(UNIT) %>% summarise(m = mean(sum), freq = n())  %>% filter(freq > 20) %>% top_n(-15, m)
 sub = rbind(df1, df2)
 sub = as.vector(sub$UNIT)
 eez_sub = subset(eez, UNIT %in% sub & period %in% c("2010-2019"))
 # eez_sub = lme_sub %>% group_by(UNIT) %>% mutate(m = median(sum)) %>% arrange(UNIT, m)
 eez_sub = eez_sub[,c("UNIT", "sum")]; eez_sub = as.data.frame(eez_sub); eez_sub = eez_sub[1:2]; eez_sub$class = "EEZ"
 
-df1 = bgcp %>% group_by(bgcp) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 100) %>% top_n(15, m); df1 = df1 %>% top_n(15)
-df2 = bgcp %>% group_by(bgcp) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 100) %>% top_n(-15, m)
+df1 = bgcp %>% group_by(bgcp) %>% summarise(m = mean(sum), freq = n()) %>% filter(freq > 20) %>% top_n(15, m); df1 = df1 %>% top_n(15)
+df2 = bgcp %>% group_by(bgcp) %>% summarise(m = mean(sum), freq = n()) %>% filter(freq > 20) %>% top_n(-15, m)
 sub = rbind(df1, df2)
 sub = as.vector(sub$bgcp)
 bgcp_sub = subset(bgcp, bgcp %in% sub & period %in% c("2010-2019"))
