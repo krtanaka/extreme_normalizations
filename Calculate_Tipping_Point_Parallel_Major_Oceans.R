@@ -1,3 +1,6 @@
+cores = detectCores()/2
+registerDoParallel(cores = cores)
+
 rm(list = ls())
 
 library(raster)
@@ -9,9 +12,6 @@ library(rgdal)
 library(dplyr)
 library(maps)
 library(doParallel)
-
-cores = detectCores()/2
-registerDoParallel(cores = cores)
 
 p = c(0.975, 0.95, 0.9)[2]
 
@@ -63,7 +63,7 @@ colnames(Target)[1] = "area"
 
 for (i in 1:7) {
   
-  i = 2
+  # i = 2
   
   Baseline_n = subset(Baseline, area == major_oceans[i])
   Target_n = subset(Target, area ==  major_oceans[i])
