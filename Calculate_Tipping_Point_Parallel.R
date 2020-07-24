@@ -10,14 +10,14 @@ library(dplyr)
 library(maps)
 library(doParallel)
 
-# cores = detectCores()/2
-# registerDoParallel(cores = cores)
+cores = detectCores()/2
+registerDoParallel(cores = cores)
 
 p = c(0.975, 0.95, 0.9)[2]
 
 calculate_anomalies = function(data){
   
-  data = c("HadI", "COBE", "ER")[1]
+  data = c("HadI", "COBE", "ER")[3]
   
   setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/")
   
@@ -35,32 +35,40 @@ calculate_anomalies = function(data){
   Target <- df[[361:1800]] #Jan 1900 - Dec 2019
   Target <- Target %>% rasterToPoints() %>% data.frame()
   
-  #add stat area
-  names(Target)
-  latlon = Target[,c(1:2)]; plot(latlon, pch = ".")
-  library(sp)
-  library(maptools)
-  library(colorRamps)
-  coordinates(latlon) = ~x+y
-  statarea <- rgdal::readOGR("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/World_Seas_IHO_v1/World_Seas.shp")
-  CRS.new <- CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0+datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")  #EPSG:102003
-  proj4string(latlon) <- CRS.new 
-  proj4string(statarea) <- CRS.new
-  area <- over(latlon,statarea)
-  colnames(area)[1] = "area"
-  area = as.data.frame(area[,1])
-  
-  Baseline = cbind(area, Baseline)
-  Target = cbind(area, Target)
-  
-  colnames(Baseline)[1] = "area"
-  colnames(Target)[1] = "area"
-  
-  Baseline = subset(Baseline, area == "Gulf of Mexico")
-  Target = subset(Target, area == "Gulf of Mexico")
-  
-  Baseline = Baseline[,c(2:603)]
-  Target = Target[,c(2:1443)]
+  # #choose ocean 
+  # names(Target)
+  # latlon = Target[,c(1:2)]; plot(latlon, pch = ".")
+  # library(sp)
+  # library(maptools)
+  # library(colorRamps)
+  # coordinates(latlon) = ~x+y
+  # statarea <- rgdal::readOGR("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/World_Seas_IHO_v1/World_Seas.shp")
+  # CRS.new <- CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0+datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")  #EPSG:102003
+  # proj4string(latlon) <- CRS.new 
+  # proj4string(statarea) <- CRS.new
+  # area <- over(latlon,statarea)
+  # colnames(area)[1] = "area"
+  # area = as.data.frame(area[,1])
+  # 
+  # major_oceans = table(area) %>% 
+  #   as.data.frame() %>% 
+  #   arrange(desc(Freq)) %>% 
+  #   top_n(7) %>% 
+  #   select(area)
+  # 
+  # major_oceans = as.character(major_oceans[,1])
+  # 
+  # Baseline = cbind(area, Baseline)
+  # Target = cbind(area, Target)
+  # 
+  # colnames(Baseline)[1] = "area"
+  # colnames(Target)[1] = "area"
+  # 
+  # Baseline = subset(Baseline, area == major_oceans[7])
+  # Target = subset(Target, area ==  major_oceans[7])
+  # 
+  # Baseline = Baseline[,c(2:603)]
+  # Target = Target[,c(2:1443)]
   
   yy_anom = NULL
   
@@ -131,10 +139,10 @@ calculate_anomalies = function(data){
     
   }
   
-  # plot(yy_anom$year_sum, type = "o", axes = F, pch = ".", xlab = "", ylab = "")
-  # axis(1)
-  # axis(2, las = 2, at = seq(0, 0.8, 0.1))
-  # abline(h = 0.5, lty = 2)
+  plot(yy_anom$year_sum, type = "o", axes = F, pch = ".", xlab = "", ylab = "")
+  axis(1)
+  axis(2, las = 2, at = seq(0, 0.8, 0.1))
+  abline(h = 0.5, lty = 2)
   
   # save(yy_anom, file = paste0("/Users/ktanaka/extreme_normalizations/results/", data, "/SST_TippingPoints_", p, ".RData"))
   save(yy_anom, file = paste0("/Users/ktanaka/Desktop/SST_TippingPoints_", data, "_", p, ".RData"))
@@ -146,4 +154,3 @@ calculate_anomalies = function(data){
 calculate_anomalies("HadI")
 calculate_anomalies("COBE")
 calculate_anomalies("ER")
-
