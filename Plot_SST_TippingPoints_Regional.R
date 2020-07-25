@@ -54,17 +54,72 @@ df$Day <- sprintf("%02d", as.numeric(df$Day))
 df$Time = paste(df$Year, df$Month, df$Day, sep = "-")
 df$Time = as.Date(df$Time)
 
-df %>% 
-  # group_by(Time, region, data) %>% summarise(year_sum = mean(year_sum)) %>%
-  ggplot(aes(x = Time, y = year_sum, color = year_sum, group = region)) +
-  # geom_point(alpha = 0.8) +
-  geom_line(size = 0.5, alpha = 0.75) +
-  # geom_smooth(method = "loess", span = 0.1) +
+df1 = df %>% group_by(Year, data, region) %>% summarise(year_sum = mean(year_sum))
+df1$Year = as.numeric(df1$Year)
+
+df1 %>% 
+  ggplot(aes(x = Year, y = year_sum, color = data)) +
+  geom_point(alpha = 0.8) +
+  geom_line(alpha = 0.8) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") +
   labs(x = "", y = "Area Fraction") +
-  scale_color_viridis_c("") + 
   cowplot::theme_cowplot() +
-  facet_grid(region~data) +
-  scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2019-12-01"), by = "40 years"), 
-               labels = scales::date_format("%Y")) 
+  scale_color_brewer(palette = "Set1", "") + 
+  facet_wrap(~region, ncol = 4, scales = "free_y") + 
+  scale_x_continuous(breaks = seq(1900, 2020, 40), limits = c(1900, 2020)) + 
+  theme(legend.position = "top",
+        legend.justification = c(0,1))
 
+  # scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2019-12-01"), by = "40 years"), 
+  #              labels = scales::date_format("%Y")) 
+  
+  df2 = df %>% group_by(Year, region) %>% summarise(year_sum = mean(year_sum))
+  df2$Year = as.numeric(df2$Year)
+  
+  # The palette with black:
+  cbp <- c("#E69F00", "#000000", "#56B4E9", "#009E73",
+            "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+  
+  ElNino = subset(df, Year %in% c(1905, 1906, 
+                                  1911, 1912, 1914, 1915, 
+                                  1940, 1941, 1942, 
+                                  1965, 1966, 
+                                  1972, 1973,
+                                  1982, 1983, 1987, 1988, 
+                                  1991, 1992, 1997, 1998, 
+                                  2015, 2016))
+  
+  df2$linesize = ifelse(df2$region == "Global", 2, 1)
+  
+  df2 %>% 
+    ggplot(aes(Year, year_sum, group = region, colour = region, size = linesize)) +
+    geom_smooth(span = 0.1, se = F, alpha = 0.8)  +
+    scale_size(range = c(1, 3), guide = "none") +
+    geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
+    scale_colour_manual(values = cbp, "") + 
+    labs(x = "", y = "Proportion of Area") +
+    scale_x_continuous(breaks = seq(1900, 2020, 20), limits = c(1900, 2020)) + 
+    scale_y_continuous(breaks = c(seq(0, 1, by = 0.2))) + 
+    ggpubr::theme_pubr(I(20)) +
+    theme(legend.position = c(0.16, 0.85),
+          axis.text.x = element_text(size = 10),
+          axis.text.y = element_text(size = 10))
+  
+  df2 %>% 
+    ggplot(aes(Year, year_sum, colour = year_sum)) +
+    scale_size(range = c(1, 3), guide = "none") +
+    geom_line() +
+    geom_point() +
+    geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
+    labs(x = "", y = "Proportion of Area") +
+    scale_color_viridis_c() + 
+    scale_x_continuous(breaks = seq(1900, 2020, 40), limits = c(1900, 2020)) + 
+    scale_y_continuous(breaks = c(seq(0, 1, by = 0.2))) + 
+    cowplot::theme_cowplot(I(20)) +
+    facet_wrap(~region, scales = "free_y", ncol = 4) + 
+    theme(legend.position = "none",
+          axis.text.x = element_text(size = 10),
+          axis.text.y = element_text(size = 10))
+  # geom_dl(aes(label = region), method = list(dl.trans(x = x - .2), "first.points")) 
+  
+  
