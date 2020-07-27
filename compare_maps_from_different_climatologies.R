@@ -26,7 +26,35 @@ a2 = rbind(hadi1, hadi2, hadi3, hadi4, cobe1, cobe2, cobe3, cobe4)
 
 rm(hadi1, hadi2, hadi3, hadi4, cobe1, cobe2, cobe3, cobe4)
 
-anom = anom %>% group_by(x, y) %>% summarise(sum = mean(sum))
-anom$sum = range01(anom$sum)
+a1 = a1 %>% group_by(x, y) %>% summarise(sum = mean(sum))
+a1$sum = range01(a1$sum)
 
-anom %>% ggplot(aes(x, y, fill = sum)) + geom_raster(interpolate = T) + scale_fill_viridis_c() + coord_fixed() + theme_minimal()
+a2 = a2 %>% group_by(x, y) %>% summarise(sum = mean(sum))
+a2$sum = range01(a2$sum)
+
+a1 %>% ggplot(aes(x, y, fill = sum)) + geom_raster(interpolate = T) + scale_fill_viridis_c() + coord_fixed() + theme_minimal()
+a2 %>% ggplot(aes(x, y, fill = sum)) + geom_raster(interpolate = T) + scale_fill_viridis_c() + coord_fixed() + theme_minimal()
+
+a1$time = "based on 1870-1919 climatology"
+a2$time = "based on 1956-2005 climatology"
+
+anom = rbind(a1, a2)
+
+anom$time = factor(anom$time, levels = c("based on 1870-1919 climatology", "based on 1956-2005 climatology"))
+
+
+anom %>% ggplot(aes(x, y, fill = sum)) + 
+  geom_raster(interpolate = T) +
+  geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
+           color = "gray20", fill = "gray20", size = 0.001) + 
+  scale_fill_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
+  coord_fixed() + theme_minimal(I(15)) + 
+  ylab("") + xlab("") + 
+  facet_wrap(.~time, ncol = 1) +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        legend.position = "right")
