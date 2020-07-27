@@ -106,7 +106,7 @@ calculate_anomalies = function(period, data){
   
   anom$sum = rowSums(anom[3:14])
   
-  save(anom, file = paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/", data, "/SST_Anomalies_", period, ".RData"))
+  save(anom, file = paste0("/Users/", Sys.info()[7], "/extreme_normalizations/", data, "_SST_Anomalies_", period, ".RData"))
 
   beepr::beep(2)
   
