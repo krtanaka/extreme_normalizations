@@ -1,6 +1,7 @@
 library(colorRamps)
 library(ggplot2)
 library(ggpubr)
+library(dplyr)
 
 rm(list = ls())
 
@@ -93,7 +94,7 @@ df2$linesize = ifelse(df2$region == "Global", 2, 1)
 
 df2 %>% 
   ggplot(aes(Year, year_sum, group = region, colour = region, size = linesize)) +
-  geom_smooth(span = 0.1, se = F, alpha = 0.8)  +
+  geom_smooth(span = 0.05, se = F, alpha = 0.8)  +
   scale_size(range = c(1, 3), guide = "none") +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
   scale_colour_manual(values = cbp, "") + 

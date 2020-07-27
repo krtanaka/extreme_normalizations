@@ -17,8 +17,8 @@ cutoff = c(0.95, 0.975)[1]
 
 calculate_anomalies = function(period, data){
   
-  period = "2010-2019"
-  data = "ER"
+  # period = "2010-2019"
+  # data = "ER"
   
   setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes")
   
@@ -28,7 +28,11 @@ calculate_anomalies = function(period, data){
   # df = crop(df, e); rm(e)
   
   # set baseline Jan 1870 - Dec 1919, 50 years
-  Baseline <- df[[1:600]] 
+  Baseline <- df[[1:600]]
+  
+  # set baseline Jan 1956 - Dec 2005, 50 years
+  Baseline <- df[[1033:1632]]
+  
   names(Baseline)
   
   # pdf(paste0("~/Desktop/", data, "_Climatology_1870-1929.pdf"), height = 10, width = 8.5)
@@ -102,8 +106,7 @@ calculate_anomalies = function(period, data){
   
   anom$sum = rowSums(anom[3:14])
   
-  save(anom, file = paste0("/Users/", Sys.info()[7], 
-                           "/extreme_normalizations/results/", data, "/SST_Anomalies_", period, ".RData"))
+  save(anom, file = paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/", data, "/SST_Anomalies_", period, ".RData"))
 
   beepr::beep(2)
   
