@@ -3,6 +3,8 @@ setwd("/Users/ktanaka/extreme_normalizations/")
 
 library(raster)
 library(colorRamps)
+library(dplyr)
+library(ggplot2)
 
 rm(list = ls())
 
@@ -59,7 +61,7 @@ r3 = r %>% select(x, y, past_future) %>% mutate(t = "extreme + anomalies", z = p
 
 r = rbind(r1, r2, r3)
 
-world <- fortify(getMap())
+world <- fortify(rworldmap::getMap())
 
 #IPCC - Temperature -
 ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
@@ -82,7 +84,7 @@ r %>% ggplot(aes(x, y, fill = z)) +
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
            color = "gray20", fill = "gray20", size = 0.001) + 
   scale_fill_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
-  coord_fixed() + theme_minimal(I(20)) + 
+  coord_fixed() + theme_minimal(I(15)) + 
   ylab("") + xlab("") + 
   facet_wrap(.~t, ncol = 1) +
   theme(axis.title.x = element_blank(),
