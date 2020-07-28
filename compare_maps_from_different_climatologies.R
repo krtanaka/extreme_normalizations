@@ -1,3 +1,19 @@
+rm(list = ls())
+world <- fortify(rworldmap::getMap())
+range01 <- function(x){(x-min(x))/(max(x)-min(x))}
+
+ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
+               rgb(178, 24, 43, maxColorValue = 255, alpha = 255),
+               rgb(214, 96, 77, maxColorValue = 255, alpha = 255),
+               rgb(244, 165, 130, maxColorValue = 255, alpha = 255),
+               rgb(253, 219, 199, maxColorValue = 255, alpha = 255),
+               rgb(247, 247, 247, maxColorValue = 255, alpha = 255),
+               rgb(209, 229, 240, maxColorValue = 255, alpha = 255),
+               rgb(146, 197, 222, maxColorValue = 255, alpha = 255),
+               rgb(67, 147, 195, maxColorValue = 255, alpha = 255),
+               rgb(33, 102, 172, maxColorValue = 255, alpha = 255),
+               rgb(5, 48, 97, maxColorValue = 255, alpha = 255))
+
 #historical extreme from 1870-1919
 cutoff = c(0.95, 0.975)[1]
 load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/SST_Anomalies_1980-1989_", cutoff, ".RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1989"
@@ -41,7 +57,6 @@ a2$time = "based on 1956-2005 climatology"
 anom = rbind(a1, a2)
 
 anom$time = factor(anom$time, levels = c("based on 1870-1919 climatology", "based on 1956-2005 climatology"))
-
 
 anom %>% ggplot(aes(x, y, fill = sum)) + 
   geom_raster(interpolate = T) +

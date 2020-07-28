@@ -124,13 +124,25 @@ df2 %>%
 # geom_dl(aes(label = region), method = list(dl.trans(x = x - .2), "first.points")) 
 
 
-df %>% 
+
+df3 = df %>% 
   group_by(Year, region) %>% 
   summarise(year_sum = mean(year_sum)) %>% 
   mutate(y = ifelse(year_sum > 0.5, 1, 0)) %>% 
   select(Year, region, y) %>% 
-  subset(y > 0) %>% 
-  mutate(region2 = region) %>% 
+  subset(y > 0) 
+
+df3$region = factor(df3$region, levels = c(
+  "Southern",
+  "S.Pacific",
+  "Arctic",
+  "N.Pacific",
+  "Global",
+  "N.Atlantic",
+  "Indian",
+  "S.Atlantic"))
+
+df3  %>% 
   ggplot(aes(Year, y = region, fill = region)) +
   scale_fill_manual(values = cbp, "") + 
   geom_tile(show.legend = F) +
