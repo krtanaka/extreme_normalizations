@@ -14,6 +14,19 @@ library(ggalt)
 
 rm(list = ls())
 
+#IPCC - Temperature -
+ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
+               rgb(178, 24, 43, maxColorValue = 255, alpha = 255),
+               rgb(214, 96, 77, maxColorValue = 255, alpha = 255),
+               rgb(244, 165, 130, maxColorValue = 255, alpha = 255),
+               rgb(253, 219, 199, maxColorValue = 255, alpha = 255),
+               rgb(247, 247, 247, maxColorValue = 255, alpha = 255),
+               rgb(209, 229, 240, maxColorValue = 255, alpha = 255),
+               rgb(146, 197, 222, maxColorValue = 255, alpha = 255),
+               rgb(67, 147, 195, maxColorValue = 255, alpha = 255),
+               rgb(33, 102, 172, maxColorValue = 255, alpha = 255),
+               rgb(5, 48, 97, maxColorValue = 255, alpha = 255))
+
 # World map
 worldMap <- getMap()
 world.points <- fortify(worldMap)
@@ -26,7 +39,8 @@ plot_clim = function(data, mode){
   # data = c("HadI", "COBE", "ER")[1]
   # mode = "mean"
   
-  setwd("/Users/Kisei/Dropbox/PAPER Kisei heat extremes")
+  # setwd("/Users/Kisei/Dropbox/PAPER Kisei heat extremes")
+  setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes")
   
   load(paste0("data/", data, "_SST.RData"))
   
@@ -35,6 +49,7 @@ plot_clim = function(data, mode){
   
   # set baseline Jan 1870 - Dec 1919, 50 years
   Baseline <- df[[1:600]] 
+  values(Baseline)[values(Baseline) == -1000] = -1.8
   names(Baseline)
   
   if (mode == "mean") {
@@ -168,32 +183,6 @@ d6 = plot_clim("COBE", "sd"); d6$source = "COBE v2"
 mean = rbind(d1, d2, d3)
 sd = rbind(d4, d5, d6)
 
-world <- ne_countries(scale = "small", returnclass = "sf") 
-
-p = mean %>% 
-  sample_frac(0.001) %>%
-  ggplot() + 
-  geom_point(aes(x, y, color = layer)) + 
-  geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
-  scale_color_gradientn(colors = matlab.like(100), "", limits = c(-2, 29.4)) +
-  # scale_x_continuous(expand = c(-10, 0), "") +
-  # scale_y_continuous(expand = c(0, 0), "") +
-  facet_grid(source ~ month) + 
-  # coord_sf(xlim = range(d$x), ylim = range(d$y)) +
-  coord_map("ortho", orientation = c(10, 250, 0)) +
-  # coord_map("moll") +
-  theme_pubr()+
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank(), 
-        axis.text.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.ticks.y = element_blank(),
-        legend.position = "right", 
-        legend.justification = c(1,0))
-
-print(p)
-
 world <- fortify(getMap())
 
 mean$month = factor(mean$month, levels=c('jan', 'feb', 'mar', 
@@ -215,78 +204,56 @@ sd$stat = "SD"
 d = rbind(mean, sd)
 
 p = d %>% 
-  sample_frac(1) %>%
+  # sample_frac(0.1) %>%
+  subset(stat %in% c("Mean")) %>% 
+  subset(source %in% c("HadISST v1.1", "COBE v2")) %>% 
   ggplot() + 
-  # geom_point(aes(x = x, y = y, color = layer), size = 0.5, alpha = 0.5) +
   geom_raster(aes(x = x, y = y, fill = layer)) +
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
            color = "black", fill = "gray", size = 0.1) +
-  scale_color_gradientn(colors = matlab.like(100), "mean", limits = c(-2, 29.4)) +
-  scale_fill_gradientn(colors = matlab.like(100), "mean", limits = c(-2, 29.4)) +
+  scale_fill_gradientn(colors = rev(ipcc_temp), "") + 
   # coord_proj("+proj=wintri") +
-  # facet_grid(source ~ month) + 
-  facet_grid(month ~ stat + source) + 
-  theme_pubr(I(9)) +
+  facet_grid(month ~ source) +
+  # scale_x_continuous(expand = c(-0.1, 0), "") +
+  # scale_y_continuous(expand = c(-0.1, 0), "") +
+  coord_fixed() + 
+  theme_void() +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(), 
         axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.x = element_blank(),
         axis.ticks.y = element_blank(),
-        legend.position = "bottom", 
-        legend.justification = c(1,0))
+        legend.position = "right")
 
-p1 = mean %>% 
-  sample_frac(1) %>%
+pdf("~/Desktop/s1.pdf", width = 10, height = 10)
+p
+dev.off()
+
+p = d %>% 
+  # sample_frac(0.01) %>%
+  subset(stat %in% c("SD")) %>% 
+  subset(source %in% c("HadISST v1.1", "COBE v2")) %>% 
   ggplot() + 
-  # geom_point(aes(x = x, y = y, color = layer), size = 0.5, alpha = 0.5) +
-  geom_raster(aes(x = x, y = y, fill = layer)) +
+  geom_raster(aes(x = x, y = y, fill = layer), interpolate = T) +
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
            color = "black", fill = "gray", size = 0.1) +
-  # scale_color_gradientn(colors = matlab.like(100), "mean", limits = c(-2, 33)) +
-  scale_fill_gradientn(colors = matlab.like(100), "mean", limits = c(-2, 33)) +
+  scale_fill_gradientn(colors = rev(ipcc_temp), "") + 
   # coord_proj("+proj=wintri") +
-  # facet_grid(source ~ month) + 
-  facet_grid(month~source) + 
+  facet_grid(month ~ source) +
+  # scale_x_continuous(expand = c(-0.1, 0), "") +
+  # scale_y_continuous(expand = c(-0.1, 0), "") +
   coord_fixed() + 
-  theme_pubr(I(9)) +
+  theme_void() +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(), 
         axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.x = element_blank(),
         axis.ticks.y = element_blank(),
-        legend.position = "bottom", 
-        legend.justification = c(1,0))
-
-p2 = sd %>% 
-  sample_frac(1) %>%
-  ggplot() + 
-  # geom_point(aes(x = x, y = y, color = layer), size = 0.5, alpha = 0.5) +
-  geom_raster(aes(x = x, y = y, fill = layer)) +
-  geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
-           color = "black", fill = "gray", size = 0.1) +
-  # scale_color_gradientn(colors = matlab.like(100), "sd", limits = c(0, 3.7)) +
-  scale_fill_gradientn(colors = matlab.like(100), "sd", limits = c(0, 3.7)) +
-  # coord_proj("+proj=wintri") +
-  # facet_grid(source ~ month) + 
-  facet_grid(month~source) +
-  coord_fixed() + 
-  theme_pubr(I(9)) +
-  theme(
-    axis.title.x = element_blank(),
-    axis.title.y = element_blank(),
-    axis.text.x = element_blank(),
-    axis.text.y = element_blank(),
-    axis.ticks.x = element_blank(),
-    axis.ticks.y = element_blank(),
-    legend.position = "bottom",
-    legend.justification = c(1,0))
+        legend.position = "right")
 
 
-pdf("~/Desktop/Climatologies_1870-1919.pdf", width = 6, height = 7)
-png("~/Desktop/Climatologies_1870-1919.png", width = 6, height = 7, units = "in", res = 100)
-
-cowplot::plot_grid(p1, p2, ncol = 2)
-# p
+pdf("~/Desktop/s2.pdf", width = 10, height = 10)
+p
 dev.off()
