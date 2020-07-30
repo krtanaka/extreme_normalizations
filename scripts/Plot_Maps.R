@@ -126,14 +126,14 @@ map = function(mode){
             legend.justification = c(1,0))
     
     p = ggplot(anom) +
-      geom_raster(aes(x = x, y = y, fill = sum)) +
+      geom_raster(aes(x = x, y = y, fill = sum), interpolate = T) +
       geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
                color = "gray20", fill = "gray20", size = 0.001) +
       scale_fill_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
       scale_x_continuous(expand = c(-0.005, 0), "") +
       scale_y_continuous(expand = c(-0.005, 0), "") +
       coord_fixed() +
-      facet_grid(period ~ source) +
+      facet_grid(source ~ period) +
       theme_minimal(I(20)) +
       theme(axis.title.x = element_blank(),
             axis.title.y = element_blank(),
@@ -144,8 +144,7 @@ map = function(mode){
             legend.position = "bottom",
             legend.justification = c(1,0))
     
-    # pdf(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".pdf"), height = 12, width = 12)
-    png(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".png"), height = 12, width = 12, units = "in", res = 100)
+    pdf(paste0("/Users/ktanaka/Desktop/s2_", Sys.Date(), "_", cutoff, ".pdf"), height = 12, width = 12)
     print(p)
     dev.off()
     
