@@ -8,8 +8,8 @@ world <- fortify(rworldmap::getMap())
 
 png("/Users/Kisei/Desktop/LME.png", units = "in", res = 100, height = 10, width = 10)
 lme %>% 
-  subset(LME_NAME %in% c("East Brazil Shelf", "Somali Coastal Current", "Sulu-Celebes Sea")) %>%
-  subset(LME_NAME %in% c("California Current", "Humboldt Current", "Canadian High Arctic - North Greenland")) %>% 
+  # subset(LME_NAME %in% c("East Brazil Shelf", "Somali Coastal Current", "Sulu-Celebes Sea")) %>%
+  # subset(LME_NAME %in% c("California Current", "Humboldt Current", "Canadian High Arctic - North Greenland")) %>% 
   ggplot() + 
   geom_sf(aes(group = LME_NAME, fill = LME_NAME), color = "NA", show.legend = T) + 
   scale_fill_viridis_d("") + 

@@ -58,6 +58,8 @@ df$Time = as.Date(df$Time)
 df1 = df %>% group_by(Year, data, region) %>% summarise(year_sum = mean(year_sum))
 df1$Year = as.numeric(df1$Year)
 
+pdf("~/Desktop/s6.pdf", height = 6, width = 10)
+
 df1 %>% 
   ggplot(aes(x = Year, y = year_sum, color = data)) +
   geom_point(alpha = 0.8) +
@@ -70,6 +72,9 @@ df1 %>%
   scale_x_continuous(breaks = seq(1900, 2020, 40), limits = c(1900, 2020)) + 
   theme(legend.position = "top",
         legend.justification = c(0,1))
+
+dev.off()
+
 
 # scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2019-12-01"), by = "40 years"), 
 #              labels = scales::date_format("%Y")) 

@@ -33,9 +33,9 @@ range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 # eez <- rmapshaper::ms_simplify(eez, keep = 0.001, keep_shapes = F)
 # eez <- eez %>% st_as_sf()  
 
-load('/Users/ktanaka/extreme_normalizations/eez_sf_dataframe_0.001.RData') 
-load('/Users/ktanaka/extreme_normalizations/lme_sf_dataframe_0.001.RData') 
-load('/Users/ktanaka/extreme_normalizations/meow_sf_dataframe.RData') 
+load('/Users/ktanaka/extreme_normalizations/data/eez_sf_dataframe_0.001.RData') 
+load('/Users/ktanaka/extreme_normalizations/data/lme_sf_dataframe_0.001.RData') 
+load('/Users/ktanaka/extreme_normalizations/data/meow_sf_dataframe.RData') 
 
 #IPCC - Temperature -
 ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
@@ -57,7 +57,7 @@ ipcc_temp_4_cols <- c(rgb(153, 0, 2, maxColorValue = 255, alpha = 255),
 
 rank_joy = function(region){
   
-  # region = "eez"
+  region = "eez"
   
   if (region == "meow"){
     shape = meow; shape$UNIT = shape$PROVINCE
@@ -263,20 +263,20 @@ rank_joy = function(region){
   write_csv(summary, paste0('~/Desktop/', region, "_", cutoff, ".csv"))
   
   p = ggplot(tas_combined, aes(x = sum, y = UNIT, fill = UNIT)) +
-    geom_joy(scale = 3, bandwidth = 0.03, alpha = 0.8, size = 0.3) +
-    theme_joy(grid = F) +
-    scale_y_discrete(expand = c(0.01, 0)) + # will generally have to set the `expand` option
-    scale_x_continuous(limits = c(0, 1), expand = c(0.1, 0.1), breaks = c(0, 0.5, 1)) +
-    # scale_fill_cyclical(values = matlab.like(length(unique(df$UNIT))))+
+    geom_joy(scale = 2, alpha = 0.8, size = 0.3) +
+    theme_minimal() +
+    scale_y_discrete(expand = c(-0.01, 0)) + # will generally have to set the `expand` option
+    scale_x_continuous(limits = c(0, 1), expand = c(-0.05, 0.1), breaks = c(0.25,  0.75)) +
     scale_fill_cyclical(values = ipcc_temp_expand)+
     facet_wrap(.~period, ncol = 4) +
     ylab(NULL) + xlab(NULL) +
     theme(axis.text.y = element_text(size = 10),
+          panel.background = element_blank(),
           legend.position = "none")
   
   p
   
-  pdf(paste0("~/Desktop/Joy_", region, "_", cutoff, ".pdf"), height = 20, width = 10)
+  pdf(paste0("~/Desktop/Joy_", region, "_", cutoff, ".pdf"), height = 15, width = 10)
   print(p)
   dev.off()
   
@@ -463,21 +463,21 @@ rank_joy_bgcp = function(){
   write_csv(summary, paste0("~/Desktop/bgcp_", cutoff, ".csv"))
   
   p = tas_combined %>% 
-    # mutate(bgcp = gsub("\xca", "", bgcp)) %>% 
     ggplot(aes(x = sum, y = bgcp, fill = bgcp)) +
-    geom_joy(scale = 3, bandwidth = 0.03, alpha = 0.8, size = 0.3) +
-    theme_joy(grid = F) +
-    scale_y_discrete(expand = c(0.01, 0)) + # will generally have to set the `expand` option
-    scale_x_continuous(limits = c(0, 1), expand = c(0.1, 0.1), breaks = c(0, 0.5, 1)) +
+    geom_joy(scale = 2, alpha = 0.8, size = 0.3) +
+    theme_minimal() +
+    # scale_y_discrete(expand = c(-0.01, 0)) + # will generally have to set the `expand` option
+    scale_x_continuous(limits = c(0, 1), expand = c(-0.05, 0.1), breaks = c(0.25,  0.75)) +
     scale_fill_cyclical(values = ipcc_temp_expand)+
     facet_wrap(.~period, ncol = 4) +
     ylab(NULL) + xlab(NULL) +
     theme(axis.text.y = element_text(size = 10),
+          panel.background = element_blank(),
           legend.position = "none")
   
   p
   
-  pdf(paste0("~/Desktop/Joy_bgcp_", cutoff, ".pdf"), height = 20, width = 10)
+  pdf(paste0("~/Desktop/Joy_bgcp_", cutoff, ".pdf"), height = 10, width = 10)
   print(p)
   dev.off()
   
