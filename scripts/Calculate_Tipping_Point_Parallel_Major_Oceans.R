@@ -19,17 +19,21 @@ setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/")
 
 load("major_oceans.RData")
 
-data = c("HadI", "COBE", "ER")[2]
+data = c("HadI", "COBE", "ER")[1]
 
 load(paste0(data, "_SST.RData"))
 
 # set baseline Jan 1870 - Dec 1919, 50 years
 Baseline <- df[[1:600]] 
+values(Baseline)[values(Baseline) == -1000] = -1.8
+
 names(Baseline)
 
 Baseline <- Baseline %>% rasterToPoints() %>% data.frame()
 
 Target <- df[[361:1800]] #Jan 1900 - Dec 2019
+values(Target)[values(Target) == -1000] = -1.8 
+
 Target <- Target %>% rasterToPoints() %>% data.frame()
 
 #choose ocean
