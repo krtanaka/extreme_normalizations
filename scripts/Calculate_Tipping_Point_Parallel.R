@@ -28,13 +28,43 @@ calculate_anomalies = function(data){
   
   # set baseline Jan 1870 - Dec 1919, 50 years
   Baseline <- df[[1:600]] 
+  values(Baseline)[values(Baseline) == -1000] = -1.8
+  
   names(Baseline)
   
   Baseline <- Baseline %>% rasterToPoints() %>% data.frame()
   
   Target <- df[[361:1800]] #Jan 1900 - Dec 2019
+  values(Target)[values(Target) == -1000] = -1.8 
+  
   Target <- Target %>% rasterToPoints() %>% data.frame()
   
+  #choose ocean
+  names(Target)
+  latlon = Target[,c(1:2)]; plot(latlon, pch = ".")
+  library(sp)
+  library(maptools)
+  coordinates(latlon) = ~x+y
+  statarea <- rgdal::readOGR("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/World_Seas_IHO_v1/World_Seas.shp")
+  CRS.new <- CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0+datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0") #EPSG:102003
+  proj4string(latlon) <- CRS.new
+  proj4string(statarea) <- CRS.new
+  area <- over(latlon,statarea)
+  colnames(area)[1] = "area"
+  area = as.data.frame(area[,1])
+  
+  Baseline = cbind(area, Baseline)
+  Target = cbind(area, Target)
+  
+  colnames(Baseline)[1] = "area"
+  colnames(Target)[1] = "area"
+  
+  Baseline = Baseline %>% subset(area %in% c("South Pacific Ocean", "North Pacific Ocean", "Indian Ocean", "South Atlantic Ocean", "North Atlantic Ocean"))
+  Target = Target %>% subset(area %in% c("South Pacific Ocean", "North Pacific Ocean", "Indian Ocean", "South Atlantic Ocean", "North Atlantic Ocean"))
+  
+  Baseline = Baseline[,c(2:603)]
+  Target = Target[,c(2:1443)]
+
   yy_anom = NULL
   
   for (y in 1:120) { #every year between 1980-2018 (39) or 1900-2018 (119)

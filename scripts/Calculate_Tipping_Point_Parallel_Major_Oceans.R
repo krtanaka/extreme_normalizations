@@ -19,7 +19,7 @@ setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/")
 
 load("major_oceans.RData")
 
-data = c("HadI", "COBE", "ER")[1]
+data = c("HadI", "COBE", "ER")[2]
 
 load(paste0(data, "_SST.RData"))
 
