@@ -139,7 +139,6 @@ calculate_anomalies = function(data){
   axis(2, las = 2, at = seq(0, 0.8, 0.1))
   abline(h = 0.5, lty = 2)
   
-  # save(yy_anom, file = paste0("/Users/ktanaka/extreme_normalizations/results/", data, "/SST_TippingPoints_", p, ".RData"))
   save(yy_anom, file = paste0("/Users/ktanaka/Desktop/SST_TippingPoints_", data, "_", p, ".RData"))
   
   # beepr::beep(2)
