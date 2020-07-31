@@ -57,7 +57,7 @@ ipcc_temp_4_cols <- c(rgb(153, 0, 2, maxColorValue = 255, alpha = 255),
 
 rank_joy = function(region){
   
-  region = "eez"
+  # region = "eez"
   
   if (region == "meow"){
     shape = meow; shape$UNIT = shape$PROVINCE
@@ -520,7 +520,7 @@ ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
 # ipcc_temp_expand = ipcc_temp_expand(60)
 # ipcc_temp_expand = paste(ipcc_temp_expand, ipcc_temp_expand)
 
-pdf(paste0("~/Desktop/Fig2_LME.", cutoff, ".pdf"), width = 4.5, height = 6)
+pdf(paste0("~/Desktop/Fig2_LME.", cutoff, "_", Sys.Date(), ".pdf"), width = 4.5, height = 6)
 p = lme_sub %>% 
   mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
   ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
@@ -535,7 +535,7 @@ p = lme_sub %>%
 print(p)
 dev.off()
 
-pdf(paste0("~/Desktop/Fig2_EEZ.", cutoff, ".pdf"), width = 4, height = 6)
+pdf(paste0("~/Desktop/Fig2_EEZ.", cutoff, "_", Sys.Date(), ".pdf"), width = 4, height = 6)
 p = eez_sub %>% 
   mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
   ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
@@ -550,7 +550,7 @@ p = eez_sub %>%
 print(p)
 dev.off()
 
-pdf(paste0("~/Desktop/Fig2_BGCP.", cutoff, ".pdf"), width = 4.5, height = 6)
+pdf(paste0("~/Desktop/Fig2_BGCP.", cutoff, "_", Sys.Date(), ".pdf"), width = 4.5, height = 6)
 p = bgcp_sub %>%  
   mutate(UNIT = gsub("\xca", "", UNIT)) %>% 
   mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 

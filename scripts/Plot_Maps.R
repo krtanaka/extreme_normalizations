@@ -82,39 +82,42 @@ map = function(mode){
   anom$source = factor(anom$source, levels = c("HadISST v1.1", "COBE v2",  "ERSST v5"))
   
   if (mode == "annual") {
+
     
-    anom$sum = range01(anom$sum)
-    anom = subset(anom, source %in% c("COBE v2", "HadISST v1.1"))
-    
-    p = ggplot(anom) +
-      geom_point(aes(x, y, color = sum, fill = sum), size = 0.2) +
+    anom %>% 
+      mutate(sum = range01(sum)) %>% 
+      subset(source %in% c("COBE v2", "HadISST v1.1")) %>%
+      # subset(y %in% seq(-70, 70, by = 0.1)) %>%
+      ggplot() + 
+      geom_point(aes(x, y, color = sum, fill = sum), size = 0.1) +
       geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
-      scale_fill_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
-      scale_color_gradientn(colors = matlab.like(100), "", limits = c(0,1)) +
+      scale_color_gradientn(colors = rev(ipcc_temp), "", limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+      scale_fill_gradientn(colors = rev(ipcc_temp), "", limits = c(0, 1), breaks = c(0, 0.5, 1)) +
       scale_x_continuous(expand = c(-0.005, 0), "") +
       scale_y_continuous(expand = c(-0.005, 0), "") +
       # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
       facet_grid(source ~ period) +
       theme_minimal() +
-      coord_map("ortho", orientation = c(0, 0, 0)) +
+      coord_map("ortho", orientation = c(-90, 45, 0)) + #arctic centered, 0, 0, 0 gives you a normal look
       theme(axis.title.x = element_blank(),
             axis.title.y = element_blank(),
             legend.position = "right")
     
     p = anom %>% 
-      sample_frac(0.01) %>%
-      # subset(source %in% c("HadISST v1.1", "COBE v2")) %>% 
-      group_by(x, y, period) %>% 
+      # sample_frac(0.01) %>%
+      mutate(sum = range01(sum)) %>% 
+      subset(source %in% c("HadISST v1.1", "COBE v2")) %>%
+      subset(y %in% seq(-60, 60, by = 0.1)) %>%
+      group_by(x, y, period, source) %>% 
       summarise(sum = median(sum)) %>% 
       ggplot(aes(x = x, y = y, color = sum)) + 
       geom_point(alpha = 0.5, shape = 16) +
-      geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
-               color = "gray20", fill = "gray20", size = 0.001) + 
+      geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id), color = "gray20", fill = "gray20", size = 0.001) + 
       scale_color_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
       coord_proj("+proj=wintri") +
       # coord_fixed() +
-      # facet_grid(source ~ period) +
-      facet_grid(~ period) +
+      facet_grid(source ~ period) +
+      # facet_grid(~ period) +
       theme_minimal(I(20)) +
       theme(axis.title.x = element_blank(),
             axis.title.y = element_blank(), 
@@ -125,7 +128,14 @@ map = function(mode){
             legend.position = "bottom", 
             legend.justification = c(1,0))
     
-    p = ggplot(anom) +
+    p = anom %>% 
+      # sample_frac(0.01) %>%
+      mutate(sum = range01(sum)) %>% 
+      subset(source %in% c("HadISST v1.1", "COBE v2")) %>%
+      # subset(y %in% seq(-60, 60, by = 0.1)) %>%
+      group_by(x, y, period, source) %>% 
+      summarise(sum = median(sum)) %>% 
+      ggplot() +
       geom_raster(aes(x = x, y = y, fill = sum), interpolate = T) +
       geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
                color = "gray20", fill = "gray20", size = 0.001) +
@@ -163,9 +173,6 @@ map = function(mode){
     
     anom = rbind(season_1, season_2)
     
-    anom$sum = range01(anom$sum)
-    
-    
     # p = ggplot(anom) + 
     #   geom_point(aes(x, y, color = sum, fill = sum), alpha = 0.5, size = 0.5) + 
     #   geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
@@ -185,6 +192,7 @@ map = function(mode){
     
     p = anom %>% 
       # sample_frac(0.01) %>%
+      mutate(sum = range01(sum)) %>% 
       subset(source %in% c("HadISST v1.1", "COBE v2")) %>% 
       group_by(x, y, period, season) %>% 
       summarise(sum = median(sum)) %>% 
