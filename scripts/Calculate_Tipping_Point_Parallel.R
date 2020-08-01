@@ -17,7 +17,7 @@ p = c(0.975, 0.95, 0.9)[2]
 
 calculate_anomalies = function(data){
   
-  data = c("HadI", "COBE", "ER")[1]
+  data = c("HadI", "COBE", "ER")[2]
   
   setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/")
   
