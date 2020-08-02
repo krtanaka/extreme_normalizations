@@ -1,3 +1,5 @@
+rm(list = ls())
+
 library(raster)
 library(colorRamps)
 library(ggpubr)
@@ -6,7 +8,6 @@ library(sf)
 library(rgdal)
 library(dplyr)
 library(maps)
-# library(ggdark)
 library(ggjoy)
 library(rworldmap)
 library(ggalt)
@@ -20,16 +21,16 @@ setwd("~/Dropbox (MBA)/PAPER Kisei heat extremes")
 
 load(paste0("data/", data, "_SST.RData"))
 
-# e = extent(-120, -100, 30, 40)
-# df = crop(df, e); rm(e)
+e = extent(-120, -100, 30, 40)
+df = crop(df, e); rm(e)
 
-# set baseline Jan 1870 - Dec 1929, 60 years
-Baseline <- df[[1:720]] 
+# set baseline Jan 1870 - Dec 1929, 50 years
+Baseline <- df[[1:600]] 
 names(Baseline)
 
 Baseline <- Baseline %>% rasterToPoints() %>% data.frame()
 
-Target <- df[[1321:1788]] #Jan 1980 - Dec 2018
+Target <- df[[1321:1800]] #Jan 1980 - Dec 2019
 Target <- Target %>% rasterToPoints() %>% data.frame()
 
 yy_anom = NULL
@@ -44,7 +45,7 @@ last_month = first_month+11
 target = Target[,first_month:last_month]; names(target) # target year
 ll_anom = NULL
 
-ll = 30000
+ll = 5000
 
 monthly_anom = NULL
 
@@ -89,7 +90,7 @@ baseline_12 = as.data.frame(baseline_12)
 q_12 = as.data.frame(q_12)
 world <- fortify(getMap())
 
-Baseline$mean = rowMeans(Baseline[,3:722])
+Baseline$mean = rowMeans(Baseline[,3:602])
 
 #IPCC - Temperature -
 ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
@@ -104,13 +105,14 @@ ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
                rgb(33, 102, 172, maxColorValue = 255, alpha = 255),
                rgb(5, 48, 97, maxColorValue = 255, alpha = 255))
 
-p1 = ggplot(Baseline, aes(x, y, fill = mean)) + 
-  geom_raster(alpha = 1) + 
-  scale_fill_gradientn(colors = ipcc_temp(100), "") +
-  theme_void() + 
-  # geom_point(data = Baseline[ll,], aes(x, y), color = "red", size = 5, shape = 15) +
+p1 = ggplot(Baseline, aes(x, y, color = mean)) + 
+  geom_point() + 
+  scale_color_gradientn(colors = rev(ipcc_temp), "") +
+  theme_minimal() + 
+  geom_point(data = Baseline[ll,], aes(x, y), color = "red", size = 5, shape = 15) +
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
            color = "gray40", fill = "gray40", size = 0.001) +
+  coord_proj("+proj=wintri") +
   # scale_x_continuous(expand = c(-0.005, 0), "") +
   # scale_y_continuous(expand = c(-0.005, 0), "") +
   theme(legend.position = "none", 
@@ -124,7 +126,7 @@ p2 = ggplot(baseline_12, aes(baseline, fill = factor(m))) +
   geom_vline(data = q_12, aes(xintercept = q)) + 
   coord_flip() + 
   # theme_pubr() + 
-  dark_theme_bw(I(20)) +
+  ggdark::dark_theme_bw(I(20)) +
   xlab("SST (deg C)") + 
   scale_x_reverse() + 
   theme(legend.position = "none", 
