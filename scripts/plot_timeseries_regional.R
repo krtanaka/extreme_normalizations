@@ -82,6 +82,16 @@ df$Time = as.Date(df$Time)
 df1 = df %>% group_by(Year, data, region) %>% summarise(year_sum = mean(year_sum))
 df1$Year = as.numeric(df1$Year)
 
+df1$region = factor(df1$region, levels = c("Global", 
+                                           "Sub_Global",  
+                                           "Arctic",
+                                           "N.Atlantic",
+                                           "S.Atlantic",
+                                           "N.Pacific",
+                                           "S.Pacific",
+                                           "Indian",
+                                           "Southern"))
+
 pdf("~/Desktop/s6.pdf", height = 6, width = 10)
 
 df1 %>% 
@@ -124,10 +134,6 @@ dev.off()
 df2 = df %>% group_by(Year, region) %>% summarise(year_sum = mean(year_sum))
 df2$Year = as.numeric(df2$Year)
 
-# The palette with black:
-cbp <- c("#E69F00", "#000000", "#56B4E9", "#009E73",
-         "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-
 ElNino = subset(df, Year %in% c(1905, 1906, 
                                 1911, 1912, 1914, 1915, 
                                 1940, 1941, 1942, 
@@ -139,19 +145,59 @@ ElNino = subset(df, Year %in% c(1905, 1906,
 
 df2$linesize = ifelse(df2$region == "Global", 2, 1)
 
-df2 %>% 
+df2$region[df2$region == "Global"] <- "Global (2009)"
+df2$region[df2$region == "Arctic"] <- "Arctic (2016)"
+df2$region[df2$region == "N.Atlantic"] <- "N.Atlantic (2003)"
+df2$region[df2$region == "N.Pacific"] <- "N.Pacific (2014)"
+df2$region[df2$region == "Southern"] <- "Southern (n/a)"
+df2$region[df2$region == "S.Atlantic"] <- "S.Atlantic (1993)"
+df2$region[df2$region == "S.Pacific"] <- "S.Pacific (n/a)"
+df2$region[df2$region == "Indian"] <- "Indian (1995)"
+
+nh = df2 %>% subset(region %in% c("Global (2009)", "Arctic (2016)","N.Atlantic (2003)","N.Pacific (2014)"))
+sh = df2 %>% subset(region %in% c("Global (2009)", "Southern (n/a)","S.Atlantic (1993)","S.Pacific (n/a)", "Indian (1995)"))
+
+col1 <- c("gray40", 
+          rgb(67, 147, 195, maxColorValue = 255, alpha = 255),
+          rgb(33, 102, 172, maxColorValue = 255, alpha = 255),
+          rgb(5, 48, 97, maxColorValue = 255, alpha = 255))
+
+col2 <- c("gray40", 
+          rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
+          rgb(178, 24, 43, maxColorValue = 255, alpha = 255),
+          rgb(214, 96, 77, maxColorValue = 255, alpha = 255),
+          rgb(244, 165, 130, maxColorValue = 255, alpha = 255))
+
+p1 = nh %>% 
+  mutate(region = factor(region, levels = c("Global (2009)", "Arctic (2016)","N.Atlantic (2003)","N.Pacific (2014)"))) %>% 
   ggplot(aes(Year, year_sum, group = region, colour = region, size = linesize)) +
   geom_smooth(span = 0.05, se = F, alpha = 0.8)  +
   scale_size(range = c(1, 3), guide = "none") +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
-  scale_colour_manual(values = cbp, "") + 
-  labs(x = "", y = "Proportion of Area") +
+  scale_colour_manual(values = col1, "") +
+  labs(x = "", y = "") +
+  scale_x_continuous(breaks = seq(1900, 2020, 20), limits = c(1900, 2020)) + 
+  scale_y_continuous(breaks = c(seq(0, 1, by = 0.2)), limits = c(0, 0.8)) + 
+  ggthemes::theme_few(I(20)) +
+  theme(legend.position = c(0.15, 0.8),
+        axis.text.x = element_blank())
+
+p2 = sh %>% 
+  mutate(region = factor(region, levels = c("Global (2009)", "Southern (n/a)","S.Atlantic (1993)","S.Pacific (n/a)", "Indian (1995)"))) %>% 
+  ggplot(aes(Year, year_sum, group = region, colour = region, size = linesize)) +
+  geom_smooth(span = 0.05, se = F, alpha = 0.8)  +
+  scale_size(range = c(1, 3), guide = "none") +
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
+  scale_colour_manual(values = col2, "") +
+  labs(x = "", y = "proportion of area extent") +
   scale_x_continuous(breaks = seq(1900, 2020, 20), limits = c(1900, 2020)) + 
   scale_y_continuous(breaks = c(seq(0, 1, by = 0.2))) + 
-  ggpubr::theme_pubr(I(20)) +
-  theme(legend.position = c(0.16, 0.85),
-        axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 10))
+  ggthemes::theme_few(I(20)) +
+  theme(legend.position = c(0.15, 0.8))
+
+pdf(paste0('~/Dropbox (MBA)/PAPER Kisei heat extremes/figures/Fig3_global_timeseries_', Sys.Date(), '.pdf'), height = 12, width = 10)
+cowplot::plot_grid(p1, p2, ncol = 1)
+dev.off()
 
 df2 %>% 
   ggplot(aes(Year, year_sum, colour = year_sum)) +
@@ -159,18 +205,15 @@ df2 %>%
   geom_line() +
   geom_point() +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
-  labs(x = "", y = "Proportion of Area") +
+  labs(x = "", y = "proportion of area extent") +
   scale_color_viridis_c() + 
   scale_x_continuous(breaks = seq(1900, 2020, 40), limits = c(1900, 2020)) + 
   scale_y_continuous(breaks = c(seq(0, 1, by = 0.2))) + 
   cowplot::theme_cowplot(I(20)) +
-  facet_wrap(~region, scales = "free_y", ncol = 4) + 
+  facet_wrap(~region, scales = "free_y", ncol = 3) + 
   theme(legend.position = "none",
         axis.text.x = element_text(size = 10),
         axis.text.y = element_text(size = 10))
-# geom_dl(aes(label = region), method = list(dl.trans(x = x - .2), "first.points")) 
-
-
 
 df3 = df %>% 
   group_by(Year, region) %>% 
@@ -185,13 +228,14 @@ df3$region = factor(df3$region, levels = c(
   "Arctic",
   "N.Pacific",
   "Global",
+  "Sub_Global",
   "N.Atlantic",
   "Indian",
   "S.Atlantic"))
 
 df3  %>% 
   ggplot(aes(Year, y = region, fill = region)) +
-  scale_fill_manual(values = cbp, "") + 
+  # scale_fill_manual(values = cbp, "") + 
   geom_tile(show.legend = F) +
   labs(x = "", y = "") +
   theme_minimal(I(15)) + 
