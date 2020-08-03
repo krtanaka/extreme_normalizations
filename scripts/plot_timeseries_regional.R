@@ -233,9 +233,21 @@ df3$region = factor(df3$region, levels = c(
   "Indian",
   "S.Atlantic"))
 
+col3 <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
+          rgb(178, 24, 43, maxColorValue = 255, alpha = 255),
+          rgb(214, 96, 77, maxColorValue = 255, alpha = 255),
+          rgb(244, 165, 130, maxColorValue = 255, alpha = 255),
+          rgb(253, 219, 199, maxColorValue = 255, alpha = 255),
+          rgb(247, 247, 247, maxColorValue = 255, alpha = 255),
+          rgb(209, 229, 240, maxColorValue = 255, alpha = 255),
+          rgb(146, 197, 222, maxColorValue = 255, alpha = 255),
+          rgb(67, 147, 195, maxColorValue = 255, alpha = 255),
+          rgb(33, 102, 172, maxColorValue = 255, alpha = 255),
+          rgb(5, 48, 97, maxColorValue = 255, alpha = 255))
+
 df3  %>% 
   ggplot(aes(Year, y = region, fill = region)) +
-  # scale_fill_manual(values = cbp, "") + 
+  scale_fill_manual(values = col3, "") +
   geom_tile(show.legend = F) +
   labs(x = "", y = "") +
   theme_minimal(I(15)) + 
