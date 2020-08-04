@@ -61,18 +61,18 @@ invert_geom_defaults()
 
 map = function(mode){
   
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/SST_Anomalies_1980-1989_", cutoff, ".RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1989"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/SST_Anomalies_1990-1999_", cutoff, ".RData")); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/SST_Anomalies_2000-2009_", cutoff, ".RData")); hadi3 = anom; hadi3$source = "HadISST v1.1"; hadi3$period = "2000-2009"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/SST_Anomalies_2010-2019_", cutoff, ".RData")); hadi4 = anom; hadi4$source = "HadISST v1.1"; hadi4$period = "2010-2019"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/SST_Anomalies_1980-1989_", cutoff, ".RData")); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1989"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/SST_Anomalies_1990-1999_", cutoff, ".RData")); cobe2 = anom; cobe2$source = "COBE v2"; cobe2$period = "1990-1999"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/SST_Anomalies_2000-2009_", cutoff, ".RData")); cobe3 = anom; cobe3$source = "COBE v2"; cobe3$period = "2000-2009"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/SST_Anomalies_2010-2019_", cutoff, ".RData")); cobe4 = anom; cobe4$source = "COBE v2"; cobe4$period = "2010-2019"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/SST_Anomalies_1980-1989_", cutoff, ".RData")); er1 = anom; er1$source = "ERSST v5"; er1$period = "1980-1989"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/SST_Anomalies_1990-1999_", cutoff, ".RData")); er2 = anom; er2$source = "ERSST v5"; er2$period = "1990-1999"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/SST_Anomalies_2000-2009_", cutoff, ".RData")); er3 = anom; er3$source = "ERSST v5"; er3$period = "2000-2009"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/SST_Anomalies_2010-2019_", cutoff, ".RData")); er4 = anom; er4$source = "ERSST v5"; er4$period = "2010-2019"
+  load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_1980-1989_", cutoff, ".RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1989"
+  load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_1990-1999_", cutoff, ".RData")); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
+  load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_2000-2009_", cutoff, ".RData")); hadi3 = anom; hadi3$source = "HadISST v1.1"; hadi3$period = "2000-2009"
+  load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_2010-2019_", cutoff, ".RData")); hadi4 = anom; hadi4$source = "HadISST v1.1"; hadi4$period = "2010-2019"
+  load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/anomalies_1980-1989_", cutoff, ".RData")); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1989"
+  load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/anomalies_1990-1999_", cutoff, ".RData")); cobe2 = anom; cobe2$source = "COBE v2"; cobe2$period = "1990-1999"
+  load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/anomalies_2000-2009_", cutoff, ".RData")); cobe3 = anom; cobe3$source = "COBE v2"; cobe3$period = "2000-2009"
+  load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/anomalies_2010-2019_", cutoff, ".RData")); cobe4 = anom; cobe4$source = "COBE v2"; cobe4$period = "2010-2019"
+  load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/anomalies_1980-1989_", cutoff, ".RData")); er1 = anom; er1$source = "ERSST v5"; er1$period = "1980-1989"
+  load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/anomalies_1990-1999_", cutoff, ".RData")); er2 = anom; er2$source = "ERSST v5"; er2$period = "1990-1999"
+  load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/anomalies_2000-2009_", cutoff, ".RData")); er3 = anom; er3$source = "ERSST v5"; er3$period = "2000-2009"
+  load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/anomalies_2010-2019_", cutoff, ".RData")); er4 = anom; er4$source = "ERSST v5"; er4$period = "2010-2019"
   
   #all periods
   anom = rbind(hadi1, hadi2, hadi3, hadi4, 
@@ -107,8 +107,9 @@ map = function(mode){
       # sample_frac(0.01) %>%
       mutate(sum = range01(sum)) %>% 
       subset(source %in% c("HadISST v1.1", "COBE v2")) %>%
-      subset(y %in% seq(-60, 60, by = 0.1)) %>%
-      group_by(x, y, period, source) %>% 
+      # subset(y %in% seq(-60, 60, by = 0.1)) %>%
+      # group_by(x, y, period, source) %>% 
+      group_by(x, y) %>% 
       summarise(sum = median(sum)) %>% 
       ggplot(aes(x = x, y = y, color = sum)) + 
       geom_point(alpha = 0.5, shape = 16) +
@@ -116,7 +117,7 @@ map = function(mode){
       scale_color_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
       coord_proj("+proj=wintri") +
       # coord_fixed() +
-      facet_grid(source ~ period) +
+      # facet_grid(source ~ period) +
       # facet_grid(~ period) +
       theme_minimal(I(20)) +
       theme(axis.title.x = element_blank(),
