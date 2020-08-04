@@ -1,17 +1,22 @@
 rm(list = ls())
 
+library(dplyr)
+library(ggthemes)
+library(precrec)
+library(ggplot2)
+
 world <- fortify(rworldmap::getMap())
 range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 
 #IPCC style anomalies
-load("~/extreme_normalizations/COBE_Normal_SST_Anomalies_2019.RData"); cobe_ipcc = anom; cobe_ipcc$data = "COBE"; cobe_ipcc$sum = rowMeans(cobe_ipcc[3:14])
-load("~/extreme_normalizations/HadI_Normal_SST_Anomalies_2019.RData"); hadi_ipcc = anom; hadi_ipcc$data = "HadI"; hadi_ipcc$sum = rowMeans(hadi_ipcc[3:14])
+load("~/extreme_normalizations/results/COBE/anomalies_2019_ipcc.RData"); cobe_ipcc = anom; cobe_ipcc$data = "COBE"; cobe_ipcc$sum = rowMeans(cobe_ipcc[3:14])
+load("~/extreme_normalizations/results/HadI/anomalies_2019_ipcc.RData"); hadi_ipcc = anom; hadi_ipcc$data = "HadI"; hadi_ipcc$sum = rowMeans(hadi_ipcc[3:14])
 anom_ipcc = rbind(cobe_ipcc, hadi_ipcc) %>% dplyr::select(x, y, sum) %>% group_by(x, y) %>% summarise(anom = mean(sum))
 anom_ipcc$anom = range01(anom_ipcc$anom)
 
 #Extreme index for 2019
-load("~/extreme_normalizations/results/HadI/SST_Anomalies_2019.RData"); hadi_extreme = anom; hadi_extreme$data = "HadI"
-load("~/extreme_normalizations/results/COBE/SST_Anomalies_2019.RData"); cobe_extreme = anom; cobe_extreme$data = "COBE"
+load("~/extreme_normalizations/results/HadI/anomalies_2019_0.95.rdata"); hadi_extreme = anom; hadi_extreme$data = "HadI"
+load("~/extreme_normalizations/results/COBE/anomalies_2019_0.95.rdata"); cobe_extreme = anom; cobe_extreme$data = "COBE"
 anom_extreme = rbind(cobe_extreme, hadi_extreme) %>% dplyr::select(x, y, sum) %>% group_by(x, y) %>% summarise(anom = mean(sum))
 anom_extreme$anom = range01(anom_extreme$anom)
 
@@ -47,7 +52,7 @@ p1 = anom_ipcc %>% ggplot(aes(x, y, fill = anom)) +
   scale_fill_gradientn(colors = rev(ipcc_precip), "") +
   scale_x_continuous(expand = c(-0.005, 0), "") +
   scale_y_continuous(expand = c(-0.005, 0), "") +
-  coord_fixed()+ 
+  coord_fixed() + 
   ggtitle("SST Anomalies 2019") +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(),
