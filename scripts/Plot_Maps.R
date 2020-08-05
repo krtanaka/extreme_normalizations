@@ -81,6 +81,10 @@ map = function(mode){
   
   anom$source = factor(anom$source, levels = c("HadISST v1.1", "COBE v2",  "ERSST v5"))
   
+  anom %>% group_by(period) %>% 
+     mutate(sum = range01(sum)) %>% 
+    summarise(mean = mean(sum))
+  
   if (mode == "annual") {
 
     
