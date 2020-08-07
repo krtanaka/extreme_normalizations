@@ -143,6 +143,13 @@ ElNino = subset(df, Year %in% c(1905, 1906,
                                 1991, 1992, 1997, 1998, 
                                 2015, 2016))
 
+t = df2 %>% mutate(period = ifelse(Year %in% c(1900:1959), "1st", "2nd")) %>% 
+  group_by(region, period) %>%
+  summarise(sum = mean(year_sum)) %>% 
+  mutate(percent = (sum/lag(sum)-1)*100)
+
+readr::write_csv(t, "~/Dropbox (MBA)/PAPER Kisei heat extremes/figures/supplemental/TableS3.csv")
+
 df2$linesize = ifelse(df2$region == "Global", 2, 1)
 
 df2$region[df2$region == "Global"] <- "Global (2009)"
