@@ -168,11 +168,11 @@ rank_joy = function(region){
     # tas_combined_sub = subset(tas_combined, UNIT %in% country$UNIT)
     
     tas_combined_sub = subset(tas_combined, UNIT %in% c("United States", 
-                                                        "Greenland", 
+                                                        # "Greenland", 
                                                         "Japan"))
   } 
   
-  pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 4, width = 6)
+  pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 7, width = 4)
   
   p = tas_combined_sub %>% 
     subset(source %in% c("HadISST v1.1", "COBE v2")) %>% 
@@ -186,14 +186,13 @@ rank_joy = function(region){
       expand = c(0.05, 0.05),
       breaks = c(0, 0.5, 1)) +
     scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
-    facet_grid(~UNIT, scales = "free") +
+    facet_wrap(~UNIT, scales = "fixed", ncol = 1) +
     ylab(NULL) + xlab(NULL) +
     theme(
       axis.text.y = element_blank(),
       axis.ticks = element_blank(),
       axis.text.x = element_text(size = 10),
-      legend.position = "bottom", 
-      legend.justification = c(1,0))
+      legend.position = c(0.7,0.95))
   
   print(p)
   
