@@ -89,6 +89,8 @@ map = function(mode){
     p = anom %>% 
       mutate(sum = range01(sum)) %>% 
       subset(source %in% c("COBE v2", "HadISST v1.1")) %>%
+      group_by(x, y, period) %>% 
+      summarise()
       # subset(y %in% seq(-70, 70, by = 0.1)) %>%
       ggplot() + 
       geom_point(aes(x, y, color = sum, fill = sum), size = 0.1) +
@@ -100,10 +102,12 @@ map = function(mode){
       # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
       facet_grid(source ~ period) +
       theme_minimal() +
-      coord_map("ortho", orientation = c(-90, 45, 0)) + #arctic centered, 0, 0, 0 gives you a normal look
-      theme(axis.title.x = element_blank(),
-            axis.title.y = element_blank(),
-            legend.position = "right")
+      coord_map("ortho", orientation = c(0, 0, 0)) + #normal
+        # coord_map("ortho", orientation = c(-90, 45, 0)) + #arctic centered, 0, 0, 0 gives you a normal look
+        theme(axis.title.x = element_blank(),
+              axis.title.y = element_blank(),
+              axis.ticks = element_blank(), 
+              legend.position = "right")
     
     p = anom %>% 
       # sample_frac(0.01) %>%

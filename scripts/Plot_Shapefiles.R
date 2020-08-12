@@ -1,3 +1,8 @@
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(rgdal)
+
 rm(list = ls())
 
 lme <- readOGR("/Users/ktanaka/Google Drive/Research/GIS/LME66/LMEs66.shp")
@@ -64,7 +69,7 @@ dev.off()
 
 
 load("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData")
-load("/Users/ktanaka/extreme_normalizations/results/HadI/SST_Anomalies_1980-1989_0.95.RData")
+load("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_1980-1989_0.95.RData")
 anom = anom[, c(1:2, 15)]
 x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 1, crs = "+proj=longlat +datum=WGS84")
 anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -82,16 +87,19 @@ bgcp = merge(anom, bgcp, all = T)
 bgcp$bgcp = round(bgcp$bgcp, 0)
 bgcp$bgcp = as.factor(as.character(bgcp$bgcp))
 
-bgcp_names <- read_csv("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/NAME_BGCP_2019_REYGONDEAU.csv")
+bgcp_names <- readr::read_csv("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/NAME_BGCP_2019_REYGONDEAU.csv")
 bgcp_names = bgcp_names[,c("NAME", "BGCP")]
 colnames(bgcp_names) = c("name", "bgcp")
 bgcp = merge(bgcp, bgcp_names)
 bgcp$bgcp = bgcp$name
+bgcp = bgcp %>% mutate(bgcp = gsub("\xca", "", bgcp)) 
 
 png("/Users/Kisei/Desktop/BGCP.png", units = "in", res = 100, height = 6, width = 10)
 p = bgcp %>% 
   mutate(bgcp = gsub("\xca", "", bgcp)) %>% 
-  # subset(bgcp %in% c("Indian monsoon gyre", "Western tropical Atlantic", "Northwest Arabian Sea upwelling")) %>%
+  subset(bgcp %in% c("Indian monsoon gyre", 
+                     "Western India Coast", 
+                     "Northwest Arabian Sea upwelling")) %>%
   # subset(bgcp %in% c("Pacific equatorial divergence", "North Pacific polar front", "North Atlantic Drift")) %>%
   ggplot() + 
   geom_raster(aes(x = x, y = y, fill = bgcp)) +
@@ -99,7 +107,7 @@ p = bgcp %>%
            color = "gray20", fill = "gray20", size = 0.001) + 
   scale_fill_viridis_d() +
   coord_fixed() + 
-  theme_pubr(I(20)) +
+  ggpubr::theme_pubr(I(20)) +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(), 
         axis.text.x = element_blank(),

@@ -12,7 +12,6 @@ library(rworldmap)
 library(ggalt)
 library(readr)
 library(lwgeom)
-
 library(sp)
 library(maptools)
 library(colorRamps)
@@ -61,25 +60,23 @@ ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
                rgb(33, 102, 172, maxColorValue = 255, alpha = 255),
                rgb(5, 48, 97, maxColorValue = 255, alpha = 255))
 
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/SST_Anomalies_1980-1989_", cutoff, ".RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1989"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/SST_Anomalies_1990-1999_", cutoff, ".RData")); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/SST_Anomalies_2000-2009_", cutoff, ".RData")); hadi3 = anom; hadi3$source = "HadISST v1.1"; hadi3$period = "2000-2009"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/SST_Anomalies_2010-2018_", cutoff, ".RData")); hadi4 = anom; hadi4$source = "HadISST v1.1"; hadi4$period = "2010-2018"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/SST_Anomalies_1980-1989_", cutoff, ".RData")); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1989"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/SST_Anomalies_1990-1999_", cutoff, ".RData")); cobe2 = anom; cobe2$source = "COBE v2"; cobe2$period = "1990-1999"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/SST_Anomalies_2000-2009_", cutoff, ".RData")); cobe3 = anom; cobe3$source = "COBE v2"; cobe3$period = "2000-2009"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/SST_Anomalies_2010-2018_", cutoff, ".RData")); cobe4 = anom; cobe4$source = "COBE v2"; cobe4$period = "2010-2018"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/SST_Anomalies_1980-1989_", cutoff, ".RData")); er1 = anom; er1$source = "ERSST v4"; er1$period = "1980-1989"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/SST_Anomalies_1990-1999_", cutoff, ".RData")); er2 = anom; er2$source = "ERSST v4"; er2$period = "1990-1999"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/SST_Anomalies_2000-2009_", cutoff, ".RData")); er3 = anom; er3$source = "ERSST v4"; er3$period = "2000-2009"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/SST_Anomalies_2010-2018_", cutoff, ".RData")); er4 = anom; er4$source = "ERSST v4"; er4$period = "2010-2018"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_1980-1989_", cutoff, ".RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1989"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_1990-1999_", cutoff, ".RData")); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_2000-2009_", cutoff, ".RData")); hadi3 = anom; hadi3$source = "HadISST v1.1"; hadi3$period = "2000-2009"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_2010-2019_", cutoff, ".RData")); hadi4 = anom; hadi4$source = "HadISST v1.1"; hadi4$period = "2010-2019"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/anomalies_1980-1989_", cutoff, ".RData")); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1989"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/anomalies_1990-1999_", cutoff, ".RData")); cobe2 = anom; cobe2$source = "COBE v2"; cobe2$period = "1990-1999"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/anomalies_2000-2009_", cutoff, ".RData")); cobe3 = anom; cobe3$source = "COBE v2"; cobe3$period = "2000-2009"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/anomalies_2010-2019_", cutoff, ".RData")); cobe4 = anom; cobe4$source = "COBE v2"; cobe4$period = "2010-2019"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/anomalies_1980-1989_", cutoff, ".RData")); er1 = anom; er1$source = "ERSST v5"; er1$period = "1980-1989"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/anomalies_1990-1999_", cutoff, ".RData")); er2 = anom; er2$source = "ERSST v5"; er2$period = "1990-1999"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/anomalies_2000-2009_", cutoff, ".RData")); er3 = anom; er3$source = "ERSST v5"; er3$period = "2000-2009"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/anomalies_2010-2019_", cutoff, ".RData")); er4 = anom; er4$source = "ERSST v5"; er4$period = "2010-2019"
 
 #all periods
 anom = rbind(hadi1, hadi2, hadi3, hadi4, 
              cobe1, cobe2, cobe3, cobe4,
              er1, er2, er3, er4)
-
-anom[anom=="ERSST v4"]<-"ERSST v5"
 
 anom$source = factor(anom$source, levels=c("HadISST v1.1","COBE v2",  "ERSST v5"))
 anom = subset(anom, source %in% c("COBE v2", "HadISST v1.1"))
@@ -108,27 +105,29 @@ if (mode == "annual") {
   xlims <- range(pretty(anom_i$x));ylims <- range(pretty(anom_i$y))
   
   p = ggplot(anom_i) +
-    geom_tile(aes(x = x, y = y, fill = sum), interpolate = F) +
-    # geom_point(aes(x, y, color = sum, fill = sum)) +
-    borders(xlim = xlims,ylim = ylims, fill = "gray") +
+    geom_tile(aes(x = x, y = y, fill = sum)) +
+    annotation_map(map_data("world")) +
     coord_fixed(xlim = xlims,ylim = ylims) +
-    # scale_fill_gradientn(colors = matlab.like(100), "", limits = c(0,1), breaks = c(0,0.5,1)) +
-    scale_fill_gradientn(colors = rev(ipcc_temp), "") +
-    scale_x_continuous(expand = c(-0.005, 0), "") +
-    scale_y_continuous(expand = c(-0.005, 0), "") +
-    facet_grid(LME_NAME ~ period) +
-    theme_pubr(I(12)) +
-    theme(axis.title.x = element_blank(),
-          axis.title.y = element_blank(),
-          axis.text.x = element_blank(),
-          axis.text.y = element_blank(),
-          axis.ticks.x = element_blank(),
-          axis.ticks.y = element_blank(),
-          legend.position = "right",
-          legend.justification = c(1,0))
+    scale_fill_gradientn(colors = rev(ipcc_temp), "", breaks = c(0,0.5,1), limits = c(0,1)) +
+    # scale_x_continuous(expand = c(-0.005, 0), "") +
+    # scale_y_continuous(expand = c(-0.005, 0), "") +
+    scale_x_longitude(xmin=-180, xmax=180, step=10) +
+    scale_y_latitude(ymin=-180, ymax=180, step=10) +
+    facet_wrap( ~ period) +
+    theme_minimal() +
+    theme(
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      # axis.text.x = element_blank(),
+      # axis.text.y = element_blank(),
+      # axis.ticks.x = element_blank(),
+      # axis.ticks.y = element_blank(),
+      legend.position = "bottom",
+      legend.justification = c(1,0)) + 
+    ggtitle(unique(anom_i$LME_NAME))
   
-  pdf(paste0("/Users/ktanaka/Desktop/SST_Anomalies_Annual_", cutoff, ".pdf"), height = 3, width = 8)
-  # png(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".png"), height = 3, width = 9, units = "in", res = 300)
+  pdf(paste0("/Users/ktanaka/Desktop/SST_Anomalies_Annual_", cutoff, ".pdf"), height = 5, width = 5)
+  # png(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".png"), height = 3, width = 9, units = "in", res = 500)
   print(p)
   dev.off()
   

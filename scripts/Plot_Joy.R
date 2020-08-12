@@ -77,7 +77,7 @@ rank_joy = function(region){
     
     # i = 1
     
-    load(paste0(paste0("~/extreme_normalizations/results/HadI/SST_Anomalies_", period[[i]], "_", cutoff, ".RData")))
+    load(paste0(paste0("~/extreme_normalizations/results/HadI/anomalies_", period[[i]], "_", cutoff, ".RData")))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     summary(tas)
@@ -98,7 +98,7 @@ rank_joy = function(region){
     hadi = merge(hadi, df)
     hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
-    load(paste0(paste0("~/extreme_normalizations/results/COBE/SST_Anomalies_", period[[i]], "_", cutoff, ".RData")))
+    load(paste0(paste0("~/extreme_normalizations/results/COBE/anomalies_", period[[i]], "_", cutoff, ".RData")))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     # cobe <- st_intersection(tas, shape)
@@ -118,7 +118,7 @@ rank_joy = function(region){
     cobe = merge(cobe, df)
     cobe$source = "COBE v2"; cobe$period = period[[i]]
     
-    load(paste0(paste0("~/extreme_normalizations/results/ER/SST_Anomalies_", period[[i]], "_", cutoff, ".RData")))
+    load(paste0(paste0("~/extreme_normalizations/results/ER/anomalies_", period[[i]], "_", cutoff, ".RData")))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     # er <- st_intersection(tas, shape)
@@ -172,7 +172,7 @@ rank_joy = function(region){
                                                         "Japan"))
   } 
   
-  pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 10, width = 12)
+  pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 4, width = 6)
   
   p = tas_combined_sub %>% 
     subset(source %in% c("HadISST v1.1", "COBE v2")) %>% 
@@ -180,16 +180,13 @@ rank_joy = function(region){
     # summarise(sum = mean(sum)) %>% 
     ggplot() +
     geom_density(aes(x = sum, fill = period), alpha = 0.8, size = 0.01) +
-    theme_minimal() +
+    cowplot::theme_cowplot() +
     scale_x_continuous(
       limits = c(0, 1),
       expand = c(0.05, 0.05),
       breaks = c(0, 0.5, 1)) +
     scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
-    # facet_grid(source~UNIT, scales = "free") +
     facet_grid(~UNIT, scales = "free") +
-    # facet_grid(source~UNIT, scales = "free_y") +
-    # facet_wrap(.~source+UNIT, scales = "free_y") +
     ylab(NULL) + xlab(NULL) +
     theme(
       axis.text.y = element_blank(),
@@ -246,21 +243,26 @@ rank_joy = function(region){
   
   ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
   ipcc_temp_expand = ipcc_temp_expand(length(unique(tas_combined$UNIT)))
-  # invert_geom_defaults()
-  
-  summary = tas_combined %>% 
-    group_by(UNIT, period) %>% 
-    summarise_each(funs(mean, sd, se = sd(.)/sqrt(n())), sum)
-  
-  summary = as.data.frame(summary)
-  summary = summary[,c('UNIT', 'period', 'mean', 'sd', 'se')]
-  summary$UNIT = as.character(summary$UNIT)
-  summary <- summary[order(summary$UNIT),]
-  summary[,3:5] = round(summary[,3:5], 2)
-  summary$UNIT[duplicated(summary$UNIT)] <- ""
-  colnames(summary) = c("Unit", "Period", "Mean", "SD", "SE")
-  
-  write_csv(summary, paste0('~/Desktop/', region, "_", cutoff, ".csv"))
+
+  # summary = tas_combined %>% 
+  #   group_by(UNIT, period) %>% 
+  #   summarise_each(funs(mean, sd, se = sd(.)/sqrt(n())), sum)
+  # 
+  # summary = as.data.frame(summary)
+  # summary = summary[,c('UNIT', 'period', 'mean', 'sd', 'se')]
+  # summary$UNIT = as.character(summary$UNIT)
+  # summary <- summary[order(summary$UNIT),]
+  # summary[,3:5] = round(summary[,3:5], 2)
+  # summary$UNIT[duplicated(summary$UNIT)] <- ""
+  # colnames(summary) = c("Unit", "Period", "Mean", "SD", "SE")
+  # 
+  # s1 = summary %>% subset(Period == "1980-1989")
+  # s2 = summary %>% subset(Period == "1990-1999")
+  # s3 = summary %>% subset(Period == "2000-2009")
+  # s4 = summary %>% subset(Period == "2010-2019")
+  # 
+  # summary = cbind(s1, s2, s3, s4)
+  # write_csv(summary, paste0('~/Desktop/', region, "_", cutoff, ".csv"))
   
   p = ggplot(tas_combined, aes(x = sum, y = UNIT, fill = UNIT)) +
     geom_joy(scale = 2, alpha = 0.8, size = 0.3) +
@@ -292,7 +294,7 @@ rank_joy_bgcp = function(){
     # i = 1
     
     load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData")
-    load(paste0(paste0("~/extreme_normalizations/results/HadI/SST_Anomalies_", period[[i]], "_", cutoff, ".RData")))
+    load(paste0(paste0("~/extreme_normalizations/results/HadI/anomalies_", period[[i]], "_", cutoff, ".RData")))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 1, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -327,7 +329,7 @@ rank_joy_bgcp = function(){
     hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
     load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData")
-    load(paste0(paste0("~/extreme_normalizations/results/COBE/SST_Anomalies_", period[[i]], "_", cutoff, ".RData")))
+    load(paste0(paste0("~/extreme_normalizations/results/COBE/anomalies_", period[[i]], "_", cutoff, ".RData")))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 1, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -362,7 +364,7 @@ rank_joy_bgcp = function(){
     cobe$source = "COBE v2"; cobe$period = period[[i]]
     
     load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData")
-    load(paste0(paste0("~/extreme_normalizations/results/ER/SST_Anomalies_", period[[i]], "_", cutoff, ".RData")))
+    load(paste0(paste0("~/extreme_normalizations/results/ER/anomalies_", period[[i]], "_", cutoff, ".RData")))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 2, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -449,18 +451,25 @@ rank_joy_bgcp = function(){
   ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
   ipcc_temp_expand = ipcc_temp_expand(length(unique(tas_combined$bgcp)))
   
-  summary = tas_combined %>% 
-    group_by(bgcp, period) %>% 
-    summarise_each(funs(mean, sd, se = sd(.)/sqrt(n())), sum)
-  
-  summary = as.data.frame(summary)
-  summary = summary[,c('bgcp', 'period', 'mean', 'sd', 'se')]
-  summary$bgcp = as.character(summary$bgcp)
-  summary <- summary[order(summary$bgcp),]
-  summary$bgcp[duplicated(summary$bgcp)] <- ""
-  summary[,3:5] = round(summary[,3:5], 2)
-  colnames(summary) = c("Unit", "Period", "Mean", "SD", "SE")
-  write_csv(summary, paste0("~/Desktop/bgcp_", cutoff, ".csv"))
+  # summary = tas_combined %>% 
+  #   group_by(bgcp, period) %>% 
+  #   summarise_each(funs(mean, sd, se = sd(.)/sqrt(n())), sum)
+  # 
+  # summary = as.data.frame(summary)
+  # summary = summary[,c('bgcp', 'period', 'mean', 'sd', 'se')]
+  # summary$bgcp = as.character(summary$bgcp)
+  # summary <- summary[order(summary$bgcp),]
+  # summary$bgcp[duplicated(summary$bgcp)] <- ""
+  # summary[,3:5] = round(summary[,3:5], 2)
+  # colnames(summary) = c("Unit", "Period", "Mean", "SD", "SE")
+  # 
+  # s1 = summary %>% subset(Period == "1980-1989")
+  # s2 = summary %>% subset(Period == "1990-1999")
+  # s3 = summary %>% subset(Period == "2000-2009")
+  # s4 = summary %>% subset(Period == "2010-2019")
+  # 
+  # summary = cbind(s1, s2, s3, s4)
+  # write_csv(summary, paste0("~/Desktop/bgcp_", cutoff, ".csv"))
   
   p = tas_combined %>% 
     ggplot(aes(x = sum, y = bgcp, fill = bgcp)) +
