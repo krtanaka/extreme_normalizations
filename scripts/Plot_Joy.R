@@ -57,7 +57,7 @@ ipcc_temp_4_cols <- c(rgb(153, 0, 2, maxColorValue = 255, alpha = 255),
 
 rank_joy = function(region){
   
-  # region = "eez"
+  # region = "lme"
   
   if (region == "meow"){
     shape = meow; shape$UNIT = shape$PROVINCE
@@ -230,6 +230,14 @@ rank_joy = function(region){
   } 
   
   tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
+  
+  count = tas_combined %>% 
+    subset(period %in% c("2010-2019")) %>%
+    # subset(period %in% c("1980-1989")) %>%
+    group_by(UNIT) %>% 
+    summarise(sum = round(mean(sum), 2)) %>% 
+    subset(sum >= 0.8)
+  
   tas_combined = subset(tas_combined, period %in% c("2010-2019"))
   
   prov_levels <- subset(tas_combined, period %in% c("2010-2019")) %>% # Reorder levels by 2010-2019
@@ -435,6 +443,14 @@ rank_joy_bgcp = function(){
   dev.off()
   
   tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
+  
+  count = tas_combined %>% 
+    subset(period %in% c("2010-2019")) %>%
+    # subset(period %in% c("1980-1989")) %>%
+    group_by(bgcp) %>% 
+    summarise(sum = round(mean(sum), 2)) %>% 
+    subset(sum >= 0.8)
+  
   tas_combined = subset(tas_combined, period %in% c("2010-2019")) 
   tas_combined = tas_combined %>% mutate(bgcp = gsub("\xca", "", bgcp)) 
   tas_combined = tas_combined %>% group_by(x, y, bgcp, period) %>% summarise(sum = mean(sum))
