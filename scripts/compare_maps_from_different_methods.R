@@ -12,14 +12,18 @@ range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 load("~/extreme_normalizations/results/COBE/anomalies_2019_ipcc.RData"); cobe_ipcc = anom; cobe_ipcc$data = "COBE"; cobe_ipcc$sum = rowMeans(cobe_ipcc[3:14])
 load("~/extreme_normalizations/results/HadI/anomalies_2019_ipcc.RData"); hadi_ipcc = anom; hadi_ipcc$data = "HadI"; hadi_ipcc$sum = rowMeans(hadi_ipcc[3:14])
 anom_ipcc = rbind(cobe_ipcc, hadi_ipcc) %>% dplyr::select(x, y, sum) %>% group_by(x, y) %>% summarise(anom = mean(sum))
-quantile(anom_ipcc$anom, 0.999)
+q = quantile(anom_ipcc$anom, 0.999); q
+d = anom_ipcc %>% subset(anom >= q)
+(dim(d)[1]/dim(anom_ipcc)[1])*100
 
 #Extreme Index for 2019
 load("~/extreme_normalizations/results/HadI/anomalies_2019_0.95.rdata"); hadi_extreme = anom; hadi_extreme$data = "HadI"
 load("~/extreme_normalizations/results/COBE/anomalies_2019_0.95.rdata"); cobe_extreme = anom; cobe_extreme$data = "COBE"
 anom_extreme = rbind(cobe_extreme, hadi_extreme) %>% dplyr::select(x, y, sum) %>% group_by(x, y) %>% summarise(anom = mean(sum))
 anom_extreme$anom = range01(anom_extreme$anom)
-quantile(anom_extreme$anom, 0.999)
+q = quantile(anom_extreme$anom, 0.999); q
+d = anom_extreme %>% subset(anom >= q)
+(dim(d)[1]/dim(anom_extreme)[1])*100
 
 #IPCC colors
 ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
@@ -48,7 +52,7 @@ ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
 
 p1 = anom_ipcc %>% ggplot(aes(x, y, fill = anom)) +  
   geom_tile() + 
-  geom_point(data = subset(anom_ipcc, anom >= 1.773027), aes(x, y), color = 5, shape = 4, alpha = 0.5) + 
+  geom_tile(data = subset(anom_ipcc, anom >= 1.773027), aes(x, y), fill = 5, alpha = 0.9) + 
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
            color = "gray20", fill = "gray20", size = 0.001) +
   scale_fill_gradientn(colors = rev(ipcc_temp), "") +
@@ -67,7 +71,7 @@ p1 = anom_ipcc %>% ggplot(aes(x, y, fill = anom)) +
 
 p2 = anom_extreme %>% ggplot(aes(x, y, fill = anom)) +  
   geom_tile() + 
-  geom_point(data = subset(anom_extreme, anom >= 1), aes(x, y), color = 5, shape = 4, alpha = 0.5) + 
+  geom_tile(data = subset(anom_extreme, anom >= 1), aes(x, y), fill = 5, alpha = 0.9) + 
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
            color = "gray20", fill = "gray20", size = 0.001) +
   scale_fill_gradientn(colors = rev(ipcc_temp), "") +
@@ -84,7 +88,7 @@ p2 = anom_extreme %>% ggplot(aes(x, y, fill = anom)) +
         legend.justification = c(1,0)) + 
   labs(tag = "b")
 
-pdf(paste0("~/Desktop/Fig4_", Sys.Date(), ".pdf"), height = 6, width = 6)
+pdf(paste0("~/Desktop/Fig4_", Sys.Date(), ".pdf"), height = 5, width = 5)
 
 p1/p2
 
