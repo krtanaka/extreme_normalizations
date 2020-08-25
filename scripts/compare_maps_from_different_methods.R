@@ -4,6 +4,7 @@ library(dplyr)
 library(ggthemes)
 library(precrec)
 library(ggplot2)
+library(patchwork)
 
 world <- fortify(rworldmap::getMap())
 range01 <- function(x){(x-min(x))/(max(x)-min(x))}
