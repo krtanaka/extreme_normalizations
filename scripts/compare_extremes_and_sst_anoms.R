@@ -20,7 +20,7 @@ load("COBE/anomalies_2019_ipcc.RData"); cobe_ipcc = anom; cobe_ipcc$data = "COBE
 load("HadI/anomalies_2019_ipcc.RData"); hadi_ipcc = anom; hadi_ipcc$data = "HadI"; hadi_ipcc$sum = rowMeans(hadi_ipcc[3:14])
 anom_ipcc = rbind(cobe_ipcc, hadi_ipcc) %>% dplyr::select(x, y, sum) %>% group_by(x, y) %>% summarise(anom = mean(sum))
 
-#99.9th percentile and area fractions
+#99th percentile and area fractions
 q = quantile(anom_ipcc$anom, 0.99); q
 d = anom_ipcc %>% subset(anom >= q)
 (dim(d)[1]/dim(anom_ipcc)[1])*100

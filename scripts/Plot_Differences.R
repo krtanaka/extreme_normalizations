@@ -6,7 +6,6 @@ library(sf)
 library(rgdal)
 library(dplyr)
 library(maps)
-# library(ggdark)
 library(ggjoy)
 library(rworldmap)
 library(ggalt)
@@ -46,9 +45,9 @@ range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 # eez <- rmapshaper::ms_simplify(eez, keep = 0.01, keep_shapes = F)
 # eez <- eez %>% st_as_sf()  
 
-load('/Users/Kisei/extreme_normalizations/eez_sf_dataframe_0.001.RData') 
-load('/Users/Kisei/extreme_normalizations/lme_sf_dataframe_0.001.RData') 
-load('/Users/Kisei/extreme_normalizations/meow_sf_dataframe.RData') 
+load('~/extreme_normalizations/data/eez_sf_dataframe_0.001.RData') 
+load('~/extreme_normalizations/data/lme_sf_dataframe_0.001.RData') 
+load('~/extreme_normalizations/data/meow_sf_dataframe.RData') 
 
 #IPCC - Temperature -
 ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
@@ -85,7 +84,7 @@ rank_mean = function(region){
     
     # i = 1
     
-    load(paste0(dir, "/extreme_normalizations/results/HadI/SST_Anomalies_", period[[i]], "_", cutoff, ".RData"))
+    load(paste0(dir, "/extreme_normalizations/results/HadI/anomalies_", period[[i]], "_", cutoff, ".RData"))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     summary(tas)
@@ -102,7 +101,7 @@ rank_mean = function(region){
              upper.ci = median + qt(1 - (0.05 / 2), n - 1) * se)
     hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
-    load(paste0(dir, "/extreme_normalizations/results/COBE/SST_Anomalies_", period[[i]], "_", cutoff, ".RData"))
+    load(paste0(dir, "/extreme_normalizations/results/COBE/anomalies_", period[[i]], "_", cutoff, ".RData"))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     # cobe <- st_intersection(tas, shape)
@@ -118,23 +117,23 @@ rank_mean = function(region){
              upper.ci = median + qt(1 - (0.05 / 2), n - 1) * se)
     cobe$source = "COBE v2"; cobe$period = period[[i]]
     
-    load(paste0(dir, "/extreme_normalizations/results/ER/SST_Anomalies_", period[[i]], "_", cutoff, ".RData"))
-    anom = anom[, c(1:2, 15)]
-    tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
-    # er <- st_intersection(tas, shape)
-    er <- st_intersection(tas, st_make_valid(shape))
-    # er <- st_intersection(tas, st_buffer(shape, 0))
-    er$sum = range01(er$sum)
-    er <- er %>% group_by(UNIT) %>%
-      summarise(median = median(sum, na.rm = T),
-                sd = sd(sum, na.rm = T),
-                n = n()) %>%
-      mutate(se = sd/sqrt(n),
-             lower.ci = median - qt(1 - (0.05 / 2), n - 1) * se,
-             upper.ci = median + qt(1 - (0.05 / 2), n - 1) * se)
-    er$source = "ERSST v4"; er$period = period[[i]]
+    # load(paste0(dir, "/extreme_normalizations/results/ER/anomalies_", period[[i]], "_", cutoff, ".RData"))
+    # anom = anom[, c(1:2, 15)]
+    # tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
+    # # er <- st_intersection(tas, shape)
+    # er <- st_intersection(tas, st_make_valid(shape))
+    # # er <- st_intersection(tas, st_buffer(shape, 0))
+    # er$sum = range01(er$sum)
+    # er <- er %>% group_by(UNIT) %>%
+    #   summarise(median = median(sum, na.rm = T),
+    #             sd = sd(sum, na.rm = T),
+    #             n = n()) %>%
+    #   mutate(se = sd/sqrt(n),
+    #          lower.ci = median - qt(1 - (0.05 / 2), n - 1) * se,
+    #          upper.ci = median + qt(1 - (0.05 / 2), n - 1) * se)
+    # er$source = "ERSST v4"; er$period = period[[i]]
     
-    tas = rbind(hadi, cobe, er)
+    tas = rbind(hadi, cobe)
     tas = as.data.frame(tas)
     
     tas_combined = rbind(tas_combined, tas)
