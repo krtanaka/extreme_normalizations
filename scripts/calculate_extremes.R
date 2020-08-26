@@ -9,14 +9,14 @@ library(maps)
 
 rm(list = ls())
 
-cutoff = c(0.95, 0.975)[1]
+cutoff = c(0.95, 0.975, 0.98)[3]
 
 calculate_anomalies = function(period, data){
   
   # period = "1980-1989"
   # data = "COBE"
   
-  setwd("~/Dropbox (MBA)/PAPER Kisei heat extremes")
+  setwd(paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes"))
   
   load(paste0("data/", data, "_SST.RData"))
   
@@ -106,7 +106,7 @@ calculate_anomalies = function(period, data){
   
   anom$sum = rowSums(anom[3:14])
   
-  save(anom, file = paste0("/Users/", Sys.info()[7], "/extreme_normalizations/", data, "_SST_Anomalies_", period, ".RData"))
+  save(anom, file = paste0("/Users/", Sys.info()[7], "/extreme_normalizations/", data, "_", cutoff, "_SST_Anomalies_", period, ".RData"))
 
   beepr::beep(2)
   
@@ -128,5 +128,7 @@ calculate_anomalies("1980-1989", "ER")
 calculate_anomalies("1990-1999", "ER")
 calculate_anomalies("2000-2009", "ER")
 calculate_anomalies("2010-2019", "ER")
+calculate_anomalies("2019", "ER")
+
 
 
