@@ -108,7 +108,7 @@ calculate_anomalies = function(period, data){
   
   save(anom, file = paste0("/Users/", Sys.info()[7], "/extreme_normalizations/", data, "_", cutoff, "_SST_Anomalies_", period, ".RData"))
 
-  beepr::beep(2)
+  # beepr::beep(2)
   
 }
 
