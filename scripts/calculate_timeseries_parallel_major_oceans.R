@@ -1,19 +1,21 @@
-cores = detectCores()/2
-registerDoParallel(cores = cores)
-
 rm(list = ls())
 
 library(raster)
 library(colorRamps)
 library(ggpubr)
 library(rnaturalearth)
+library(sp)
+library(maptools)
 library(sf)
 library(rgdal)
 library(dplyr)
 library(maps)
 library(doParallel)
 
-p = c(0.975, 0.95, 0.9)[2]
+cores = detectCores()/2
+registerDoParallel(cores = cores)
+
+p = c(0.975, 0.95, 0.98)[3]
 
 setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/")
 
@@ -39,9 +41,6 @@ Target <- Target %>% rasterToPoints() %>% data.frame()
 #choose ocean
 names(Target)
 latlon = Target[,c(1:2)]; plot(latlon, pch = ".")
-library(sp)
-library(maptools)
-library(colorRamps)
 coordinates(latlon) = ~x+y
 statarea <- rgdal::readOGR("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/World_Seas_IHO_v1/World_Seas.shp")
 CRS.new <- CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0+datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")  #EPSG:102003
@@ -149,7 +148,7 @@ for (i in 1:7) {
   axis(2, las = 2, at = seq(0, 0.8, 0.1))
   abline(h = 0.5, lty = 2)
   
-  save(yy_anom, file = paste0("/Users/ktanaka/Desktop/SST_TippingPoints_", data, "_", p, "_", major_oceans[i], ".RData"))
+  save(yy_anom, file = paste0("/Users/", Sys.info()[7], "/Desktop/timeseries_", data, "_", p, "_", major_oceans[i], ".RData"))
 
 }
 
