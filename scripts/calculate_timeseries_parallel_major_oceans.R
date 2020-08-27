@@ -148,7 +148,7 @@ for (i in 1:7) {
   axis(2, las = 2, at = seq(0, 0.8, 0.1))
   abline(h = 0.5, lty = 2)
   
-  save(yy_anom, file = paste0("/Users/", Sys.info()[7], "/Desktop/timeseries_", data, "_", p, "_", major_oceans[i], ".RData"))
+  save(yy_anom, file = paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/", data, "/timeseries_", p, "_", major_oceans[i], ".RData"))
 
 }
 
