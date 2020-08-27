@@ -21,7 +21,7 @@ setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/")
 
 load("major_oceans.RData")
 
-data = c("HadI", "COBE", "ER")[2]
+data = c("HadI", "COBE", "ER")[1]
 
 load(paste0(data, "_SST.RData"))
 
@@ -66,7 +66,7 @@ colnames(Target)[1] = "area"
 
 for (i in 1:7) {
   
-  # i = 2
+  # i = 7
   
   Baseline_n = subset(Baseline, area == major_oceans[i])
   Target_n = subset(Target, area ==  major_oceans[i])
