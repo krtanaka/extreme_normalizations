@@ -14,19 +14,11 @@ library(lwgeom)
 
 rm(list = ls())
 
-cutoff = c(0.95, 0.975)[1]
+percentile = c(0.95, 0.98)[2]
 
 period = c("1980-1989", "1990-1999", "2000-2009", "2010-2019")
 
 data = c("HadI", "COBE", "ER")
-
-world <- ne_countries(scale = "small", returnclass = "sf") 
-
-worldMap <- getMap()
-world.points <- fortify(worldMap)
-world.points$region <- world.points$id
-
-world.df <- world.points[,c("long","lat","group", "region")]
 
 world <- fortify(getMap())
 
@@ -35,16 +27,15 @@ range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 meow <- readOGR(dsn = paste0("/Users/", Sys.info()[7], "/Downloads/MEOW"), layer = "meow_ecos")
 meow <- meow %>% st_as_sf()  
 
-lme <- readOGR("/Users/ktanaka/Google Drive/Research/GIS/LME66/LMEs66.shp")
+lme <- readOGR("/Users/", Sys.info()[7], "/Google Drive/Research/GIS/LME66/LMEs66.shp")
 lme <- rmapshaper::ms_simplify(lme, keep = 0.01, keep_shapes = F)
 lme <- lme %>% st_as_sf()  
 
-eez <- readOGR(dsn = "/Users/ktanaka/clim_geo_disp/data/EEZ_land_union", layer = "EEZ_land_v2_201410")
+eez <- readOGR(dsn = "/Users/", Sys.info()[7], "/clim_geo_disp/data/EEZ_land_union", layer = "EEZ_land_v2_201410")
 eez <- rmapshaper::ms_simplify(eez, keep = 0.01, keep_shapes = F)
 eez <- eez %>% st_as_sf()  
 
-#IPCC - Temperature -
-ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
+ipcc_col <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
                rgb(178, 24, 43, maxColorValue = 255, alpha = 255),
                rgb(214, 96, 77, maxColorValue = 255, alpha = 255),
                rgb(244, 165, 130, maxColorValue = 255, alpha = 255),
@@ -58,18 +49,18 @@ ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
 
 map = function(mode){
   
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_1980-1989_", cutoff, ".RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1989"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_1990-1999_", cutoff, ".RData")); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_2000-2009_", cutoff, ".RData")); hadi3 = anom; hadi3$source = "HadISST v1.1"; hadi3$period = "2000-2009"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_2010-2019_", cutoff, ".RData")); hadi4 = anom; hadi4$source = "HadISST v1.1"; hadi4$period = "2010-2019"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/anomalies_1980-1989_", cutoff, ".RData")); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1989"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/anomalies_1990-1999_", cutoff, ".RData")); cobe2 = anom; cobe2$source = "COBE v2"; cobe2$period = "1990-1999"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/anomalies_2000-2009_", cutoff, ".RData")); cobe3 = anom; cobe3$source = "COBE v2"; cobe3$period = "2000-2009"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/anomalies_2010-2019_", cutoff, ".RData")); cobe4 = anom; cobe4$source = "COBE v2"; cobe4$period = "2010-2019"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/anomalies_1980-1989_", cutoff, ".RData")); er1 = anom; er1$source = "ERSST v5"; er1$period = "1980-1989"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/anomalies_1990-1999_", cutoff, ".RData")); er2 = anom; er2$source = "ERSST v5"; er2$period = "1990-1999"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/anomalies_2000-2009_", cutoff, ".RData")); er3 = anom; er3$source = "ERSST v5"; er3$period = "2000-2009"
-  load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/anomalies_2010-2019_", cutoff, ".RData")); er4 = anom; er4$source = "ERSST v5"; er4$period = "2010-2019"
+  load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/HadI/extremes_1980-1989_", percentile, ".RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1989"
+  load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/HadI/extremes_1990-1999_", percentile, ".RData")); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
+  load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/HadI/extremes_2000-2009_", percentile, ".RData")); hadi3 = anom; hadi3$source = "HadISST v1.1"; hadi3$period = "2000-2009"
+  load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/HadI/extremes_2010-2019_", percentile, ".RData")); hadi4 = anom; hadi4$source = "HadISST v1.1"; hadi4$period = "2010-2019"
+  load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/COBE/extremes_1980-1989_", percentile, ".RData")); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1989"
+  load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/COBE/extremes_1990-1999_", percentile, ".RData")); cobe2 = anom; cobe2$source = "COBE v2"; cobe2$period = "1990-1999"
+  load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/COBE/extremes_2000-2009_", percentile, ".RData")); cobe3 = anom; cobe3$source = "COBE v2"; cobe3$period = "2000-2009"
+  load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/COBE/extremes_2010-2019_", percentile, ".RData")); cobe4 = anom; cobe4$source = "COBE v2"; cobe4$period = "2010-2019"
+  load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/ER/extremes_1980-1989_", percentile, ".RData")); er1 = anom; er1$source = "ERSST v5"; er1$period = "1980-1989"
+  load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/ER/extremes_1990-1999_", percentile, ".RData")); er2 = anom; er2$source = "ERSST v5"; er2$period = "1990-1999"
+  load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/ER/extremes_2000-2009_", percentile, ".RData")); er3 = anom; er3$source = "ERSST v5"; er3$period = "2000-2009"
+  load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/ER/extremes_2010-2019_", percentile, ".RData")); er4 = anom; er4$source = "ERSST v5"; er4$period = "2010-2019"
   
   #all periods
   anom = rbind(hadi1, hadi2, hadi3, hadi4, 
@@ -160,7 +151,7 @@ map = function(mode){
             legend.position = "bottom",
             legend.justification = c(1,0))
     
-    pdf(paste0("/Users/ktanaka/Desktop/s2_", Sys.Date(), "_", cutoff, ".pdf"), height = 12, width = 12)
+    pdf(paste0("/Users/", Sys.info()[7], "/Desktop/s2_", Sys.Date(), "_", percentile, ".pdf"), height = 12, width = 12)
     print(p)
     dev.off()
     
@@ -245,8 +236,8 @@ map = function(mode){
             legend.position = "bottom", 
             legend.justification = c(1,0))
     
-    # pdf(paste0("/Users/ktanaka/Desktop/SST_Anomalies_Season_", cutoff, ".pdf"), height = 5, width = 18)
-    png(paste0("/Users/ktanaka/Desktop/Fig2_", Sys.Date(), "_", cutoff, ".png"), height = 12, width = 12, units = "in", res = 100)
+    # pdf(paste0("/Users/", Sys.info()[7], "/Desktop/SST_Anomalies_Season_", percentile, ".pdf"), height = 5, width = 18)
+    png(paste0("/Users/", Sys.info()[7], "/Desktop/Fig2_", Sys.Date(), "_", percentile, ".png"), height = 12, width = 12, units = "in", res = 100)
     
     print(p)
     dev.off()
@@ -337,7 +328,7 @@ map = function(mode){
         legend.position = "bottom", 
         legend.justification = c(1,0))
     
-    pdf(paste0("/Users/ktanaka/Desktop/Fig2_", Sys.Date(), "_", cutoff, ".pdf"), height = 7, width = 10)
+    pdf(paste0("/Users/", Sys.info()[7], "/Desktop/Fig2_", Sys.Date(), "_", percentile, ".pdf"), height = 7, width = 10)
     print(p)
     dev.off()
     
@@ -410,8 +401,8 @@ map = function(mode){
             legend.position = "bottom",
             legend.justification = c(1,0))
     
-    pdf(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".pdf"), height = 10, width = 10)
-    png(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".png"), height = 10, width = 10, units = "in", res = 100)
+    pdf(paste0("/Users/", Sys.info()[7], "/Desktop/Fig1_", Sys.Date(), "_", percentile, ".pdf"), height = 10, width = 10)
+    png(paste0("/Users/", Sys.info()[7], "/Desktop/Fig1_", Sys.Date(), "_", percentile, ".png"), height = 10, width = 10, units = "in", res = 100)
     print(p)
     dev.off()
     
