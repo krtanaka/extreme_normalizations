@@ -15,7 +15,7 @@ library(doParallel)
 cores = detectCores()/2
 registerDoParallel(cores = cores)
 
-p = c(0.975, 0.95, 0.98)[3]
+p = c(0.975, 0.95, 0.98)[2]
 
 setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/")
 
@@ -64,7 +64,7 @@ Target = cbind(area, Target)
 colnames(Baseline)[1] = "area"
 colnames(Target)[1] = "area"
 
-for (i in 4:7) {
+for (i in 1:7) {
   
   # i = 7
   
@@ -148,11 +148,10 @@ for (i in 4:7) {
   axis(2, las = 2, at = seq(0, 0.8, 0.1))
   abline(h = 0.5, lty = 2)
   
-  save(yy_anom, file = paste0("/Users/", Sys.info()[7], 
-                              "/extreme_normalizations/results/", data,
-                              "/timeseries_", p, "_", major_oceans[i], ".RData"))
+  save(yy_anom, file = paste0("/Users/", 
+                              Sys.info()[7], 
+                              "/extreme_normalizations/results/", 
+                              data,
+                              "/timeseries_", major_oceans[i], "_", p, ".RData"))
 
 }
-
-# beepr::beep(2)
-
