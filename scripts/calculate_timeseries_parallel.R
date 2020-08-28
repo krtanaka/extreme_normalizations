@@ -4,6 +4,8 @@ library(raster)
 library(colorRamps)
 library(ggpubr)
 library(rnaturalearth)
+library(sp)
+library(maptools)
 library(sf)
 library(rgdal)
 library(dplyr)
@@ -13,20 +15,19 @@ library(doParallel)
 cores = detectCores()/2
 registerDoParallel(cores = cores)
 
-p = c(0.975, 0.95, 0.9)[2]
+p = c(0.95, 0.98)[2]
 
 calculate_anomalies = function(data){
 
   data = c("HadI", "COBE", "ER")[2]
   
-  setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/")
+  setwd(paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/"))
   
   load(paste0(data, "_SST.RData"))
   
   # e = extent(-132, -110, 22.5, 47.5)
-  e = extent(-72, -66, 41, 45)
-  
-  df = crop(df, e); rm(e)
+  # e = extent(-72, -66, 41, 45)
+  # df = crop(df, e); rm(e)
   
   # set baseline Jan 1870 - Dec 1919, 50 years
   Baseline <- df[[1:600]] 
@@ -141,9 +142,11 @@ calculate_anomalies = function(data){
   axis(2, las = 2, at = seq(0, 0.8, 0.1))
   abline(h = 0.5, lty = 2)
   
-  save(yy_anom, file = paste0("/Users/ktanaka/Desktop/SST_TippingPoints_", data, "_", p, ".RData"))
-  
-  # beepr::beep(2)
+  save(yy_anom, file = paste0("/Users/", 
+                              Sys.info()[7], 
+                              "/extreme_normalizations/results/", 
+                              data,
+                              "/timeseries_global_", p, ".RData"))
   
 }
 
