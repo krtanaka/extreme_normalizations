@@ -24,17 +24,6 @@ world <- fortify(getMap())
 
 range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 
-meow <- readOGR(dsn = paste0("/Users/", Sys.info()[7], "/Downloads/MEOW"), layer = "meow_ecos")
-meow <- meow %>% st_as_sf()  
-
-lme <- readOGR("/Users/", Sys.info()[7], "/Google Drive/Research/GIS/LME66/LMEs66.shp")
-lme <- rmapshaper::ms_simplify(lme, keep = 0.01, keep_shapes = F)
-lme <- lme %>% st_as_sf()  
-
-eez <- readOGR(dsn = "/Users/", Sys.info()[7], "/clim_geo_disp/data/EEZ_land_union", layer = "EEZ_land_v2_201410")
-eez <- rmapshaper::ms_simplify(eez, keep = 0.01, keep_shapes = F)
-eez <- eez %>% st_as_sf()  
-
 ipcc_col <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
               rgb(178, 24, 43, maxColorValue = 255, alpha = 255),
               rgb(214, 96, 77, maxColorValue = 255, alpha = 255),
@@ -64,28 +53,27 @@ map = function(mode){
   load(paste0("ER/extremes_2000-2009_", percentile, ".RData")); er3 = anom; er3$source = "ERSST v5"; er3$period = "2000-2009"
   load(paste0("ER/extremes_2010-2019_", percentile, ".RData")); er4 = anom; er4$source = "ERSST v5"; er4$period = "2010-2019"
   
-  #all periods
-  anom = rbind(hadi1, hadi2, hadi3, hadi4, 
-               cobe1, cobe2, cobe3, cobe4,
-               er1, er2, er3, er4)
-  
-  anom$source = factor(anom$source, levels = c("HadISST v1.1", "COBE v2",  "ERSST v5"))
-  
-  anom = anom %>% subset(source %in% c("HadISST v1.1", "COBE v2"))
-  
-  anom %>% group_by(period) %>% 
-    mutate(sum = range01(sum)) %>% 
-    summarise(mean = mean(sum))
-  
   if (mode == "annual") {
+    
+    anom = rbind(hadi1, hadi2, hadi3, hadi4, 
+                 cobe1, cobe2, cobe3, cobe4,
+                 er1, er2, er3, er4)
+    
+    anom$source = factor(anom$source, levels = c("HadISST v1.1", "COBE v2",  "ERSST v5"))
+    
+    anom %>% 
+      subset(source %in% c("HadISST v1.1", "COBE v2")) %>% 
+      group_by(period) %>% 
+      mutate(sum = range01(sum)) %>% 
+      summarise(mean = mean(sum))
     
     p = anom %>% 
       mutate(sum = range01(sum)) %>% 
       subset(source %in% c("COBE v2", "HadISST v1.1")) %>%
       group_by(x, y, period) %>% 
-      summarise()
-    # subset(y %in% seq(-70, 70, by = 0.1)) %>%
-    ggplot() + 
+      summarise() + 
+      # subset(y %in% seq(-70, 70, by = 0.1)) %>%
+      ggplot() + 
       geom_point(aes(x, y, color = sum, fill = sum), size = 0.1) +
       geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
       scale_color_gradientn(colors = rev(ipcc_temp), "", limits = c(0, 1), breaks = c(0, 0.5, 1)) +
@@ -113,9 +101,8 @@ map = function(mode){
       ggplot(aes(x = x, y = y, color = sum)) + 
       geom_point(alpha = 0.5, shape = 16) +
       geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id), color = "gray20", fill = "gray20", size = 0.001) + 
-      scale_color_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
+      scale_color_gradientn(colors = rev(ipcc_col), "", limits = c(0,1), breaks = c(0,0.5,1)) +
       coord_proj("+proj=wintri") +
-      # coord_fixed() +
       # facet_grid(source ~ period) +
       # facet_grid(~ period) +
       theme_minimal(I(20)) +
@@ -139,7 +126,7 @@ map = function(mode){
       geom_raster(aes(x = x, y = y, fill = sum), interpolate = T) +
       geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
                color = "gray20", fill = "gray20", size = 0.001) +
-      scale_fill_gradientn(colors = rev(ipcc_temp), "", limits = c(0,1), breaks = c(0,0.5,1)) +
+      scale_fill_gradientn(colors = rev(ipcc_col), "", limits = c(0,1), breaks = c(0,0.5,1)) +
       scale_x_continuous(expand = c(-0.005, 0), "") +
       scale_y_continuous(expand = c(-0.005, 0), "") +
       coord_fixed() +
