@@ -5,30 +5,29 @@ library(dplyr)
 
 rm(list = ls())
 
-p = c(0.975, 0.95, 0.9)[2]
+p = c(0.95, 0.98)[2]
 
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_", p, "_global.RData")); hadi_global = yy_anom; hadi_global$region = "Global"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_", p, "_global_no_polar.RData")); hadi_sub_global = yy_anom; hadi_sub_global$region = "Sub_Global"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_", p, "_arctic.RData")); hadi_arctic = yy_anom; hadi_arctic$region = "Arctic"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_", p, "_indian.RData")); hadi_indian = yy_anom; hadi_indian$region = "Indian"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_", p, "_north_atlantic.RData")); hadi_north_atlantic = yy_anom; hadi_north_atlantic$region = "N.Atlantic"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_", p, "_north_pacific.RData")); hadi_north_pacific = yy_anom; hadi_north_pacific$region = "N.Pacific"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_", p, "_south_atlantic.RData")); hadi_south_atlantic = yy_anom; hadi_south_atlantic$region = "S.Atlantic"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_", p, "_south_pacific.RData")); hadi_south_pacific = yy_anom; hadi_south_pacific$region = "S.Pacific"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_", p, "_southern.RData")); hadi_southern_ocean = yy_anom; hadi_southern_ocean$region = "Southern"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_", p, "_gom.RData")); hadi_gom = yy_anom; hadi_gom$region = "Gulf of Maine"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_global_", p, ".RData")); hadi_global = yy_anom; hadi_global$region = "Global"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_global_no_polar_", p, ".RData")); hadi_sub_global = yy_anom; hadi_sub_global$region = "Sub_Global"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_arctic_", p, ".RData")); hadi_arctic = yy_anom; hadi_arctic$region = "Arctic"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_indian_", p, ".RData")); hadi_indian = yy_anom; hadi_indian$region = "Indian"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_north_atlantic_", p, ".RData")); hadi_north_atlantic = yy_anom; hadi_north_atlantic$region = "N.Atlantic"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_north_pacific_", p, ".RData")); hadi_north_pacific = yy_anom; hadi_north_pacific$region = "N.Pacific"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_south_atlantic_", p, ".RData")); hadi_south_atlantic = yy_anom; hadi_south_atlantic$region = "S.Atlantic"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_south_pacific_", p, ".RData")); hadi_south_pacific = yy_anom; hadi_south_pacific$region = "S.Pacific"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_southern_", p, ".RData")); hadi_southern_ocean = yy_anom; hadi_southern_ocean$region = "Southern"
+# load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_gom_", p, ".RData")); hadi_gom = yy_anom; hadi_gom$region = "Gulf of Maine"
 
-
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_", p, "_global.RData")); cobe_global = yy_anom; cobe_global$region = "Global"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_", p, "_global_no_polar.RData")); cobe_sub_global = yy_anom; cobe_sub_global$region = "Sub_Global"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_", p, "_arctic.RData")); cobe_arctic = yy_anom; cobe_arctic$region = "Arctic"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_", p, "_indian.RData")); cobe_indian = yy_anom; cobe_indian$region = "Indian"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_", p, "_north_atlantic.RData")); cobe_north_atlantic = yy_anom; cobe_north_atlantic$region = "N.Atlantic"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_", p, "_north_pacific.RData")); cobe_north_pacific = yy_anom; cobe_north_pacific$region = "N.Pacific"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_", p, "_south_atlantic.RData")); cobe_south_atlantic = yy_anom; cobe_south_atlantic$region = "S.Atlantic"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_", p, "_south_pacific.RData")); cobe_south_pacific = yy_anom; cobe_south_pacific$region = "S.Pacific"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_", p, "_southern.RData")); cobe_southern_ocean = yy_anom; cobe_southern_ocean$region = "Southern"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_", p, "_gom.RData")); cobe_gom = yy_anom; cobe_gom$region = "Gulf of Maine"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_global_", p, ".RData")); cobe_global = yy_anom; cobe_global$region = "Global"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_global_no_polar_", p, ".RData")); cobe_sub_global = yy_anom; cobe_sub_global$region = "Sub_Global"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_arctic_", p, ".RData")); cobe_arctic = yy_anom; cobe_arctic$region = "Arctic"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_indian_", p, ".RData")); cobe_indian = yy_anom; cobe_indian$region = "Indian"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_north_atlantic_", p, ".RData")); cobe_north_atlantic = yy_anom; cobe_north_atlantic$region = "N.Atlantic"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_north_pacific_", p, ".RData")); cobe_north_pacific = yy_anom; cobe_north_pacific$region = "N.Pacific"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_south_atlantic_", p, ".RData")); cobe_south_atlantic = yy_anom; cobe_south_atlantic$region = "S.Atlantic"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_south_pacific_", p, ".RData")); cobe_south_pacific = yy_anom; cobe_south_pacific$region = "S.Pacific"
+load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_southern_", p, ".RData")); cobe_southern_ocean = yy_anom; cobe_southern_ocean$region = "Southern"
+# load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_gom_", p, ".RData")); cobe_gom = yy_anom; cobe_gom$region = "Gulf of Maine"
 
 hadi = rbind(hadi_global, 
              hadi_sub_global,
@@ -38,8 +37,8 @@ hadi = rbind(hadi_global,
              hadi_north_pacific,
              hadi_south_atlantic, 
              hadi_south_pacific, 
-             hadi_southern_ocean,
-             hadi_gom)
+             hadi_southern_ocean)
+             # hadi_gom)
 
 cobe = rbind(cobe_global, 
              cobe_sub_global,
@@ -49,8 +48,8 @@ cobe = rbind(cobe_global,
              cobe_north_pacific,
              cobe_south_atlantic, 
              cobe_south_pacific, 
-             cobe_southern_ocean, 
-             cobe_gom)
+             cobe_southern_ocean)
+             # cobe_gom)
 
 rm(hadi_global, 
    hadi_sub_global,

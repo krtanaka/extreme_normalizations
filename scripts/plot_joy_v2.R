@@ -11,10 +11,11 @@ library(rworldmap)
 library(ggalt)
 library(readr)
 library(lwgeom)
+library(patchwork)
 
 rm(list = ls())
 
-percentile = 0.98
+percentile = c(0.95, 0.98)[2]
 
 period = c("1980-1989", "1990-1999", "2000-2009", "2010-2019")
 
@@ -419,48 +420,61 @@ bgcp_sub = bgcp_sub[,c("bgcp", "sum")]; bgcp_sub = as.data.frame(bgcp_sub); coln
 
 ipcc_temp_expand = colorRampPalette(rev(ipcc_cols))
 
-pdf(paste0("~/Desktop/Fig2_LME.", percentile, "_", Sys.Date(), ".pdf"), width = 4.5, height = 6)
-p = lme_sub %>% 
+#####################
+### Plot Figure 2 ###
+#####################
+
+pdf(paste0("~/Desktop/Fig2_LME.", percentile, "_", Sys.Date(), ".pdf"), width = 8, height = 6)
+p1 = lme_sub %>% 
   mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
   ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
-  geom_joy(scale = 3, alpha = 0.8, size = 0.5, bandwidth = 0.03) +
+  geom_joy(scale = 10, alpha = 0.8, size = 0.1) +
   theme_joy(grid = F) +
   scale_y_discrete(expand = c(0.05, 0)) + # will generally have to set the `expand` option
-  scale_x_continuous(limits = c(0, 1), expand = c(0, 0), breaks = c(0,0.5, 1)) +
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0), breaks = c(0, 0.5, 1)) +
   scale_fill_cyclical(values = ipcc_temp_expand(length(unique(lme_sub$UNIT))))+
   ylab(NULL) + xlab(NULL) +
+  coord_fixed(ratio = 0.1) + 
   theme(axis.text.y = element_text(size = 10),
-        legend.position = "none")
-print(p)
+        legend.position = "none")+ 
+  ggtitle("(b) Large Marine Ecosystem")
+print(p1)
 dev.off()
 
-pdf(paste0("~/Desktop/Fig2_EEZ.", percentile, "_", Sys.Date(), ".pdf"), width = 4, height = 6)
-p = eez_sub %>% 
+pdf(paste0("~/Desktop/Fig2_EEZ.", percentile, "_", Sys.Date(), ".pdf"), width = 8, height = 6)
+p2 = eez_sub %>% 
   mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
   ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
-  geom_joy(scale = 3, alpha = 0.8, size = 0.5, bandwidth = 0.03) +
+  geom_joy(scale = 10, alpha = 0.8, size = 0.1) +
   theme_joy(grid = F) +
   scale_y_discrete(expand = c(0.05, 0)) + # will generally have to set the `expand` option
-  scale_x_continuous(limits = c(0, 1), expand = c(0, 0), breaks = c(0,0.5, 1)) +
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0), breaks = c(0, 0.5, 1)) +
   scale_fill_cyclical(values = ipcc_temp_expand(length(unique(eez_sub$UNIT))))+
   ylab(NULL) + xlab(NULL) +
+  coord_fixed(ratio = 0.1) + 
   theme(axis.text.y = element_text(size = 10),
-        legend.position = "none")
-print(p)
+        legend.position = "none") + 
+  ggtitle("(c) Exclusive Ecoonmic Zone")
+print(p2)
 dev.off()
 
-pdf(paste0("~/Desktop/Fig2_BGCP.", percentile, "_", Sys.Date(), ".pdf"), width = 4.5, height = 6)
-p = bgcp_sub %>%  
+pdf(paste0("~/Desktop/Fig2_BGCP.", percentile, "_", Sys.Date(), ".pdf"), width = 8, height = 6)
+p3 = bgcp_sub %>%  
   mutate(UNIT = gsub("\xca", "", UNIT)) %>% 
   mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
   ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
-  geom_joy(scale = 3, alpha = 0.8, size = 0.5, bandwidth = 0.03) +
+  geom_joy(scale = 10, alpha = 0.8, size = 0.1) +
   theme_joy(grid = F) +
   scale_y_discrete(expand = c(0.05, 0)) + # will generally have to set the `expand` option
-  scale_x_continuous(limits = c(0, 1), expand = c(0, 0), breaks = c(0,0.5, 1)) +
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0), breaks = c(0, 0.5, 1)) +
   scale_fill_cyclical(values = ipcc_temp_expand(length(unique(bgcp_sub$UNIT))))+
   ylab(NULL) + xlab(NULL) +
+  coord_fixed(ratio = 0.1) + 
   theme(axis.text.y = element_text(size = 10),
-        legend.position = "none")
-print(p)
+        legend.position = "none")+ 
+  ggtitle("(a) Biogeographic Province")
+print(p3)
+dev.off()
+
+p3 + p1 + p2
 dev.off()
