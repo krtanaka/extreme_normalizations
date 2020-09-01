@@ -22,32 +22,13 @@ period = c("1980-1989", "1990-1999", "2000-2009", "2010-2018")
 
 data = c("HadI", "COBE", "ER")
 
-world <- ne_countries(scale = "small", returnclass = "sf") 
-
-worldMap <- getMap()
-world.points <- fortify(worldMap)
-world.points$region <- world.points$id
-
-world.df <- world.points[,c("long","lat","group", "region")]
-
 world <- fortify(getMap())
 
 range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 
-# meow <- readOGR(dsn = paste0("/Users/", Sys.info()[7], "/Downloads/MEOW"), layer = "meow_ecos")
-# meow <- meow %>% st_as_sf()  
-# 
-# lme <- readOGR("/Users/ktanaka/Google Drive/Research/GIS/LME66/LMEs66.shp")
-# lme <- rmapshaper::ms_simplify(lme, keep = 0.01, keep_shapes = F)
-# lme <- lme %>% st_as_sf()  
-# 
-# eez <- readOGR(dsn = "/Users/ktanaka/clim_geo_disp/data/EEZ_land_union", layer = "EEZ_land_v2_201410")
-# eez <- rmapshaper::ms_simplify(eez, keep = 0.01, keep_shapes = F)
-# eez <- eez %>% st_as_sf()  
-
-load('~/extreme_normalizations/data/eez_sf_dataframe_0.001.RData') 
-load('~/extreme_normalizations/data/lme_sf_dataframe_0.001.RData') 
-load('~/extreme_normalizations/data/meow_sf_dataframe.RData') 
+load(paste0(dir, '/extreme_normalizations/data/eez_sf_dataframe_0.001.RData'))
+load(paste0(dir, '/extreme_normalizations/data/lme_sf_dataframe_0.001.RData')) 
+load(paste0(dir, '/extreme_normalizations/data/meow_sf_dataframe.RData'))
 
 #IPCC - Temperature -
 ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),

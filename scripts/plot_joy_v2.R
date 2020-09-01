@@ -64,7 +64,7 @@ rank_joy_eez_lme = function(region){
     
     # i = 1
     
-    load(paste0(paste0("~/extreme_normalizations/results/HadI/extremes_", period[[i]], "_", percentile, ".RData")))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/HadI/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     summary(tas)
@@ -83,7 +83,7 @@ rank_joy_eez_lme = function(region){
     hadi = merge(hadi, df)
     hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
-    load(paste0(paste0("~/extreme_normalizations/results/COBE/extremes_", period[[i]], "_", percentile, ".RData")))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/COBE/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     cobe <- st_intersection(tas, st_make_valid(shape))
@@ -101,7 +101,7 @@ rank_joy_eez_lme = function(region){
     cobe = merge(cobe, df)
     cobe$source = "COBE v2"; cobe$period = period[[i]]
     
-    load(paste0(paste0("~/extreme_normalizations/results/ER/extremes_", period[[i]], "_", percentile, ".RData")))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/ER/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     er <- st_intersection(tas, st_make_valid(shape))
@@ -191,6 +191,26 @@ rank_joy_eez_lme = function(region){
   ipcc_temp_expand = colorRampPalette(rev(ipcc_cols))
   ipcc_temp_expand = ipcc_temp_expand(length(unique(tas_combined$UNIT)))
   
+  # summary = tas_combined %>% 
+  #   group_by(UNIT, period) %>% 
+  #   summarise_each(funs(mean, sd, se = sd(.)/sqrt(n())), sum)
+  # 
+  # summary = as.data.frame(summary)
+  # summary = summary[,c('UNIT', 'period', 'mean', 'sd', 'se')]
+  # summary$UNIT = as.character(summary$UNIT)
+  # summary <- summary[order(summary$UNIT),]
+  # summary[,3:5] = round(summary[,3:5], 2)
+  # summary$UNIT[duplicated(summary$UNIT)] <- ""
+  # colnames(summary) = c("Unit", "Period", "Mean", "SD", "SE")
+  # 
+  # s1 = summary %>% subset(Period == "1980-1989")
+  # s2 = summary %>% subset(Period == "1990-1999")
+  # s3 = summary %>% subset(Period == "2000-2009")
+  # s4 = summary %>% subset(Period == "2010-2019")
+  # 
+  # summary = cbind(s1, s2, s3, s4)
+  # write_csv(summary, paste0('~/Desktop/', region, "_", cutoff, ".csv"))
+  
   p = ggplot(tas_combined, aes(x = sum, y = UNIT, fill = UNIT)) +
     geom_joy(scale = 2, alpha = 0.8, size = 0.3, bandwidth = 0.03) +
     theme_minimal() +
@@ -222,8 +242,8 @@ rank_joy_bgcp = function(){
     
     # i = 1
     
-    load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData")
-    load(paste0(paste0("~/extreme_normalizations/results/HadI/extremes_", period[[i]], "_", percentile, ".RData")))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/bgcp_raster_0.25.RData"))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/HadI/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 1, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -235,7 +255,7 @@ rank_joy_bgcp = function(){
     bgcp = merge(anom, bgcp, all = T)
     bgcp$bgcp = round(bgcp$bgcp, 0)
     bgcp$bgcp = as.factor(as.character(bgcp$bgcp))
-    bgcp_names <- read_csv("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/NAME_BGCP_2019_REYGONDEAU.csv")
+    bgcp_names <- read_csv(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/NAME_BGCP_2019_REYGONDEAU.csv"))
     bgcp_names = bgcp_names[,c("NAME", "BGCP")]
     colnames(bgcp_names) = c("name", "bgcp")
     bgcp = merge(bgcp, bgcp_names)
@@ -257,8 +277,8 @@ rank_joy_bgcp = function(){
     hadi = df
     hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
-    load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData")
-    load(paste0(paste0("~/extreme_normalizations/results/COBE/extremes_", period[[i]], "_", percentile, ".RData")))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/bgcp_raster_0.25.RData"))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/COBE/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 1, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -270,7 +290,7 @@ rank_joy_bgcp = function(){
     bgcp = merge(anom, bgcp, all = T)
     bgcp$bgcp = round(bgcp$bgcp, 0)
     bgcp$bgcp = as.factor(as.character(bgcp$bgcp))
-    bgcp_names <- read_csv("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/NAME_BGCP_2019_REYGONDEAU.csv")
+    bgcp_names <- read_csv(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/NAME_BGCP_2019_REYGONDEAU.csv"))
     bgcp_names = bgcp_names[,c("NAME", "BGCP")]
     colnames(bgcp_names) = c("name", "bgcp")
     bgcp = merge(bgcp, bgcp_names)
@@ -292,8 +312,8 @@ rank_joy_bgcp = function(){
     cobe = df
     cobe$source = "COBE v2"; cobe$period = period[[i]]
     
-    load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData")
-    load(paste0(paste0("~/extreme_normalizations/results/ER/extremes_", period[[i]], "_", percentile, ".RData")))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/bgcp_raster_0.25.RData"))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/ER/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 2, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -305,7 +325,7 @@ rank_joy_bgcp = function(){
     bgcp = merge(anom, bgcp, all = T)
     bgcp$bgcp = round(bgcp$bgcp, 0)
     bgcp$bgcp = as.factor(as.character(bgcp$bgcp))
-    bgcp_names <- read_csv("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/NAME_BGCP_2019_REYGONDEAU.csv")
+    bgcp_names <- read_csv(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/NAME_BGCP_2019_REYGONDEAU.csv"))
     bgcp_names = bgcp_names[,c("NAME", "BGCP")]
     colnames(bgcp_names) = c("name", "bgcp")
     bgcp = merge(bgcp, bgcp_names)
