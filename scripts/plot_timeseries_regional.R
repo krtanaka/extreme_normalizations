@@ -5,29 +5,36 @@ library(dplyr)
 
 rm(list = ls())
 
-p = c(0.95, 0.98)[2]
+#########################
+### choose percentile ###
+#########################
+p = c(0.95, 0.98)[1]
 
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_global_", p, ".RData")); hadi_global = yy_anom; hadi_global$region = "Global"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_global_no_polar_", p, ".RData")); hadi_sub_global = yy_anom; hadi_sub_global$region = "Sub_Global"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_arctic_", p, ".RData")); hadi_arctic = yy_anom; hadi_arctic$region = "Arctic"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_indian_", p, ".RData")); hadi_indian = yy_anom; hadi_indian$region = "Indian"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_north_atlantic_", p, ".RData")); hadi_north_atlantic = yy_anom; hadi_north_atlantic$region = "N.Atlantic"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_north_pacific_", p, ".RData")); hadi_north_pacific = yy_anom; hadi_north_pacific$region = "N.Pacific"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_south_atlantic_", p, ".RData")); hadi_south_atlantic = yy_anom; hadi_south_atlantic$region = "S.Atlantic"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_south_pacific_", p, ".RData")); hadi_south_pacific = yy_anom; hadi_south_pacific$region = "S.Pacific"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_southern_", p, ".RData")); hadi_southern_ocean = yy_anom; hadi_southern_ocean$region = "Southern"
-# load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/timeseries_gom_", p, ".RData")); hadi_gom = yy_anom; hadi_gom$region = "Gulf of Maine"
+########################################################
+### load area fraction time series results 1900-2019 ###
+########################################################
 
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_global_", p, ".RData")); cobe_global = yy_anom; cobe_global$region = "Global"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_global_no_polar_", p, ".RData")); cobe_sub_global = yy_anom; cobe_sub_global$region = "Sub_Global"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_arctic_", p, ".RData")); cobe_arctic = yy_anom; cobe_arctic$region = "Arctic"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_indian_", p, ".RData")); cobe_indian = yy_anom; cobe_indian$region = "Indian"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_north_atlantic_", p, ".RData")); cobe_north_atlantic = yy_anom; cobe_north_atlantic$region = "N.Atlantic"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_north_pacific_", p, ".RData")); cobe_north_pacific = yy_anom; cobe_north_pacific$region = "N.Pacific"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_south_atlantic_", p, ".RData")); cobe_south_atlantic = yy_anom; cobe_south_atlantic$region = "S.Atlantic"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_south_pacific_", p, ".RData")); cobe_south_pacific = yy_anom; cobe_south_pacific$region = "S.Pacific"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_southern_", p, ".RData")); cobe_southern_ocean = yy_anom; cobe_southern_ocean$region = "Southern"
-# load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/timeseries_gom_", p, ".RData")); cobe_gom = yy_anom; cobe_gom$region = "Gulf of Maine"
+setwd(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/"))
+
+load(paste0("HadI/timeseries_global_", p, ".RData")); hadi_global = yy_anom; hadi_global$region = "Global"
+load(paste0("HadI/timeseries_global_no_polar_", p, ".RData")); hadi_sub_global = yy_anom; hadi_sub_global$region = "Sub_Global"
+load(paste0("HadI/timeseries_arctic_", p, ".RData")); hadi_arctic = yy_anom; hadi_arctic$region = "Arctic"
+load(paste0("HadI/timeseries_indian_", p, ".RData")); hadi_indian = yy_anom; hadi_indian$region = "Indian"
+load(paste0("HadI/timeseries_north_atlantic_", p, ".RData")); hadi_north_atlantic = yy_anom; hadi_north_atlantic$region = "N.Atlantic"
+load(paste0("HadI/timeseries_north_pacific_", p, ".RData")); hadi_north_pacific = yy_anom; hadi_north_pacific$region = "N.Pacific"
+load(paste0("HadI/timeseries_south_atlantic_", p, ".RData")); hadi_south_atlantic = yy_anom; hadi_south_atlantic$region = "S.Atlantic"
+load(paste0("HadI/timeseries_south_pacific_", p, ".RData")); hadi_south_pacific = yy_anom; hadi_south_pacific$region = "S.Pacific"
+load(paste0("HadI/timeseries_southern_", p, ".RData")); hadi_southern_ocean = yy_anom; hadi_southern_ocean$region = "Southern"
+
+load(paste0("COBE/timeseries_global_", p, ".RData")); cobe_global = yy_anom; cobe_global$region = "Global"
+load(paste0("COBE/timeseries_global_no_polar_", p, ".RData")); cobe_sub_global = yy_anom; cobe_sub_global$region = "Sub_Global"
+load(paste0("COBE/timeseries_arctic_", p, ".RData")); cobe_arctic = yy_anom; cobe_arctic$region = "Arctic"
+load(paste0("COBE/timeseries_indian_", p, ".RData")); cobe_indian = yy_anom; cobe_indian$region = "Indian"
+load(paste0("COBE/timeseries_north_atlantic_", p, ".RData")); cobe_north_atlantic = yy_anom; cobe_north_atlantic$region = "N.Atlantic"
+load(paste0("COBE/timeseries_north_pacific_", p, ".RData")); cobe_north_pacific = yy_anom; cobe_north_pacific$region = "N.Pacific"
+load(paste0("COBE/timeseries_south_atlantic_", p, ".RData")); cobe_south_atlantic = yy_anom; cobe_south_atlantic$region = "S.Atlantic"
+load(paste0("COBE/timeseries_south_pacific_", p, ".RData")); cobe_south_pacific = yy_anom; cobe_south_pacific$region = "S.Pacific"
+load(paste0("COBE/timeseries_southern_", p, ".RData")); cobe_southern_ocean = yy_anom; cobe_southern_ocean$region = "Southern"
 
 hadi = rbind(hadi_global, 
              hadi_sub_global,
@@ -99,25 +106,7 @@ df1$region = factor(df1$region, levels = c("Global",
                                            "Southern",
                                            "Gulf of Maine"))
 
-pdf("~/Desktop/s6.pdf", height = 6, width = 10)
-
-df1 %>% 
-  ggplot(aes(x = Year, y = year_sum, color = data)) +
-  geom_point(alpha = 0.8) +
-  geom_line(alpha = 0.8) +
-  geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") +
-  labs(x = "", y = "Area Fraction") +
-  cowplot::theme_cowplot() +
-  scale_color_brewer(palette = "Set1", "") + 
-  facet_wrap(~region, ncol = 4, scales = "free_y") + 
-  scale_x_continuous(breaks = seq(1900, 2020, 40), limits = c(1900, 2020)) + 
-  theme(legend.position = "top",
-        legend.justification = c(0,1))
-
-dev.off()
-
-pdf("~/Desktop/s6.pdf", height = 5, width = 5)
-
+pdf("~/Desktop/s6.pdf", height = 8, width = 10)
 df1 %>% 
   # subset(region %in% c("Global", "Sub_Global")) %>% 
   group_by(Year, region, data) %>% 
@@ -128,15 +117,13 @@ df1 %>%
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") +
   labs(x = "", y = "Area Fraction") +
   cowplot::theme_cowplot(I(20)) +
-  facet_wrap(~region) + 
+  facet_wrap( ~ region, scales = "free") + 
   scale_color_brewer(palette = "Set1", "") + 
   scale_x_continuous(breaks = seq(1900, 2020, 60), limits = c(1900, 2020)) + 
-  theme(legend.position = "right")
-
+  theme(legend.position = "top",
+        # panel.spacing.x = unit(2, "lines"),
+        legend.justification = c(0,1))
 dev.off()
-
-# scale_x_date(breaks = seq(as.Date("1900-01-01"), as.Date("2019-12-01"), by = "40 years"), 
-#              labels = scales::date_format("%Y")) 
 
 df2 = df %>% group_by(Year, region) %>% summarise(year_sum = mean(year_sum))
 df2$Year = as.numeric(df2$Year)
@@ -150,26 +137,16 @@ ElNino = subset(df, Year %in% c(1905, 1906,
                                 1991, 1992, 1997, 1998, 
                                 2015, 2016))
 
+# calculate % changes in area fraction above 50% 1900-1959 vs. 1960-2019
 t = df2 %>% mutate(period = ifelse(Year %in% c(1900:1959), "1st", "2nd")) %>% 
   group_by(region, period) %>%
   summarise(sum = mean(year_sum)) %>% 
   mutate(percent = (sum/lag(sum)-1)*100)
+t
 
 readr::write_csv(t, "~/Dropbox (MBA)/PAPER Kisei heat extremes/figures/supplemental/TableS3.csv")
 
 df2$linesize = ifelse(df2$region == "Global", 2, 1)
-
-df2$region[df2$region == "Global"] <- "Global (2009)"
-df2$region[df2$region == "Arctic"] <- "Arctic (2016)"
-df2$region[df2$region == "N.Atlantic"] <- "N.Atlantic (2003)"
-df2$region[df2$region == "N.Pacific"] <- "N.Pacific (2014)"
-df2$region[df2$region == "Southern"] <- "Southern (n/a)"
-df2$region[df2$region == "S.Atlantic"] <- "S.Atlantic (1993)"
-df2$region[df2$region == "S.Pacific"] <- "S.Pacific (n/a)"
-df2$region[df2$region == "Indian"] <- "Indian (1995)"
-
-nh = df2 %>% subset(region %in% c("Global (2009)", "Arctic (2016)","N.Atlantic (2003)","N.Pacific (2014)"))
-sh = df2 %>% subset(region %in% c("Global (2009)", "Southern (n/a)","S.Atlantic (1993)","S.Pacific (n/a)", "Indian (1995)"))
 
 col1 <- c("gray40", 
           rgb(67, 147, 195, maxColorValue = 255, alpha = 255),
@@ -182,36 +159,122 @@ col2 <- c("gray40",
           rgb(214, 96, 77, maxColorValue = 255, alpha = 255),
           rgb(244, 165, 130, maxColorValue = 255, alpha = 255))
 
-p1 = nh %>% 
-  mutate(region = factor(region, levels = c("Global (2009)", "Arctic (2016)","N.Atlantic (2003)","N.Pacific (2014)"))) %>% 
-  ggplot(aes(Year, year_sum, group = region, colour = region, size = linesize)) +
-  geom_smooth(span = 0.05, se = F, alpha = 0.8)  +
-  scale_size(range = c(1, 3), guide = "none") +
-  geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
-  scale_colour_manual(values = col1, "") +
-  labs(x = "", y = "") +
-  scale_x_continuous(breaks = seq(1900, 2020, 20), limits = c(1900, 2020)) + 
-  scale_y_continuous(breaks = c(seq(0, 1, by = 0.2)), limits = c(0, 0.8)) + 
-  ggthemes::theme_few(I(20)) +
-  theme(legend.position = c(0.15, 0.8),
-        axis.text.x = element_blank())
+if (p == 0.95) {
+  
+  df2$region[df2$region == "Global"] <- "Global (2009)"
+  df2$region[df2$region == "Arctic"] <- "Arctic (2016)"
+  df2$region[df2$region == "N.Atlantic"] <- "N.Atlantic (2003)"
+  df2$region[df2$region == "N.Pacific"] <- "N.Pacific (2014)"
+  df2$region[df2$region == "Southern"] <- "Southern (n/a)"
+  df2$region[df2$region == "S.Atlantic"] <- "S.Atlantic (1993)"
+  df2$region[df2$region == "S.Pacific"] <- "S.Pacific (n/a)"
+  df2$region[df2$region == "Indian"] <- "Indian (1995)"
+  
+  nh = df2 %>% subset(region %in% c("Global (2009)", "Arctic (2016)","N.Atlantic (2003)","N.Pacific (2014)"))
+  sh = df2 %>% subset(region %in% c("Global (2009)", "Southern (n/a)","S.Atlantic (1993)","S.Pacific (n/a)", "Indian (1995)"))
+  
+  p1 = nh %>% 
+    mutate(region = factor(region, levels = c("Global (2009)", "Arctic (2016)","N.Atlantic (2003)","N.Pacific (2014)"))) %>% 
+    ggplot(aes(Year, year_sum, group = region, colour = region, size = linesize)) +
+    geom_smooth(span = 0.05, se = F, alpha = 0.8)  +
+    scale_size(range = c(1, 3), guide = "none") +
+    geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
+    scale_colour_manual(values = col1, "") +
+    labs(x = "", y = "") +
+    scale_x_continuous(breaks = seq(1900, 2020, 20), limits = c(1900, 2020)) + 
+    scale_y_continuous(breaks = c(seq(0, 1, by = 0.2)), limits = c(0, max(df2$year_sum))) + 
+    ggthemes::theme_few(I(20)) +
+    theme(legend.position = c(0.15, 0.8),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          legend.title = element_blank(),
+          axis.ticks.length = unit(-0.25, "cm")) +  
+    labs(tag = "a")
+  
+  p2 = sh %>% 
+    mutate(region = factor(region, levels = c("Global (2009)", "Southern (n/a)","S.Atlantic (1993)","S.Pacific (n/a)", "Indian (1995)"))) %>% 
+    ggplot(aes(Year, year_sum, group = region, colour = region, size = linesize)) +
+    geom_smooth(span = 0.05, se = F, alpha = 0.8)  +
+    scale_size(range = c(1, 3), guide = "none") +
+    geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
+    scale_colour_manual(values = col2, "") +
+    labs(x = "", y = "proportion of area extent") +
+    scale_x_continuous(breaks = seq(1900, 2020, 20), limits = c(1900, 2020)) + 
+    scale_y_continuous(breaks = c(seq(0, 1, by = 0.2)), limits = c(0, max(df2$year_sum))) + 
+    ggthemes::theme_few(I(20)) +
+    theme(legend.position = c(0.15, 0.8),
+          legend.title = element_blank(),
+          axis.ticks.length = unit(-0.25, "cm"),
+          axis.text.x = element_text(margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")),
+          axis.text.y = element_text(margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"))) +  
+    labs(tag = "b")
+  
+  p1/p2
+  
+  pdf(paste0('~/Dropbox (MBA)/PAPER Kisei heat extremes/figures/Fig3_', p, '_', Sys.Date(), '.pdf'), height = 11, width = 10)
+  p1/p2
+  dev.off()
+  
+}
 
-p2 = sh %>% 
-  mutate(region = factor(region, levels = c("Global (2009)", "Southern (n/a)","S.Atlantic (1993)","S.Pacific (n/a)", "Indian (1995)"))) %>% 
-  ggplot(aes(Year, year_sum, group = region, colour = region, size = linesize)) +
-  geom_smooth(span = 0.05, se = F, alpha = 0.8)  +
-  scale_size(range = c(1, 3), guide = "none") +
-  geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
-  scale_colour_manual(values = col2, "") +
-  labs(x = "", y = "proportion of area extent") +
-  scale_x_continuous(breaks = seq(1900, 2020, 20), limits = c(1900, 2020)) + 
-  scale_y_continuous(breaks = c(seq(0, 1, by = 0.2))) + 
-  ggthemes::theme_few(I(20)) +
-  theme(legend.position = c(0.15, 0.8))
+if (p == 0.98) {
+  
+  df2$region[df2$region == "Global"] <- "Global (2014)"
+  df2$region[df2$region == "Arctic"] <- "Arctic (2016)"
+  df2$region[df2$region == "N.Atlantic"] <- "N.Atlantic (n/a)"
+  df2$region[df2$region == "N.Pacific"] <- "N.Pacific (2014)"
+  df2$region[df2$region == "Southern"] <- "Southern (n/a)"
+  df2$region[df2$region == "S.Atlantic"] <- "S.Atlantic (1998)"
+  df2$region[df2$region == "S.Pacific"] <- "S.Pacific (n/a)"
+  df2$region[df2$region == "Indian"] <- "Indian (2007)"
+  
+  nh = df2 %>% subset(region %in% c("Global (2014)", "Arctic (2016)","N.Atlantic (n/a)","N.Pacific (2014)"))
+  sh = df2 %>% subset(region %in% c("Global (2014)", "Southern (n/a)","S.Atlantic (1998)","S.Pacific (n/a)", "Indian (2007)"))
+  
+  p1 = nh %>% 
+    mutate(region = factor(region, levels = c("Global (2014)", "Arctic (2016)","N.Atlantic (n/a)","N.Pacific (2014)"))) %>% 
+    ggplot(aes(Year, year_sum, group = region, colour = region, size = linesize)) +
+    geom_smooth(span = 0.05, se = F, alpha = 0.85)  +
+    scale_size(range = c(1, 3), guide = "none") +
+    geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
+    scale_colour_manual(values = col1, "") +
+    labs(x = "", y = "") +
+    scale_x_continuous(breaks = seq(1900, 2020, 20), limits = c(1900, 2020)) + 
+    scale_y_continuous(breaks = c(seq(0, 1, by = 0.2)), limits = c(0, max(df2$year_sum))) + 
+    ggthemes::theme_few(I(20)) +
+    theme(legend.position = c(0.15, 0.8),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          legend.title = element_blank(),
+          axis.ticks.length = unit(-0.25, "cm")) +  
+    labs(tag = "a")
+  
+  p2 = sh %>% 
+    mutate(region = factor(region, levels = c("Global (2014)", "Southern (n/a)","S.Atlantic (1998)","S.Pacific (n/a)", "Indian (2007)"))) %>% 
+    ggplot(aes(Year, year_sum, group = region, colour = region, size = linesize)) +
+    geom_smooth(span = 0.05, se = F, alpha = 0.85)  +
+    scale_size(range = c(1, 3), guide = "none") +
+    geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") + 
+    scale_colour_manual(values = col2, "") +
+    labs(x = "", y = "proportion of area extent") +
+    scale_x_continuous(breaks = seq(1900, 2020, 20), limits = c(1900, 2020)) + 
+    scale_y_continuous(breaks = c(seq(0, 1, by = 0.2)), limits = c(0, max(df2$year_sum))) + 
+    ggthemes::theme_few(I(20)) +
+    theme(legend.position = c(0.15, 0.8),
+          legend.title = element_blank(),
+          axis.ticks.length = unit(-0.25, "cm"),
+          axis.text.x = element_text(margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")),
+          axis.text.y = element_text(margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm"))) +  
+    labs(tag = "b")
+  
+  p1/p2
+  
+  pdf(paste0('~/Dropbox (MBA)/PAPER Kisei heat extremes/figures/Fig3_', p, '_', Sys.Date(), '.pdf'), height = 11, width = 10)
+  p1/p2
+  dev.off()
+  
+}
 
-pdf(paste0('~/Dropbox (MBA)/PAPER Kisei heat extremes/figures/Fig3_global_timeseries_', Sys.Date(), '.pdf'), height = 12, width = 10)
-cowplot::plot_grid(p1, p2, ncol = 1)
-dev.off()
 
 df2 %>% 
   ggplot(aes(Year, year_sum, colour = year_sum)) +
@@ -269,7 +332,24 @@ df3  %>%
   theme(axis.text.x = element_text(angle = 270, vjust = 0.5, hjust=1))
   
   
+all_year = data.frame(Year = seq(1950, 2019, by = 1))
 
+region_n = c(
+  "Southern",
+  "S.Pacific",
+  "Arctic",
+  "N.Pacific",
+  "Global",
+  "Sub_Global",
+  "N.Atlantic",
+  "Indian",
+  "S.Atlantic")
 
-
-
+for (i in 1:length(region_n)) {
+  
+  # i = 2
+  ponr = subset(df3, region == region_n[[i]])
+  ponr = merge(ponr, all_year, all = T)
+  print(ponr)
+  
+}
