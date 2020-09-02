@@ -15,7 +15,7 @@ library(patchwork)
 
 rm(list = ls())
 
-percentile = c(0.95, 0.98)[2]
+percentile = c(0.95, 0.98)[1]
 
 period = c("1980-1989", "1990-1999", "2000-2009", "2010-2019")
 
