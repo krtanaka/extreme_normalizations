@@ -50,10 +50,6 @@ rank_joy_lme_eez = function(region){
   
   # region = "lme"
   
-  if (region == "meow"){
-    shape = meow; shape$UNIT = shape$PROVINCE
-  } 
-  
   if (region == "lme") {
     shape = lme; shape$UNIT = shape$LME_NAME
   } 
@@ -322,33 +318,6 @@ rank_joy_lme_eez = function(region){
   return(tas_combined)
   
 }
-
-lme = rank_joy_lme_eez("lme")
-
-df1 = lme %>% group_by(UNIT) %>% summarise(m = mean(sum), freq = n())  %>% filter(freq > 20) %>% top_n(15, m)
-df2 = lme %>% group_by(UNIT) %>% summarise(m = mean(sum), freq = n())  %>% filter(freq > 20) %>% top_n(-15, m)
-sub = rbind(df1, df2)
-sub = as.vector(sub$UNIT)
-lme_sub = subset(lme, UNIT %in% sub & period %in% c("2010-2019"))
-lme_sub = lme_sub %>% group_by(UNIT) %>% mutate(m = mean(sum)) %>% arrange(UNIT, m)
-lme_sub = lme_sub[,c("UNIT", "sum")]; lme_sub = as.data.frame(lme_sub); lme_sub = lme_sub[1:2]; lme_sub$class = "LME"
-
-pdf(paste0("~/Desktop/Fig2_LME.", percentile, "_", Sys.Date(), ".pdf"), width = 8, height = 6)
-p = lme_sub %>% 
-  mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>%
-  ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
-  geom_joy(scale = 3, alpha = 0.8, size = 0.1) +
-  theme_joy(grid = F) +
-  scale_y_discrete(expand = c(0.05, 0)) + # will generally have to set the `expand` option
-  scale_x_continuous(limits = c(0, 1), expand = c(0, 0), breaks = c(0,0.5, 1)) +
-  scale_fill_cyclical(values = ipcc_temp_expand(length(unique(lme_sub$UNIT))))+
-  ylab(NULL) + xlab(NULL) +
-  coord_fixed(ratio = 0.1) + 
-  theme(axis.text.y = element_text(size = 10),
-        legend.position = "none") + 
-  labs(tag = "(b) Large Marine Ecosystem")
-print(p)
-dev.off()
 
 eez = rank_joy_lme_eez("eez")
 
