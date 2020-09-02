@@ -11,31 +11,20 @@ library(rworldmap)
 library(ggalt)
 library(readr)
 library(lwgeom)
+library(patchwork)
 
 rm(list = ls())
 
-percentile = c(0.95, 0.975)[1]
+percentile = c(0.95, 0.98)[2]
 
 period = c("1980-1989", "1990-1999", "2000-2009", "2010-2019")
 
-data = c("HadI", "COBE", "ER")
-
+# rescale function
 range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 
-# meow <- readOGR(dsn = paste0("/Users/", Sys.info()[7], "/Downloads/MEOW"), layer = "meow_ecos")
-# meow <- meow %>% st_as_sf()  
-# 
-# lme <- readOGR("/Users/ktanaka/Google Drive/Research/GIS/LME66/LMEs66.shp")
-# lme <- rmapshaper::ms_simplify(lme, keep = 0.001, keep_shapes = F)
-# lme <- lme %>% st_as_sf()  
-# 
-# eez <- readOGR(dsn = "/Users/ktanaka/clim_geo_disp/data/EEZ_land_union", layer = "EEZ_land_v2_201410")
-# eez <- rmapshaper::ms_simplify(eez, keep = 0.001, keep_shapes = F)
-# eez <- eez %>% st_as_sf()  
-
+# coarse shape files, see prep_shapefile.R
 load('/Users/ktanaka/extreme_normalizations/data/eez_sf_dataframe_0.001.RData') 
 load('/Users/ktanaka/extreme_normalizations/data/lme_sf_dataframe_0.001.RData') 
-load('/Users/ktanaka/extreme_normalizations/data/meow_sf_dataframe.RData') 
 
 #IPCC - Temperature -
 ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
@@ -55,7 +44,9 @@ ipcc_temp_4_cols <- c(rgb(153, 0, 2, maxColorValue = 255, alpha = 255),
                       rgb(112, 160, 205, maxColorValue = 255, alpha = 255),
                       rgb(0, 52, 102, maxColorValue = 255, alpha = 255))
 
-rank_joy = function(region){
+ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
+
+rank_joy_lme_eez = function(region){
   
   # region = "lme"
   
@@ -77,7 +68,7 @@ rank_joy = function(region){
     
     # i = 1
     
-    load(paste0(paste0("~/extreme_normalizations/results/HadI/extremes_", period[[i]], "_", cutoff, ".RData")))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/HadI/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     summary(tas)
@@ -98,7 +89,7 @@ rank_joy = function(region){
     hadi = merge(hadi, df)
     hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
-    load(paste0(paste0("~/extreme_normalizations/results/COBE/extremes_", period[[i]], "_", cutoff, ".RData")))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/COBE/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     # cobe <- st_intersection(tas, shape)
@@ -118,7 +109,7 @@ rank_joy = function(region){
     cobe = merge(cobe, df)
     cobe$source = "COBE v2"; cobe$period = period[[i]]
     
-    load(paste0(paste0("~/extreme_normalizations/results/ER/extremes_", period[[i]], "_", cutoff, ".RData")))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/ER/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     # er <- st_intersection(tas, shape)
@@ -145,59 +136,53 @@ rank_joy = function(region){
     
   }
   
+  ### pick regions ###
   if (region == "lme") {
-    tas_combined_sub = subset(tas_combined, UNIT %in% c("Scotian Shelf", 
-                                                        "California Current", 
-                                                        "East Brazil Shelf"))
-  } 
-  
-  if (region == "meow") {
-    tas_combined_sub = subset(tas_combined, UNIT %in% c("Central Indian Ocean Islands", 
-                                                        "Cold Temperate Northwest Pacific", 
-                                                        "Galapagos")) 
+    
+    #pick large LMEs
+    big_lmes = tas_combined %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 1000)
+    big_lmes = as.data.frame(big_lmes)
+    big_lmes = big_lmes[, 1, drop = FALSE]
+    tas_combined_sub = subset(tas_combined, UNIT %in% dplyr::pull(big_lmes))
+
   } 
   
   if (region == "eez") {
     
-    country = tas_combined %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 950)
+    #pick large EEZs
+    big_eezs = tas_combined %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 1000)
+    big_eezs = as.data.frame(big_eezs)
+    big_eezs = big_eezs[, 1, drop = FALSE]
+    tas_combined_sub = subset(tas_combined, UNIT %in% dplyr::pull(big_eezs))
     
-    country = as.data.frame(country)
-    country = country[, 1, drop=FALSE]
-    country = as.character(country)
-    
-    # tas_combined_sub = subset(tas_combined, UNIT %in% country$UNIT)
-    
-    tas_combined_sub = subset(tas_combined, UNIT %in% c("United States", 
-                                                        # "Greenland", 
-                                                        "Japan"))
   } 
   
-  pdf(paste0("~/Desktop/Joy_", region, "_selected_", cutoff, ".pdf"), height = 7, width = 4)
+  pdf(paste0("~/Desktop/joy_", region, "_selected_", percentile, ".pdf"), height = 10, width = 10)
   
   p = tas_combined_sub %>% 
-    subset(source %in% c("HadISST v1.1", "COBE v2")) %>% 
-    # group_by(UNIT, period) %>% 
-    # summarise(sum = mean(sum)) %>% 
+    subset(source %in% c("HadISST v1.1", "COBE v2")) %>%
     ggplot() +
     geom_density(aes(x = sum, fill = period), alpha = 0.8, size = 0.01) +
-    cowplot::theme_cowplot() +
     scale_x_continuous(
       limits = c(0, 1),
-      expand = c(0.05, 0.05),
+      expand = c(0.05, 0.01),
       breaks = c(0, 0.5, 1)) +
     scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
-    facet_wrap(~UNIT, scales = "fixed", ncol = 1) +
+    facet_wrap( ~ UNIT, scales = "fixed") +
+    coord_fixed(ratio = 0.1) + 
     ylab(NULL) + xlab(NULL) +
     theme(
       axis.text.y = element_blank(),
       axis.ticks = element_blank(),
-      axis.text.x = element_text(size = 10),
-      legend.position = c(0.7,0.95))
+      # axis.text.x = element_text(size = 10),
+      legend.position = "top")
   
   print(p)
   
   dev.off()
   
+  
+  # remove disputed EEZs (see FML 2019 to find out why)
   if (region == "eez") {
     
     exclude_list = c("Area en controversia (disputed - Peruvian point of view)", 
@@ -227,65 +212,110 @@ rank_joy = function(region){
     tas_combined$UNIT = gsub("United States ", "US ", tas_combined$UNIT, fixed = T)
     tas_combined$UNIT = gsub("US Virgin Islands", "Virgin Islands, US", tas_combined$UNIT, fixed = T)
     tas_combined$UNIT = gsub("St. ", "Saint ", tas_combined$UNIT, fixed = T)
+    
+    tas_combined$UNIT = gsub("Western ", "W ", tas_combined$UNIT, fixed = T)
+    
+    
+    
   } 
   
+  if (region == "lme") {
+    
+    tas_combined$UNIT = gsub("Southeast ", "SE ", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("Northeast ", "NE ", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("Northwest ", "NW ", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("Southeast ", "SE ", tas_combined$UNIT, fixed = T)
+    
+    tas_combined$UNIT = gsub("East ", "E ", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("West ", "W ", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("North ", "N ", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("South ", "S ", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("Central ", "Cent ", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("Central", "Cent", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("Pacific ", "Pac ", tas_combined$UNIT, fixed = T)
+    
+    tas_combined$UNIT = gsub("Continental ", "Continenta ", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("Current ", "Curr ", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("California ", "Calif ", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("Australian ", "Australia ", tas_combined$UNIT, fixed = T)
+    tas_combined$UNIT = gsub("U.S. ", "US ", tas_combined$UNIT, fixed = T)
+    
+    tas_combined$UNIT = gsub("Canadian High Arctic - N Greenland", "Canada N Greenland", tas_combined$UNIT, fixed = T)
+    
+
+  } 
+  
+  
+  ### just keep HadISST and COBESST ###
   tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
+
   
-  count = tas_combined %>% 
-    subset(period %in% c("2010-2019")) %>%
-    # subset(period %in% c("1980-1989")) %>%
-    group_by(UNIT) %>% 
-    summarise(sum = round(mean(sum), 2)) %>% 
-    subset(sum >= 0.8)
-  
-  tas_combined = subset(tas_combined, period %in% c("2010-2019"))
-  
-  prov_levels <- subset(tas_combined, period %in% c("2010-2019")) %>% # Reorder levels by 2010-2019
+  #################################################
+  ### Reorder units by 2010-2019 mean or median ###
+  #################################################
+  prov_levels <- tas_combined %>% 
+    subset(period %in% c("2010-2019")) %>% 
     dplyr::select(sum, UNIT) %>%
     group_by(UNIT) %>%
-    mutate(mean_of_mean = mean(sum, na.rm = T))
+    mutate(unit_median = median(sum, na.rm = T))
   
-  levels <- unique(prov_levels$UNIT[order(prov_levels$mean_of_mean)])
+  levels <- unique(prov_levels$UNIT[order(prov_levels$unit_median)])
+ 
   tas_combined$UNIT <- factor(tas_combined$UNIT, levels = levels, ordered = TRUE)
   
+  
+  ##########################
+  ### expand IPCC colors ###
+  ##########################
   ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
   ipcc_temp_expand = ipcc_temp_expand(length(unique(tas_combined$UNIT)))
 
-  # summary = tas_combined %>% 
-  #   group_by(UNIT, period) %>% 
-  #   summarise_each(funs(mean, sd, se = sd(.)/sqrt(n())), sum)
-  # 
-  # summary = as.data.frame(summary)
-  # summary = summary[,c('UNIT', 'period', 'mean', 'sd', 'se')]
-  # summary$UNIT = as.character(summary$UNIT)
-  # summary <- summary[order(summary$UNIT),]
-  # summary[,3:5] = round(summary[,3:5], 2)
-  # summary$UNIT[duplicated(summary$UNIT)] <- ""
-  # colnames(summary) = c("Unit", "Period", "Mean", "SD", "SE")
-  # 
-  # s1 = summary %>% subset(Period == "1980-1989")
-  # s2 = summary %>% subset(Period == "1990-1999")
-  # s3 = summary %>% subset(Period == "2000-2009")
-  # s4 = summary %>% subset(Period == "2010-2019")
-  # 
-  # summary = cbind(s1, s2, s3, s4)
-  # write_csv(summary, paste0('~/Desktop/', region, "_", cutoff, ".csv"))
   
+  #############################
+  ### save full list as csv ###
+  #############################
+  summary = tas_combined %>%
+    group_by(UNIT, period) %>%
+    summarise_each(funs(mean, sd, se = sd(.)/sqrt(n())), sum)
+
+  summary = as.data.frame(summary)
+  summary = summary[,c('UNIT', 'period', 'mean', 'sd', 'se')]
+  summary$UNIT = as.character(summary$UNIT)
+  summary <- summary[order(summary$UNIT),]
+  summary[,3:5] = round(summary[,3:5], 2)
+  summary$UNIT[duplicated(summary$UNIT)] <- ""
+  colnames(summary) = c("Unit", "Period", "Mean", "SD", "SE")
+
+  s1 = summary %>% subset(Period == "1980-1989")
+  s2 = summary %>% subset(Period == "1990-1999")
+  s3 = summary %>% subset(Period == "2000-2009")
+  s4 = summary %>% subset(Period == "2010-2019")
+
+  summary = cbind(s1, s2, s3, s4)
+  write_csv(summary, paste0("/Users/", Sys.info()[7], "/Desktop/", region, "_", percentile, ".csv"))
+  
+  
+  ################
+  ### plot joy ###
+  ################
   p = ggplot(tas_combined, aes(x = sum, y = UNIT, fill = UNIT)) +
-    geom_joy(scale = 2, alpha = 0.8, size = 0.3) +
+    geom_joy(scale = 5, alpha = 0.8, size = 0.1, bandwidth = 0.03) +
     theme_minimal() +
-    scale_y_discrete(expand = c(-0.01, 0)) + # will generally have to set the `expand` option
-    scale_x_continuous(limits = c(0, 1), expand = c(-0.05, 0.1), breaks = c(0.25,  0.75)) +
+    scale_y_discrete(expand = c(0, 0)) + # will generally have to set the `expand` option
+    scale_x_continuous(expand = c(-0.05, 0.1), limits = c(0, 1), breaks = c(0.25,  0.75)) +
     scale_fill_cyclical(values = ipcc_temp_expand)+
     facet_wrap(.~period, ncol = 4) +
     ylab(NULL) + xlab(NULL) +
+    coord_fixed(ratio = 0.1) + 
     theme(axis.text.y = element_text(size = 10),
           panel.background = element_blank(),
+          panel.grid.major.x = element_blank(),
+          panel.grid.minor.x = element_blank(),
+          panel.grid.major.y = element_blank(),
+          panel.grid.minor.y = element_blank(),
           legend.position = "none")
   
-  p
-  
-  pdf(paste0("~/Desktop/Joy_", region, "_", cutoff, ".pdf"), height = 15, width = 10)
+  pdf(paste0("~/Desktop/joy_", region, "_", percentile, ".pdf"), height = 10, width = 10)
   print(p)
   dev.off()
   
@@ -300,8 +330,8 @@ rank_joy_bgcp = function(){
     
     # i = 1
     
-    load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData")
-    load(paste0(paste0("~/extreme_normalizations/results/HadI/extremes_", period[[i]], "_", cutoff, ".RData")))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/bgcp_raster_0.25.RData"))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/HadI/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 1, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -313,7 +343,7 @@ rank_joy_bgcp = function(){
     bgcp = merge(anom, bgcp, all = T)
     bgcp$bgcp = round(bgcp$bgcp, 0)
     bgcp$bgcp = as.factor(as.character(bgcp$bgcp))
-    bgcp_names <- read_csv("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/NAME_BGCP_2019_REYGONDEAU.csv")
+    bgcp_names <- read_csv(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/NAME_BGCP_2019_REYGONDEAU.csv"))
     bgcp_names = bgcp_names[,c("NAME", "BGCP")]
     colnames(bgcp_names) = c("name", "bgcp")
     bgcp = merge(bgcp, bgcp_names)
@@ -335,8 +365,8 @@ rank_joy_bgcp = function(){
     hadi = df
     hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
-    load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData")
-    load(paste0(paste0("~/extreme_normalizations/results/COBE/extremes_", period[[i]], "_", cutoff, ".RData")))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/bgcp_raster_0.25.RData"))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/COBE/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 1, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -348,7 +378,7 @@ rank_joy_bgcp = function(){
     bgcp = merge(anom, bgcp, all = T)
     bgcp$bgcp = round(bgcp$bgcp, 0)
     bgcp$bgcp = as.factor(as.character(bgcp$bgcp))
-    bgcp_names <- read_csv("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/NAME_BGCP_2019_REYGONDEAU.csv")
+    bgcp_names <- read_csv(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/NAME_BGCP_2019_REYGONDEAU.csv"))
     bgcp_names = bgcp_names[,c("NAME", "BGCP")]
     colnames(bgcp_names) = c("name", "bgcp")
     bgcp = merge(bgcp, bgcp_names)
@@ -370,8 +400,8 @@ rank_joy_bgcp = function(){
     cobe = df
     cobe$source = "COBE v2"; cobe$period = period[[i]]
     
-    load("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/bgcp_raster_0.25.RData")
-    load(paste0(paste0("~/extreme_normalizations/results/ER/extremes_", period[[i]], "_", cutoff, ".RData")))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/bgcp_raster_0.25.RData"))
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/ER/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 2, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -383,7 +413,7 @@ rank_joy_bgcp = function(){
     bgcp = merge(anom, bgcp, all = T)
     bgcp$bgcp = round(bgcp$bgcp, 0)
     bgcp$bgcp = as.factor(as.character(bgcp$bgcp))
-    bgcp_names <- read_csv("~/Dropbox (MBA)/PAPER Kisei heat extremes/data/biogeogr provinces/NAME_BGCP_2019_REYGONDEAU.csv")
+    bgcp_names <- read_csv(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/NAME_BGCP_2019_REYGONDEAU.csv"))
     bgcp_names = bgcp_names[,c("NAME", "BGCP")]
     colnames(bgcp_names) = c("name", "bgcp")
     bgcp = merge(bgcp, bgcp_names)
@@ -412,53 +442,67 @@ rank_joy_bgcp = function(){
     
   }
   
-  tas_combined_sub = subset(tas_combined, bgcp %in% c("North Atlantic Drift", 
-                                                      "Coastal Californian current", 
-                                                      "Indian monsoon gyre"))
-  
-  # tas_combined_sub = subset(tas_combined, bgcp %in% c("Coastal Californian current"))
-  
+  big_bgcps = tas_combined %>% group_by(bgcp) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 5000)
+  big_bgcps = as.data.frame(big_bgcps)
+  big_bgcps = big_bgcps[, 1, drop = FALSE]
+  tas_combined_sub = subset(tas_combined, bgcp %in% dplyr::pull(big_bgcps))
+
   p = tas_combined_sub %>% 
+    subset(source %in% c("HadISST v1.1", "COBE v2")) %>%
     group_by(x, y, bgcp, period) %>% 
     summarise(sum = mean(sum)) %>% 
     ggplot() +
     geom_density(aes(x = sum, fill = period), alpha = 0.8, size = 0.01) +
-    ggthemes::theme_few(I(15)) +
     scale_x_continuous(
       limits = c(0, 1),
-      expand = c(0.05, 0.05),
+      expand = c(0.05, 0.01),
       breaks = c(0, 0.5, 1)) +
     scale_fill_manual(values = rev(ipcc_temp_4_cols), "") +
-    facet_grid(~ bgcp, scales = "free") +
+    facet_wrap( ~ bgcp, scales = "fixed") +
+    coord_fixed(ratio = 0.05) + 
     ylab(NULL) + xlab(NULL) +
     theme(
       axis.text.y = element_blank(),
       axis.ticks = element_blank(),
-      axis.text.x = element_text(size = 10),
-      legend.position = "bottom", 
-      legend.justification = c(1,0))
+      # axis.text.x = element_text(size = 10),
+      legend.position = "top")
   
-  pdf(paste0("~/Desktop/Joy_bgcp_selected_", cutoff, ".pdf"), height = 5, width = 6)
+  pdf(paste0("~/Desktop/joy_bgcp_selected_", percentile, ".pdf"), height = 5, width = 6)
   print(p)
   dev.off()
   
   tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
-  
-  count = tas_combined %>% 
-    subset(period %in% c("2010-2019")) %>%
-    # subset(period %in% c("1980-1989")) %>%
-    group_by(bgcp) %>% 
-    summarise(sum = round(mean(sum), 2)) %>% 
-    subset(sum >= 0.8)
-  
-  tas_combined = subset(tas_combined, period %in% c("2010-2019")) 
   tas_combined = tas_combined %>% mutate(bgcp = gsub("\xca", "", bgcp)) 
   tas_combined = tas_combined %>% group_by(x, y, bgcp, period) %>% summarise(sum = mean(sum))
+  
+  tas_combined$bgcp = gsub("Southeast ", "SE ", tas_combined$bgcp, fixed = T)
+  tas_combined$bgcp = gsub("Northeast ", "NE ", tas_combined$bgcp, fixed = T)
+  tas_combined$bgcp = gsub("Northwest ", "NW ", tas_combined$bgcp, fixed = T)
+  tas_combined$bgcp = gsub("Southeast ", "SE ", tas_combined$bgcp, fixed = T)
+  
+  tas_combined$bgcp = gsub("Western ", "W ", tas_combined$bgcp, fixed = T)
+  tas_combined$bgcp = gsub("Eastern ", "E ", tas_combined$bgcp, fixed = T)
+  tas_combined$bgcp = gsub("Nothern ", "N ", tas_combined$bgcp, fixed = T)
+  tas_combined$bgcp = gsub("Southern ", "S ", tas_combined$bgcp, fixed = T)
+  
+  tas_combined$bgcp = gsub("Californian ", "Calif ", tas_combined$bgcp, fixed = T)
+  tas_combined$bgcp = gsub("current", "Curr", tas_combined$bgcp, fixed = T)
+  tas_combined$bgcp = gsub("equatorial", "Equ", tas_combined$bgcp, fixed = T)
+  tas_combined$bgcp = gsub("subtropical", "Subtrop", tas_combined$bgcp, fixed = T)
+  tas_combined$bgcp = gsub("tropical", "Trop", tas_combined$bgcp, fixed = T)
+  
+  tas_combined$bgcp = gsub("East ", "E ", tas_combined$bgcp, fixed = T)
+  tas_combined$bgcp = gsub("West ", "W ", tas_combined$bgcp, fixed = T)
+  tas_combined$bgcp = gsub("North ", "N ", tas_combined$bgcp, fixed = T)
+  tas_combined$bgcp = gsub("South ", "S ", tas_combined$bgcp, fixed = T)
+  tas_combined$bgcp = gsub("Central ", "Cent ", tas_combined$bgcp, fixed = T)
+  tas_combined$bgcp = gsub("Central", "Cent", tas_combined$bgcp, fixed = T)
+  tas_combined$bgcp = gsub("Pacific ", "Pac ", tas_combined$bgcp, fixed = T)
   
   prov_levels <- subset(tas_combined, period %in% c("2010-2019")) %>% # Reorder levels by 2010-2019
     dplyr::select(sum, bgcp) %>%
     group_by(bgcp) %>%
-    mutate(mean_of_mean = mean(sum, na.rm = T))
+    mutate(mean_of_mean = median(sum, na.rm = T))
   
   levels <- unique(prov_levels$bgcp[order(prov_levels$mean_of_mean)])
   tas_combined$bgcp <- factor(tas_combined$bgcp, levels = levels, ordered = TRUE)
@@ -484,24 +528,28 @@ rank_joy_bgcp = function(){
   # s4 = summary %>% subset(Period == "2010-2019")
   # 
   # summary = cbind(s1, s2, s3, s4)
-  # write_csv(summary, paste0("~/Desktop/bgcp_", cutoff, ".csv"))
+  # write_csv(summary, paste0("~/Desktop/bgcp_", percentile, ".csv"))
   
   p = tas_combined %>% 
     ggplot(aes(x = sum, y = bgcp, fill = bgcp)) +
-    geom_joy(scale = 2, alpha = 0.8, size = 0.3) +
+    geom_joy(scale = 2, alpha = 0.8, size = 0.1) +
+    # geom_joy(scale = 5, alpha = 0.8, size = 0.1, bandwidth = 0.03) +
     theme_minimal() +
-    # scale_y_discrete(expand = c(-0.01, 0)) + # will generally have to set the `expand` option
-    scale_x_continuous(limits = c(0, 1), expand = c(-0.05, 0.1), breaks = c(0.25,  0.75)) +
+    scale_y_discrete(expand = c(0, 0)) + # will generally have to set the `expand` option
+    scale_x_continuous(expand = c(-0.05, 0.1), limits = c(0, 1), breaks = c(0.25,  0.75)) +
     scale_fill_cyclical(values = ipcc_temp_expand)+
     facet_wrap(.~period, ncol = 4) +
     ylab(NULL) + xlab(NULL) +
+    coord_fixed(ratio = 0.1) + 
     theme(axis.text.y = element_text(size = 10),
           panel.background = element_blank(),
+          panel.grid.major.x = element_blank(),
+          panel.grid.minor.x = element_blank(),
+          panel.grid.major.y = element_blank(),
+          panel.grid.minor.y = element_blank(),
           legend.position = "none")
   
-  p
-  
-  pdf(paste0("~/Desktop/Joy_bgcp_", cutoff, ".pdf"), height = 10, width = 10)
+  pdf(paste0("~/Desktop/joy_bgcp_", percentile, ".pdf"), height = 10, width = 10)
   print(p)
   dev.off()
   
@@ -509,9 +557,8 @@ rank_joy_bgcp = function(){
   
 }
 
-lme = rank_joy("lme")
-# meaw = rank_joy("meow")
-eez = rank_joy("eez")
+lme = rank_joy_lme_eez("lme")
+eez = rank_joy_lme_eez("eez")
 bgcp = rank_joy_bgcp()
 
 df1 = lme %>% group_by(UNIT) %>% summarise(m = mean(sum), freq = n())  %>% filter(freq > 20) %>% top_n(15, m)
@@ -519,7 +566,7 @@ df2 = lme %>% group_by(UNIT) %>% summarise(m = mean(sum), freq = n())  %>% filte
 sub = rbind(df1, df2)
 sub = as.vector(sub$UNIT)
 lme_sub = subset(lme, UNIT %in% sub & period %in% c("2010-2019"))
-lme_sub = lme_sub %>% group_by(UNIT) %>% mutate(m = median(sum)) %>% arrange(UNIT, m)
+# lme_sub = lme_sub %>% group_by(UNIT) %>% mutate(m = mean(sum)) %>% arrange(UNIT, m)
 lme_sub = lme_sub[,c("UNIT", "sum")]; lme_sub = as.data.frame(lme_sub); lme_sub = lme_sub[1:2]; lme_sub$class = "LME"
 
 df1 = eez %>% group_by(UNIT) %>% summarise(m = mean(sum), freq = n()) %>% filter(freq > 20) %>% top_n(15, m)
@@ -527,7 +574,7 @@ df2 = eez %>% group_by(UNIT) %>% summarise(m = mean(sum), freq = n())  %>% filte
 sub = rbind(df1, df2)
 sub = as.vector(sub$UNIT)
 eez_sub = subset(eez, UNIT %in% sub & period %in% c("2010-2019"))
-# eez_sub = lme_sub %>% group_by(UNIT) %>% mutate(m = median(sum)) %>% arrange(UNIT, m)
+# eez_sub = eez_sub %>% group_by(UNIT) %>% mutate(m = mean(sum)) %>% arrange(UNIT, m)
 eez_sub = eez_sub[,c("UNIT", "sum")]; eez_sub = as.data.frame(eez_sub); eez_sub = eez_sub[1:2]; eez_sub$class = "EEZ"
 
 df1 = bgcp %>% group_by(bgcp) %>% summarise(m = mean(sum), freq = n()) %>% filter(freq > 20) %>% top_n(15, m); df1 = df1 %>% top_n(15)
@@ -539,75 +586,55 @@ bgcp$bgcp = as.character(bgcp$bgcp)
 # bgcp_sub = bgcp_sub %>% group_by(bgcp) %>% mutate(m = median(sum)) %>% arrange(bgcp, m)
 bgcp_sub = bgcp_sub[,c("bgcp", "sum")]; bgcp_sub = as.data.frame(bgcp_sub); colnames(bgcp_sub)[1] = "UNIT"; bgcp_sub$class = "BGCP"
 
-
-ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
-# ipcc_temp_expand = ipcc_temp_expand(60)
-# ipcc_temp_expand = paste(ipcc_temp_expand, ipcc_temp_expand)
-
-pdf(paste0("~/Desktop/Fig2_LME.", cutoff, "_", Sys.Date(), ".pdf"), width = 4.5, height = 6)
+pdf(paste0("~/Desktop/Fig2_LME.", percentile, "_", Sys.Date(), ".pdf"), width = 8, height = 6)
 p = lme_sub %>% 
-  mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
+  # mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
   ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
-  geom_joy(scale = 3, alpha = 0.8, size = 0.5) +
+  geom_joy(scale = 3, alpha = 0.8, size = 0.1) +
   theme_joy(grid = F) +
   scale_y_discrete(expand = c(0.05, 0)) + # will generally have to set the `expand` option
   scale_x_continuous(limits = c(0, 1), expand = c(0, 0), breaks = c(0,0.5, 1)) +
   scale_fill_cyclical(values = ipcc_temp_expand(length(unique(lme_sub$UNIT))))+
   ylab(NULL) + xlab(NULL) +
+  coord_fixed(ratio = 0.1) + 
   theme(axis.text.y = element_text(size = 10),
-        legend.position = "none")
+        legend.position = "none") + 
+  labs(tag = "(b) Large Marine Ecosystem")
 print(p)
 dev.off()
 
-pdf(paste0("~/Desktop/Fig2_EEZ.", cutoff, "_", Sys.Date(), ".pdf"), width = 4, height = 6)
+pdf(paste0("~/Desktop/Fig2_EEZ.", percentile, "_", Sys.Date(), ".pdf"), width = 8, height = 6)
 p = eez_sub %>% 
-  mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
+  # mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
   ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
-  geom_joy(scale = 3, alpha = 0.8, size = 0.5) +
+  geom_joy(scale = 3, alpha = 0.8, size = 0.1) +
   theme_joy(grid = F) +
   scale_y_discrete(expand = c(0.05, 0)) + # will generally have to set the `expand` option
   scale_x_continuous(limits = c(0, 1), expand = c(0, 0), breaks = c(0,0.5, 1)) +
   scale_fill_cyclical(values = ipcc_temp_expand(length(unique(eez_sub$UNIT))))+
   ylab(NULL) + xlab(NULL) +
+  coord_fixed(ratio = 0.1) + 
   theme(axis.text.y = element_text(size = 10),
-        legend.position = "none")
+        legend.position = "none") + 
+  labs(tag = "(c) Exclusive Economic Zone")
 print(p)
 dev.off()
 
-pdf(paste0("~/Desktop/Fig2_BGCP.", cutoff, "_", Sys.Date(), ".pdf"), width = 4.5, height = 6)
+pdf(paste0("~/Desktop/Fig2_BGCP.", percentile, "_", Sys.Date(), ".pdf"), width = 8, height = 6)
 p = bgcp_sub %>%  
   mutate(UNIT = gsub("\xca", "", UNIT)) %>% 
-  mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
+  mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>%
   ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
-  geom_joy(scale = 3, alpha = 0.8, size = 0.5) +
+  geom_joy(scale = 3, alpha = 0.8, size = 0.1) +
   theme_joy(grid = F) +
   scale_y_discrete(expand = c(0.05, 0)) + # will generally have to set the `expand` option
   scale_x_continuous(limits = c(0, 1), expand = c(0, 0), breaks = c(0,0.5, 1)) +
   scale_fill_cyclical(values = ipcc_temp_expand(length(unique(bgcp_sub$UNIT))))+
   ylab(NULL) + xlab(NULL) +
+  coord_fixed(ratio = 0.1) + 
   theme(axis.text.y = element_text(size = 10),
         # axis.text.x = element_text(size = 10, angle = 90, hjust = 1),
-        legend.position = "none")
+        legend.position = "none")+ 
+  labs(tag = "(a) Biogeographic Province")
 print(p)
 dev.off()
-
-df = rbind(eez_sub, lme_sub, bgcp_sub)
-
-pdf(paste0("~/Desktop/Joy_", cutoff, ".pdf"), width = 5, height = 5)
-p = df %>%  
-  mutate(UNIT = gsub("\xca", "", UNIT)) %>% 
-  mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>% 
-  ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
-  geom_joy(scale = 3, alpha = 0.8, bandwidth = 0.02, size = 0.1) +
-  theme_joy(grid = F) +
-  facet_wrap(.~class, scales = "free") +
-  scale_y_discrete(expand = c(0.01, 0)) + # will generally have to set the `expand` option
-  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
-  scale_fill_manual(values = ipcc_temp_expand(90))+
-  ylab(NULL) + xlab(NULL) +
-  theme(axis.text.y = element_text(size = 10),
-        legend.position = "none")
-print(p)
-dev.off()
-
-
