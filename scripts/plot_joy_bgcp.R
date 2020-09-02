@@ -22,10 +22,6 @@ period = c("1980-1989", "1990-1999", "2000-2009", "2010-2019")
 # rescale function
 range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 
-# coarse shape files, see prep_shapefile.R
-load('/Users/ktanaka/extreme_normalizations/data/eez_sf_dataframe_0.001.RData') 
-load('/Users/ktanaka/extreme_normalizations/data/lme_sf_dataframe_0.001.RData') 
-
 #IPCC - Temperature -
 ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
                rgb(178, 24, 43, maxColorValue = 255, alpha = 255),
@@ -248,25 +244,25 @@ rank_joy_bgcp = function(){
   ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
   ipcc_temp_expand = ipcc_temp_expand(length(unique(tas_combined$bgcp)))
   
-  # summary = tas_combined %>% 
-  #   group_by(bgcp, period) %>% 
-  #   summarise_each(funs(mean, sd, se = sd(.)/sqrt(n())), sum)
-  # 
-  # summary = as.data.frame(summary)
-  # summary = summary[,c('bgcp', 'period', 'mean', 'sd', 'se')]
-  # summary$bgcp = as.character(summary$bgcp)
-  # summary <- summary[order(summary$bgcp),]
-  # summary$bgcp[duplicated(summary$bgcp)] <- ""
-  # summary[,3:5] = round(summary[,3:5], 2)
-  # colnames(summary) = c("Unit", "Period", "Mean", "SD", "SE")
-  # 
-  # s1 = summary %>% subset(Period == "1980-1989")
-  # s2 = summary %>% subset(Period == "1990-1999")
-  # s3 = summary %>% subset(Period == "2000-2009")
-  # s4 = summary %>% subset(Period == "2010-2019")
-  # 
-  # summary = cbind(s1, s2, s3, s4)
-  # write_csv(summary, paste0("~/Desktop/bgcp_", percentile, ".csv"))
+  summary = tas_combined %>%
+    group_by(bgcp, period) %>%
+    summarise_each(funs(mean, sd, se = sd(.)/sqrt(n())), sum)
+
+  summary = as.data.frame(summary)
+  summary = summary[,c('bgcp', 'period', 'mean', 'sd', 'se')]
+  summary$bgcp = as.character(summary$bgcp)
+  summary <- summary[order(summary$bgcp),]
+  summary$bgcp[duplicated(summary$bgcp)] <- ""
+  summary[,3:5] = round(summary[,3:5], 2)
+  colnames(summary) = c("Unit", "Period", "Mean", "SD", "SE")
+
+  s1 = summary %>% subset(Period == "1980-1989")
+  s2 = summary %>% subset(Period == "1990-1999")
+  s3 = summary %>% subset(Period == "2000-2009")
+  s4 = summary %>% subset(Period == "2010-2019")
+
+  summary = cbind(s1, s2, s3, s4)
+  write_csv(summary, paste0("~/Desktop/bgcp_", percentile, ".csv"))
   
   p = tas_combined %>% 
     ggplot(aes(x = sum, y = bgcp, fill = bgcp)) +
@@ -296,8 +292,8 @@ rank_joy_bgcp = function(){
 
 bgcp = rank_joy_bgcp()
 
-df1 = bgcp %>% group_by(bgcp) %>% summarise(m = mean(sum), freq = n()) %>% filter(freq > 20) %>% top_n(15, m)
-df2 = bgcp %>% group_by(bgcp) %>% summarise(m = mean(sum), freq = n()) %>% filter(freq > 20) %>% top_n(-15, m)
+df1 = bgcp %>% group_by(bgcp) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 20) %>% top_n(15, m)
+df2 = bgcp %>% group_by(bgcp) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 20) %>% top_n(-15, m)
 sub = rbind(df1, df2)
 sub = as.vector(sub$bgcp)
 bgcp_sub = subset(bgcp, bgcp %in% sub & period %in% c("2010-2019"))
@@ -318,8 +314,7 @@ p = bgcp_sub %>%
   ylab(NULL) + xlab(NULL) +
   coord_fixed(ratio = 0.1) + 
   theme(axis.text.y = element_text(size = 10),
-        # axis.text.x = element_text(size = 10, angle = 90, hjust = 1),
-        legend.position = "none")+ 
+        legend.position = "none") + 
   labs(tag = "(a) Biogeographic Province")
 print(p)
 dev.off()
