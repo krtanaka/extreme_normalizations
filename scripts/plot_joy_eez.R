@@ -188,24 +188,12 @@ rank_joy_lme_eez = function(region){
   tas_combined$UNIT = gsub("US Virgin Islands", "Virgin Islands, US", tas_combined$UNIT, fixed = T)
   tas_combined$UNIT = gsub("St. ", "Saint ", tas_combined$UNIT, fixed = T)
   
-  ### just keep HadISST and COBESST ###
-  tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
+  ### just keep HadISST and COBESST. discard unecessary columns ###
+  tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSSTv5
+  tas_combined = tas_combined %>% as.data.frame() %>% select(UNIT, period, source, sum, geometry)
+  tas_combined = tas_combined[!is.na(tas_combined$UNIT),]
   
-  
-  #################################################
-  ### Reorder units by 2010-2019 mean or median ###
-  #################################################
-  prov_levels <- tas_combined %>% 
-    subset(period %in% c("2010-2019")) %>% 
-    dplyr::select(sum, UNIT) %>%
-    group_by(UNIT) %>%
-    mutate(unit_median = median(sum, na.rm = T))
-  
-  levels <- unique(prov_levels$UNIT[order(prov_levels$unit_median)])
-  
-  tas_combined$UNIT <- factor(tas_combined$UNIT, levels = levels, ordered = T)
-  
-  
+
   ##########################
   ### expand IPCC colors ###
   ##########################
@@ -219,7 +207,7 @@ rank_joy_lme_eez = function(region){
   summary = tas_combined %>%
     group_by(UNIT, period) %>%
     summarise_each(funs(mean, sd, se = sd(.)/sqrt(n())), sum)
-  
+
   summary = as.data.frame(summary)
   summary = summary[,c('UNIT', 'period', 'mean', 'sd', 'se')]
   summary$UNIT = as.character(summary$UNIT)
@@ -227,15 +215,15 @@ rank_joy_lme_eez = function(region){
   summary[,3:5] = round(summary[,3:5], 2)
   summary$UNIT[duplicated(summary$UNIT)] <- ""
   colnames(summary) = c("Unit", "Period", "Mean", "SD", "SE")
-  
+
   s1 = summary %>% subset(Period == "1980-1989")
   s2 = summary %>% subset(Period == "1990-1999")
   s3 = summary %>% subset(Period == "2000-2009")
   s4 = summary %>% subset(Period == "2010-2019")
-  
+
   summary = cbind(s1, s2, s3, s4)
   summary =  summary[!is.na(summary$Unit),]
-  
+
   write_csv(summary, paste0("/Users/", Sys.info()[7], "/Desktop/", region, "_", percentile, ".csv"))
   
   
@@ -243,19 +231,24 @@ rank_joy_lme_eez = function(region){
   ### plot joy ###
   ################
   
-  tas_combined = tas_combined[!is.na(tas_combined$UNIT),]
-  
-  p = ggplot(tas_combined, aes(x = sum, y = UNIT, fill = UNIT)) +
+  all_unit = tas_combined %>%
+    mutate(location_id = as.character(geometry)) %>%
+    select(UNIT, period, location_id, sum) %>%
+    group_by(UNIT, period, location_id) %>%
+    summarise(sum = median(sum, na.rm = T))
+
+  p = all_unit %>%
+    ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
     geom_joy(scale = 5, alpha = 0.8, size = 0.1, bandwidth = 0.03) +
     theme_minimal() +
-    scale_y_discrete(expand = c(0, 0)) + # will generally have to set the `expand` option
-    scale_x_continuous(expand = c(-0.05, 0.1), 
-                       limits = c(0, 1), 
+    scale_y_discrete(expand = c(0, 0)) +
+    scale_x_continuous(expand = c(-0.05, 0.1),
+                       limits = c(0, 1),
                        breaks = c(0.25,  0.75)) +
     scale_fill_cyclical(values = ipcc_temp_expand)+
     facet_wrap(.~period, ncol = 4) +
     ylab(NULL) + xlab(NULL) +
-    coord_fixed(ratio = 0.1) + 
+    coord_fixed(ratio = 0.1) +
     theme(axis.text.y = element_text(size = 10),
           panel.background = element_blank(),
           panel.grid.major.x = element_blank(),
@@ -263,7 +256,7 @@ rank_joy_lme_eez = function(region){
           panel.grid.major.y = element_blank(),
           panel.grid.minor.y = element_blank(),
           legend.position = "none")
-  
+
   pdf(paste0("~/Desktop/joy_", region, "_", percentile, ".pdf"), height = 10, width = 10)
   print(p)
   dev.off()
@@ -274,11 +267,23 @@ rank_joy_lme_eez = function(region){
 
 eez = rank_joy_lme_eez("eez")
 
-df1 = eez %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 20) %>% top_n(15, m)
+#########################################
+### Reorder units by 2010-2019 median ###
+#########################################
+
+# merge hadi and cobe from 2010-2019
+eez = eez %>% 
+  subset(period %in% c("2010-2019")) %>% 
+  mutate(location_id = as.character(geometry)) %>%
+  group_by(UNIT, location_id) %>%
+  summarise(sum = median(sum, na.rm = T))
+
+#you have to repeaet ranking because some units are ranked at same spots
+df1 = eez %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 20) %>% top_n(15, m); df1 = df1 %>% top_n(15)
 df2 = eez %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 20) %>% top_n(-15, m)
 sub = rbind(df1, df2)
-sub = as.vector(sub$UNIT)
-eez_sub = subset(eez, UNIT %in% sub & period %in% c("2010-2019"))
+sub = as.vector(sub$UNIT); sub #see top 15 bottom 15
+eez_sub = subset(eez, UNIT %in% sub) #subset
 eez_sub = eez_sub %>% group_by(UNIT) %>% mutate(m = median(sum)) %>% arrange(UNIT, m)
 eez_sub = eez_sub[,c("UNIT", "sum")]; eez_sub = as.data.frame(eez_sub); eez_sub = eez_sub[1:2]; eez_sub$class = "EEZ"
 
@@ -298,3 +303,4 @@ p = eez_sub %>%
   labs(tag = "(c) Exclusive Economic Zone")
 print(p)
 dev.off()
+

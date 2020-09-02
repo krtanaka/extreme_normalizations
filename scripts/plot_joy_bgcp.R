@@ -191,10 +191,8 @@ rank_joy_bgcp = function(){
   # print(p)
   # dev.off()
   
-  tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
   tas_combined = tas_combined %>% mutate(bgcp = gsub("\xca", "", bgcp)) 
-  tas_combined = tas_combined %>% group_by(x, y, bgcp, period) %>% summarise(sum = mean(sum))
-  
+
   tas_combined$bgcp = gsub("Southeast ", "SE ", tas_combined$bgcp, fixed = T)
   tas_combined$bgcp = gsub("Northeast ", "NE ", tas_combined$bgcp, fixed = T)
   tas_combined$bgcp = gsub("Northwest ", "NW ", tas_combined$bgcp, fixed = T)
@@ -232,15 +230,14 @@ rank_joy_bgcp = function(){
   tas_combined$bgcp = gsub("water ring", "Water Ring", tas_combined$bgcp, fixed = T)
   tas_combined$bgcp = gsub("warm pool", "Warm Pool", tas_combined$bgcp, fixed = T)
   
-  prov_levels <- tas_combined %>% 
-    subset(period %in% c("2010-2019")) %>% # Reorder levels by 2010-2019
-    dplyr::select(sum, bgcp) %>%
-    group_by(bgcp) %>%
-    mutate(unit_median = median(sum, na.rm = T))
+  ### just keep HadISST and COBESST. discard unecessary columns ###
+  tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
+  tas_combined = tas_combined %>% as.data.frame() %>% select(bgcp, period, source, sum, x, y)
+  tas_combined = tas_combined[!is.na(tas_combined$bgcp),]
   
-  levels <- unique(prov_levels$bgcp[order(prov_levels$unit_median)])
-  tas_combined$bgcp <- factor(tas_combined$bgcp, levels = levels, ordered = TRUE)
-  
+  ##########################
+  ### expand IPCC colors ###
+  ##########################
   ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
   ipcc_temp_expand = ipcc_temp_expand(length(unique(tas_combined$bgcp)))
   
@@ -260,20 +257,30 @@ rank_joy_bgcp = function(){
   s2 = summary %>% subset(Period == "1990-1999")
   s3 = summary %>% subset(Period == "2000-2009")
   s4 = summary %>% subset(Period == "2010-2019")
-
+  
   summary = cbind(s1, s2, s3, s4)
+  summary =  summary[!is.na(summary$Unit),]
+
   write_csv(summary, paste0("~/Desktop/bgcp_", percentile, ".csv"))
   
-  p = tas_combined %>% 
+  all_unit = tas_combined %>%
+    mutate(location_id = paste0(x, "_", y)) %>%
+    select(bgcp, period, location_id, sum) %>%
+    group_by(bgcp, period, location_id) %>%
+    summarise(sum = median(sum, na.rm = T))
+  
+  p = all_unit %>% 
     ggplot(aes(x = sum, y = bgcp, fill = bgcp)) +
-    geom_joy(scale = 2, alpha = 0.8, size = 0.1) +
+    geom_joy(scale = 5, alpha = 0.8, size = 0.1, bandwidth = 0.03) +
     theme_minimal() +
-    scale_y_discrete(expand = c(0, 0)) + # will generally have to set the `expand` option
-    scale_x_continuous(expand = c(-0.05, 0.1), limits = c(0, 1), breaks = c(0.25,  0.75)) +
+    scale_y_discrete(expand = c(0, 0)) +
+    scale_x_continuous(expand = c(-0.05, 0.1),
+                       limits = c(0, 1),
+                       breaks = c(0.25,  0.75)) +
     scale_fill_cyclical(values = ipcc_temp_expand)+
     facet_wrap(.~period, ncol = 4) +
     ylab(NULL) + xlab(NULL) +
-    coord_fixed(ratio = 0.1) + 
+    coord_fixed(ratio = 0.1) +
     theme(axis.text.y = element_text(size = 10),
           panel.background = element_blank(),
           panel.grid.major.x = element_blank(),
@@ -292,14 +299,24 @@ rank_joy_bgcp = function(){
 
 bgcp = rank_joy_bgcp()
 
+#########################################
+### Reorder units by 2010-2019 median ###
+#########################################
+
+# merge hadi and cobe from 2010-2019
+bgcp = bgcp %>% 
+  subset(period %in% c("2010-2019")) %>% 
+  mutate(location_id = paste0(x, "_", y)) %>%
+  group_by(bgcp, location_id) %>%
+  summarise(sum = median(sum, na.rm = T))
+
 df1 = bgcp %>% group_by(bgcp) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 20) %>% top_n(15, m)
 df2 = bgcp %>% group_by(bgcp) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 20) %>% top_n(-15, m)
 sub = rbind(df1, df2)
-sub = as.vector(sub$bgcp)
-bgcp_sub = subset(bgcp, bgcp %in% sub & period %in% c("2010-2019"))
-bgcp$bgcp = as.character(bgcp$bgcp)
+  sub = as.vector(sub$bgcp); sub #see top 15 bottom 15
+bgcp_sub = subset(bgcp, bgcp %in% sub) #subset
 bgcp_sub = bgcp_sub %>% group_by(bgcp) %>% mutate(m = median(sum)) %>% arrange(bgcp, m)
-bgcp_sub = bgcp_sub[,c("bgcp", "sum")]; bgcp_sub = as.data.frame(bgcp_sub); colnames(bgcp_sub)[1] = "UNIT"; bgcp_sub$class = "BGCP"
+bgcp_sub = bgcp_sub[,c("bgcp", "sum")]; bgcp_sub = as.data.frame(bgcp_sub); bgcp_sub = bgcp_sub[1:2]; colnames(bgcp_sub)[1] = "UNIT"; bgcp_sub$class = "BGCP"
 
 pdf(paste0("~/Desktop/Fig2_BGCP.", percentile, "_", Sys.Date(), ".pdf"), width = 8, height = 6)
 p = bgcp_sub %>%  

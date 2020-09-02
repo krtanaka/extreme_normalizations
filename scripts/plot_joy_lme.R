@@ -48,7 +48,7 @@ ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
 
 rank_joy_lme_eez = function(region){
   
-  # region = "lme"
+  region = "lme"
   
   shape = lme; shape$UNIT = shape$LME_NAME
   
@@ -180,22 +180,10 @@ rank_joy_lme_eez = function(region){
   tas_combined$UNIT = gsub("Canadian High Arctic - N Greenland", "Canada N Greenland", tas_combined$UNIT, fixed = T)
   
   
-  ### just keep HadISST and COBESST ###
-  tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSST
-  
-  
-  #################################################
-  ### Reorder units by 2010-2019 mean or median ###
-  #################################################
-  prov_levels <- tas_combined %>% 
-    subset(period %in% c("2010-2019")) %>% 
-    dplyr::select(sum, UNIT) %>%
-    group_by(UNIT) %>%
-    mutate(unit_median = median(sum, na.rm = T))
-  
-  levels <- unique(prov_levels$UNIT[order(prov_levels$unit_median)])
-  
-  tas_combined$UNIT <- factor(tas_combined$UNIT, levels = levels, ordered = T)
+  ### just keep HadISST and COBESST. discard unecessary columns ###
+  tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSSTv5
+  tas_combined = tas_combined %>% as.data.frame() %>% select(UNIT, period, source, sum, geometry)
+  tas_combined = tas_combined[!is.na(tas_combined$UNIT),]
   
   
   ##########################
@@ -231,23 +219,29 @@ rank_joy_lme_eez = function(region){
   write_csv(summary, paste0("/Users/", Sys.info()[7], "/Desktop/", region, "_", percentile, ".csv"))
   
   
+  
   ################
   ### plot joy ###
   ################
   
-  tas_combined = tas_combined[!is.na(tas_combined$UNIT),]
+  all_unit = tas_combined %>%
+    mutate(location_id = as.character(geometry)) %>%
+    select(UNIT, period, location_id, sum) %>%
+    group_by(UNIT, period, location_id) %>%
+    summarise(sum = median(sum, na.rm = T))
   
-  p = ggplot(tas_combined, aes(x = sum, y = UNIT, fill = UNIT)) +
+  p = all_unit %>%
+    ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
     geom_joy(scale = 5, alpha = 0.8, size = 0.1, bandwidth = 0.03) +
     theme_minimal() +
-    scale_y_discrete(expand = c(0, 0)) + # will generally have to set the `expand` option
-    scale_x_continuous(expand = c(-0.05, 0.1), 
-                       limits = c(0, 1), 
+    scale_y_discrete(expand = c(0, 0)) +
+    scale_x_continuous(expand = c(-0.05, 0.1),
+                       limits = c(0, 1),
                        breaks = c(0.25,  0.75)) +
     scale_fill_cyclical(values = ipcc_temp_expand)+
     facet_wrap(.~period, ncol = 4) +
     ylab(NULL) + xlab(NULL) +
-    coord_fixed(ratio = 0.1) + 
+    coord_fixed(ratio = 0.1) +
     theme(axis.text.y = element_text(size = 10),
           panel.background = element_blank(),
           panel.grid.major.x = element_blank(),
@@ -266,11 +260,23 @@ rank_joy_lme_eez = function(region){
 
 lme = rank_joy_lme_eez("lme")
 
-df1 = lme %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 20) %>% top_n(15, m)
+#########################################
+### Reorder units by 2010-2019 median ###
+#########################################
+
+# merge hadi and cobe from 2010-2019
+lme = lme %>% 
+  subset(period %in% c("2010-2019")) %>% 
+  mutate(location_id = as.character(geometry)) %>%
+  group_by(UNIT, location_id) %>%
+  summarise(sum = median(sum, na.rm = T))
+
+#you have to repeaet ranking because some units are ranked at same spots
+df1 = lme %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 20) %>% top_n(15, m); df1 = df1 %>% top_n(15)
 df2 = lme %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 20) %>% top_n(-15, m)
 sub = rbind(df1, df2)
-sub = as.vector(sub$UNIT)
-lme_sub = subset(lme, UNIT %in% sub & period %in% c("2010-2019"))
+sub = as.vector(sub$UNIT); sub #see top 15 bottom 15
+lme_sub = subset(lme, UNIT %in% sub) #subset
 lme_sub = lme_sub %>% group_by(UNIT) %>% mutate(m = median(sum)) %>% arrange(UNIT, m)
 lme_sub = lme_sub[,c("UNIT", "sum")]; lme_sub = as.data.frame(lme_sub); lme_sub = lme_sub[1:2]; lme_sub$class = "LME"
 
