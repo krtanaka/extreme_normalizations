@@ -315,6 +315,6 @@ p = bgcp_sub %>%
   coord_fixed(ratio = 0.1) + 
   theme(axis.text.y = element_text(size = 10),
         legend.position = "none") + 
-  labs(tag = "(a) Biogeographic Province")
+  labs(tag = "(a) Biogeographic Province", caption = "proportion of extremes")
 print(p)
 dev.off()
