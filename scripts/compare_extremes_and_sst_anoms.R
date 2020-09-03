@@ -49,22 +49,13 @@ ipcc_col <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
               rgb(33, 102, 172, maxColorValue = 255, alpha = 255),
               rgb(5, 48, 97, maxColorValue = 255, alpha = 255))
 
-#IPCC precip color theme
-# ipcc_col <- c(rgb(84, 48, 5, maxColorValue = 255, alpha = 255),
-#                  rgb(140, 81, 10, maxColorValue = 255, alpha = 255),
-#                  rgb(191, 129, 45, maxColorValue = 255, alpha = 255),
-#                  rgb(223, 194, 125, maxColorValue = 255, alpha = 255),
-#                  rgb(246, 232, 195, maxColorValue = 255, alpha = 255),
-#                  rgb(245, 245, 245, maxColorValue = 255, alpha = 255),
-#                  rgb(199, 234, 229, maxColorValue = 255, alpha = 255),
-#                  rgb(128, 205, 193, maxColorValue = 255, alpha = 255),
-#                  rgb(53, 151, 143, maxColorValue = 255, alpha = 255),
-#                  rgb(1, 102, 94, maxColorValue = 255, alpha = 255),
-#                  rgb(0, 60, 48, maxColorValue = 255, alpha = 255))
-
 p1 = anom_ipcc %>% ggplot(aes(x, y, fill = anom)) +  
   geom_tile() + 
-  geom_tile(data = subset(anom_ipcc, anom >= 1.375803), aes(x, y), fill = 5, alpha = 0.9) + 
+  geom_tile(data = subset(anom_ipcc, anom >= 1.375803), 
+            aes(x, y), fill = rgb(102, 255, 102, 
+                                  maxColorValue = 255, 
+                                  alpha = 255), 
+            alpha = 0.9) + 
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
            color = "gray20", fill = "gray20", size = 0.001) +
   scale_fill_gradientn(colors = rev(ipcc_col), "") +
@@ -83,7 +74,11 @@ p1 = anom_ipcc %>% ggplot(aes(x, y, fill = anom)) +
 
 p2 = anom_extreme %>% ggplot(aes(x, y, fill = anom)) +  
   geom_tile() + 
-  geom_tile(data = subset(anom_extreme, anom >= 1), aes(x, y), fill = 5, alpha = 0.9) + 
+  geom_tile(data = subset(anom_extreme, anom >= 1),
+            aes(x, y), fill = rgb(102, 255, 102, 
+                                  maxColorValue = 255, 
+                                  alpha = 255), 
+            alpha = 0.9) + 
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
           color = "gray20", fill = "gray20", size = 0.001) +
   scale_fill_gradientn(colors = rev(ipcc_col), "") +
