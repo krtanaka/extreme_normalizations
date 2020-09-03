@@ -210,7 +210,7 @@ p = d %>%
   ggplot() + 
   geom_raster(aes(x = x, y = y, fill = layer)) +
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
-           color = "black", fill = "gray", size = 0.1) +
+           color = "gray", fill = "gray", size = 0.01) +
   scale_fill_gradientn(colors = rev(ipcc_temp), "") + 
   # coord_proj("+proj=wintri") +
   facet_grid(month ~ source) +
@@ -237,7 +237,7 @@ p = d %>%
   ggplot() + 
   geom_raster(aes(x = x, y = y, fill = layer), interpolate = T) +
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
-           color = "black", fill = "gray", size = 0.1) +
+           color = "gray", fill = "gray", size = 0.01) +
   scale_fill_gradientn(colors = rev(ipcc_temp), "") + 
   # coord_proj("+proj=wintri") +
   facet_grid(month ~ source) +
@@ -252,7 +252,6 @@ p = d %>%
         axis.ticks.x = element_blank(),
         axis.ticks.y = element_blank(),
         legend.position = "right")
-
 
 pdf("~/Desktop/s2.pdf", width = 10, height = 10)
 p
