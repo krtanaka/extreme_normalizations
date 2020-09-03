@@ -15,7 +15,7 @@ library(patchwork)
 
 rm(list = ls())
 
-percentile = c(0.95, 0.98)[1]
+percentile = c(0.95, 0.98)[2]
 
 period = c("1980-1989", "1990-1999", "2000-2009", "2010-2019")
 
@@ -192,6 +192,19 @@ rank_joy_lme_eez = function(region){
   tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSSTv5
   tas_combined = tas_combined %>% as.data.frame() %>% select(UNIT, period, source, sum, geometry)
   tas_combined = tas_combined[!is.na(tas_combined$UNIT),]
+  
+  # count changes in number of unit between 1980-1989 and 2010-2019
+  n1 = tas_combined %>% 
+    subset(period %in% c("1980-1989")) %>%
+    group_by(UNIT) %>% 
+    summarise(sum = round(median(sum), 2)) %>% 
+    subset(sum >= 0.66) #use upper tercile
+  
+  n2 = tas_combined %>% 
+    subset(period %in% c("2010-2019")) %>%
+    group_by(UNIT) %>% 
+    summarise(sum = round(median(sum), 2)) %>% 
+    subset(sum >= 0.66) #use upper tercile
   
 
   ##########################

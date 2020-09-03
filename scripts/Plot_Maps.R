@@ -212,8 +212,6 @@ map = function(mode){
     
     anom = rbind(annual, season) %>% group_by(x, y, period, season) %>% summarise(sum = median(sum))
     
-    anom[anom=="2010-2018"]<-"2010-2019"
-    
     p = anom %>% 
       sample_frac(0.01) %>%
       ggplot(size = 5, alpha = 0.8) + 

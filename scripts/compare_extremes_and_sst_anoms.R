@@ -16,8 +16,8 @@ range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 setwd("~/extreme_normalizations/results/")
 
 # conventional SST anomalies for 2019
-load("COBE/anomalies_2019_ipcc.RData"); cobe_ipcc = anom; cobe_ipcc$data = "COBE"; cobe_ipcc$sum = rowMeans(cobe_ipcc[3:14])
-load("HadI/anomalies_2019_ipcc.RData"); hadi_ipcc = anom; hadi_ipcc$data = "HadI"; hadi_ipcc$sum = rowMeans(hadi_ipcc[3:14])
+load("COBE/sst_anomalies_2019.Rdata"); cobe_ipcc = anom; cobe_ipcc$data = "COBE"; cobe_ipcc$sum = rowMeans(cobe_ipcc[3:14])
+load("HadI/sst_anomalies_2019.Rdata"); hadi_ipcc = anom; hadi_ipcc$data = "HadI"; hadi_ipcc$sum = rowMeans(hadi_ipcc[3:14])
 anom_ipcc = rbind(cobe_ipcc, hadi_ipcc) %>% dplyr::select(x, y, sum) %>% group_by(x, y) %>% summarise(anom = mean(sum))
 
 #99th percentile and area fractions
@@ -26,12 +26,12 @@ d = anom_ipcc %>% subset(anom >= q)
 (dim(d)[1]/dim(anom_ipcc)[1])*100
 
 # Normalized Extreme Index for 2019
-load("HadI/anomalies_2019_0.95.rdata"); hadi_extreme = anom; hadi_extreme$data = "HadI"
-load("COBE/anomalies_2019_0.95.rdata"); cobe_extreme = anom; cobe_extreme$data = "COBE"
+load("HadI/extremes_2019_0.98.RData"); hadi_extreme = anom; hadi_extreme$data = "HadI"
+load("COBE/extremes_2019_0.98.RData"); cobe_extreme = anom; cobe_extreme$data = "COBE"
 anom_extreme = rbind(cobe_extreme, hadi_extreme) %>% dplyr::select(x, y, sum) %>% group_by(x, y) %>% summarise(anom = mean(sum))
 anom_extreme$anom = range01(anom_extreme$anom)
 
-#99.9th percentile and area fractions
+#99th percentile and area fractions
 q = quantile(anom_extreme$anom, 0.99); q
 d = anom_extreme %>% subset(anom >= q)
 (dim(d)[1]/dim(anom_extreme)[1])*100

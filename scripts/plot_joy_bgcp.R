@@ -15,7 +15,7 @@ library(patchwork)
 
 rm(list = ls())
 
-percentile = c(0.95, 0.98)[1]
+percentile = c(0.95, 0.98)[2]
 
 period = c("1980-1989", "1990-1999", "2000-2009", "2010-2019")
 
@@ -235,6 +235,19 @@ rank_joy_bgcp = function(){
   tas_combined = tas_combined %>% as.data.frame() %>% select(bgcp, period, source, sum, x, y)
   tas_combined = tas_combined[!is.na(tas_combined$bgcp),]
   
+  # count changes in number of unit between 1980-1989 and 2010-2019
+  n1 = tas_combined %>% 
+    subset(period %in% c("1980-1989")) %>%
+    group_by(bgcp) %>% 
+    summarise(sum = round(median(sum), 2)) %>% 
+    subset(sum >= 0.66) #use upper tercile
+  
+  n2 = tas_combined %>% 
+    subset(period %in% c("2010-2019")) %>%
+    group_by(bgcp) %>% 
+    summarise(sum = round(median(sum), 2)) %>% 
+    subset(sum >= 0.66) #use upper tercile
+  
   ##########################
   ### expand IPCC colors ###
   ##########################
@@ -313,7 +326,7 @@ bgcp = bgcp %>%
 df1 = bgcp %>% group_by(bgcp) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 20) %>% top_n(15, m)
 df2 = bgcp %>% group_by(bgcp) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 20) %>% top_n(-15, m)
 sub = rbind(df1, df2)
-  sub = as.vector(sub$bgcp); sub #see top 15 bottom 15
+sub = as.vector(sub$bgcp); sub #see top 15 bottom 15
 bgcp_sub = subset(bgcp, bgcp %in% sub) #subset
 bgcp_sub = bgcp_sub %>% group_by(bgcp) %>% mutate(m = median(sum)) %>% arrange(bgcp, m)
 bgcp_sub = bgcp_sub[,c("bgcp", "sum")]; bgcp_sub = as.data.frame(bgcp_sub); bgcp_sub = bgcp_sub[1:2]; colnames(bgcp_sub)[1] = "UNIT"; bgcp_sub$class = "BGCP"
