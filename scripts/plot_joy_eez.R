@@ -184,9 +184,18 @@ rank_joy_lme_eez = function(region){
   tas_combined$UNIT = gsub(" I.", " Island", tas_combined$UNIT, fixed = T)
   tas_combined$UNIT = gsub("Congo, DRC", "DR Congo", tas_combined$UNIT, fixed = T)
   tas_combined$UNIT = gsub("Bonaire, Sint-Eustasius, Saba", "Netherlands", tas_combined$UNIT, fixed = T)
-  tas_combined$UNIT = gsub("United States ", "US ", tas_combined$UNIT, fixed = T)
-  tas_combined$UNIT = gsub("US Virgin Islands", "Virgin Islands, US", tas_combined$UNIT, fixed = T)
   tas_combined$UNIT = gsub("St. ", "Saint ", tas_combined$UNIT, fixed = T)
+  
+  tas_combined$UNIT = gsub("Svalbard", "Norway", tas_combined$UNIT, fixed = T)
+  tas_combined$UNIT = gsub("Jan Mayen", "Norway", tas_combined$UNIT, fixed = T)
+  
+  tas_combined$UNIT = gsub("United States Minor Outlying Islands", "United States", tas_combined$UNIT, fixed = T)
+  tas_combined$UNIT = gsub("United States Virgin Islands", "United States", tas_combined$UNIT, fixed = T)
+
+  tas_combined$UNIT = gsub("French Southern and Antarctic Lands", "France", tas_combined$UNIT, fixed = T)
+  
+  tas_combined$UNIT = gsub("Virgin Islands, British", "United Kingdom", tas_combined$UNIT, fixed = T)
+  
   
   ### just keep HadISST and COBESST. discard unecessary columns ###
   tas_combined = subset(tas_combined, source %in% c("HadISST v1.1", "COBE v2")) # remove ERSSTv5
