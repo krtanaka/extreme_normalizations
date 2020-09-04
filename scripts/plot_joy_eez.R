@@ -174,6 +174,7 @@ rank_joy_lme_eez = function(region){
                    "Joint regime Nigeria/Sao Tome and Principe",
                    "Protected zone Australia/Papua New Guinea", 
                    "Spratly Islands", 
+                   "Paracel Islands",
                    "Antarctica", 
                    "Gaza Strip")
   
@@ -193,7 +194,8 @@ rank_joy_lme_eez = function(region){
   tas_combined$UNIT = gsub("United States Virgin Islands", "United States", tas_combined$UNIT, fixed = T)
 
   tas_combined$UNIT = gsub("French Southern and Antarctic Lands", "France", tas_combined$UNIT, fixed = T)
-  
+  tas_combined$UNIT = gsub("Reunion", "France", tas_combined$UNIT, fixed = T)
+
   tas_combined$UNIT = gsub("Virgin Islands, British", "United Kingdom", tas_combined$UNIT, fixed = T)
   
   
