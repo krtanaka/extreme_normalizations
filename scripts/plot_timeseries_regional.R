@@ -14,7 +14,7 @@ p = c(0.95, 0.98)[2]
 ### load area fraction time series results 1900-2019 ###
 ########################################################
 
-setwd(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/"))
+setwd(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/"))
 
 load(paste0("HadI/timeseries_global_", p, ".RData")); hadi_global = yy_anom; hadi_global$region = "Global"
 load(paste0("HadI/timeseries_global_no_polar_", p, ".RData")); hadi_sub_global = yy_anom; hadi_sub_global$region = "Sub_Global"
@@ -178,7 +178,7 @@ t = timeseries %>% mutate(period = ifelse(Year %in% c(1900:1959), "1st", "2nd"))
   mutate(percent = (sum/lag(sum)-1)*100)
 t
 
-readr::write_csv(t, "~/Dropbox (MBA)/PAPER Kisei heat extremes/figures/supplemental/TableS3.csv")
+readr::write_csv(t, "~/Dropbox/PAPER Kisei heat extremes/figures/supplemental/TableS3.csv")
 
 timeseries$linesize = ifelse(timeseries$region == "Global", 2, 1)
 
