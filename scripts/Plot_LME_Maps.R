@@ -15,6 +15,7 @@ library(lwgeom)
 library(sp)
 library(maptools)
 library(colorRamps)
+library(metR)
 
 rm(list = ls())
 
@@ -84,7 +85,7 @@ anom = subset(anom, source %in% c("COBE v2", "HadISST v1.1"))
 latlon = anom[,c("x", "y")]
 
 coordinates(latlon)=~x+y
-statarea<-rgdal::readOGR("/Users/", Sys.info()[7], "/Google Drive/Research/GIS/LME66/LMEs66.shp")
+statarea<-rgdal::readOGR(paste0("/Users/", Sys.info()[7], "/Google Drive/Research/GIS/LME66/LMEs66.shp"))
 CRS.new <- CRS("+proj=aeqd +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 proj4string(latlon) <- CRS.new 
 proj4string(statarea) <- CRS.new
@@ -101,6 +102,7 @@ if (mode == "annual") {
   table(anom$LME_NAME)
   anom_i = subset(anom, LME_NAME %in% c("Northeast U.S. Continental Shelf"))
   anom_i = subset(anom, LME_NAME %in% c("California Current"))
+  anom_i = subset(anom, LME_NAME %in% c("Insular Pacific-Hawaiian"))
   
   xlims <- range(pretty(anom_i$x));ylims <- range(pretty(anom_i$y))
   
@@ -108,12 +110,13 @@ if (mode == "annual") {
     geom_tile(aes(x = x, y = y, fill = sum)) +
     annotation_map(map_data("world")) +
     coord_fixed(xlim = xlims,ylim = ylims) +
-    scale_fill_gradientn(colors = rev(ipcc_temp), "", breaks = c(0,0.5,1), limits = c(0,1)) +
+    # scale_fill_gradientn(colors = rev(ipcc_temp), "", breaks = c(0,0.5,1), limits = c(0,1)) +
+    scale_fill_gradientn(colors = matlab.like(100), "", breaks = c(0,0.5,1), limits = c(0,1)) +
     # scale_x_continuous(expand = c(-0.005, 0), "") +
     # scale_y_continuous(expand = c(-0.005, 0), "") +
-    scale_x_longitude() +
-    scale_y_latitude() +
-    facet_wrap( ~ period) +
+    scale_x_longitude(breaks = NULL) +
+    scale_y_latitude(breaks = NULL) +
+    facet_wrap( ~ period, ncol = 4) +
     theme_minimal() +
     theme(
       axis.title.x = element_blank(),
@@ -126,7 +129,7 @@ if (mode == "annual") {
       legend.justification = c(1,0)) + 
     ggtitle(unique(anom_i$LME_NAME))
   
-  pdf(paste0("/Users/", Sys.info()[7], "/Desktop/SST_Anomalies_Annual_", cutoff, ".pdf"), height = 5, width = 5)
+  pdf(paste0("/Users/", Sys.info()[7], "/Desktop/SST_Anomalies_Annual_", cutoff, ".pdf"), height = 5, width = 10)
   # png(paste0("/Users/", Sys.info()[7], "/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".png"), height = 3, width = 9, units = "in", res = 500)
   print(p)
   dev.off()
