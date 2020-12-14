@@ -15,9 +15,9 @@ library(doParallel)
 cores = detectCores()/2
 registerDoParallel(cores = cores)
 
-p = c(0.975, 0.95, 0.98)[2]
+p = c(0.975, 0.95, 0.98)[3]
 
-setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/")
+setwd("/Users/kisei/Dropbox/PAPER Kisei heat extremes/data/")
 
 load("major_oceans.RData")
 
