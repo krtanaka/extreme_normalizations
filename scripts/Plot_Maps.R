@@ -72,13 +72,14 @@ map = function(mode){
       subset(source %in% c("COBE v2", "HadISST v1.1")) %>%
       group_by(x, y, period) %>% 
       summarise(sum = mean(sum)) %>% 
-      subset(y %in% seq(-70, 70, by = 0.1)) %>%
+      # subset(y %in% seq(-70, 70, by = 0.1)) %>%
       ggplot() + 
-      geom_point(aes(x, y, color = sum, fill = sum), size = 0.1) +
-      # geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
+      geom_point(aes(x, y, color = sum, fill = sum),  size = 0.8, alpha = 0.5, shape = 16) +
       geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id), color = "gray20", fill = "gray20", size = 0.001) +
-      scale_color_gradientn(colors = rev(ipcc_col), "", limits = c(0, 1), breaks = c(0, 0.5, 1)) +
-      scale_fill_gradientn(colors = rev(ipcc_col), "", limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+      # scale_color_gradientn(colors = rev(ipcc_col), "", limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+      # scale_fill_gradientn(colors = rev(ipcc_col), "", limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+      scale_color_gradientn(colors = matlab.like(10), "", limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+      scale_fill_gradientn(colors = matlab.like(10), "", limits = c(0, 1), breaks = c(0, 0.5, 1)) +
       scale_x_continuous(expand = c(-0.005, 0), "") +
       scale_y_continuous(expand = c(-0.005, 0), "") +
       # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
@@ -142,7 +143,7 @@ map = function(mode){
             legend.position = "bottom",
             legend.justification = c(1,0))
     
-    pdf(paste0("/Users/", Sys.info()[7], "/Desktop/s2_", Sys.Date(), "_", percentile, ".pdf"), height = 12, width = 12)
+    pdf(paste0("/Users/", Sys.info()[7], "/Desktop/s2_", Sys.Date(), "_", percentile, ".pdf"), height = 10, width = 10)
     print(p)
     dev.off()
     
