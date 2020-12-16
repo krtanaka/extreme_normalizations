@@ -348,7 +348,7 @@ df1$region = factor(df1$region, levels = c("Global",
                                            "Southern",
                                            "Gulf of Maine"))
 
-pdf("~/Desktop/s6.pdf", height = 5, width = 8)
+pdf("~/Desktop/s6.pdf", height = 8, width = 8)
 df1 %>% 
   subset(region %in% c("Global", "Gulf of Maine")) %>%
   group_by(Year, region) %>% 
@@ -358,9 +358,11 @@ df1 %>%
   geom_line(alpha = 0.8) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") +
   labs(x = "", y = "Area Fraction") +
-  cowplot::theme_cowplot(I(20)) +
+  # cowplot::theme_cowplot(I(20)) +
+  ggdark::dark_theme_classic(I(24)) +
   # facet_wrap( ~ region, scales = "free") + 
-  scale_color_brewer(palette = "Set1", "") + 
+  # scale_color_brewer(palette = "Set1", "") + 
+  scale_color_discrete("") + 
   scale_x_continuous(breaks = seq(1900, 2020, 60), limits = c(1900, 2020)) + 
   theme(legend.position = "top",
         # panel.spacing.x = unit(2, "lines"),

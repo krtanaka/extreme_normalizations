@@ -117,10 +117,10 @@ if (mode == "annual") {
     scale_x_longitude(breaks = NULL) +
     scale_y_latitude(breaks = NULL) +
     facet_wrap( ~ period, ncol = 4) +
-    theme_minimal() +
+    ggdark::dark_theme_bw() +
     theme(
-      axis.title.x = element_blank(),
-      axis.title.y = element_blank(),
+      # axis.title.x = element_blank(),
+      # axis.title.y = element_blank(),
       # axis.text.x = element_blank(),
       # axis.text.y = element_blank(),
       # axis.ticks.x = element_blank(),
@@ -129,7 +129,7 @@ if (mode == "annual") {
       legend.justification = c(1,0)) + 
     ggtitle(unique(anom_i$LME_NAME))
   
-  pdf(paste0("/Users/", Sys.info()[7], "/Desktop/SST_Anomalies_Annual_", cutoff, ".pdf"), height = 5, width = 10)
+  pdf(paste0("/Users/", Sys.info()[7], "/Desktop/SST_Anomalies_Annual_", cutoff, ".pdf"), height = 7, width = 10)
   # png(paste0("/Users/", Sys.info()[7], "/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".png"), height = 3, width = 9, units = "in", res = 500)
   print(p)
   dev.off()
