@@ -13,7 +13,7 @@ library(colorRamps)
 # save(bgcp, file = "~/extreme_normalizations/data/bgcp_raster_0.25.RData")
 
 load("~/extreme_normalizations/data/bgcp_raster_0.25.RData")
-load("~/extreme_normalizations/results/HadI/extremes_1980-1989_0.98.RData")
+load("~/extreme_normalizations/outputs/HadI/extremes_1980-1989_0.98.RData")
 anom = anom[, c(1:2, 15)]
 x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 1, crs = "+proj=longlat +datum=WGS84")
 anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
