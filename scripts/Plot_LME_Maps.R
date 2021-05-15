@@ -15,6 +15,7 @@ library(lwgeom)
 library(sp)
 library(maptools)
 library(colorRamps)
+library(metR)
 
 rm(list = ls())
 
@@ -39,11 +40,11 @@ range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 meow <- readOGR(dsn = paste0("/Users/", Sys.info()[7], "/Downloads/MEOW"), layer = "meow_ecos")
 meow <- meow %>% st_as_sf()  
 
-lme <- readOGR("/Users/ktanaka/Google Drive/Research/GIS/LME66/LMEs66.shp")
+lme <- readOGR("/Users/", Sys.info()[7], "/Google Drive/Research/GIS/LME66/LMEs66.shp")
 lme <- rmapshaper::ms_simplify(lme, keep = 0.01, keep_shapes = F)
 lme <- lme %>% st_as_sf()  
 
-eez <- readOGR(dsn = "/Users/ktanaka/clim_geo_disp/data/EEZ_land_union", layer = "EEZ_land_v2_201410")
+eez <- readOGR(dsn = "/Users/", Sys.info()[7], "/clim_geo_disp/data/EEZ_land_union", layer = "EEZ_land_v2_201410")
 eez <- rmapshaper::ms_simplify(eez, keep = 0.01, keep_shapes = F)
 eez <- eez %>% st_as_sf()  
 
@@ -60,18 +61,18 @@ ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
                rgb(33, 102, 172, maxColorValue = 255, alpha = 255),
                rgb(5, 48, 97, maxColorValue = 255, alpha = 255))
 
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_1980-1989_", cutoff, ".RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1989"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_1990-1999_", cutoff, ".RData")); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_2000-2009_", cutoff, ".RData")); hadi3 = anom; hadi3$source = "HadISST v1.1"; hadi3$period = "2000-2009"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/HadI/anomalies_2010-2019_", cutoff, ".RData")); hadi4 = anom; hadi4$source = "HadISST v1.1"; hadi4$period = "2010-2019"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/anomalies_1980-1989_", cutoff, ".RData")); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1989"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/anomalies_1990-1999_", cutoff, ".RData")); cobe2 = anom; cobe2$source = "COBE v2"; cobe2$period = "1990-1999"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/anomalies_2000-2009_", cutoff, ".RData")); cobe3 = anom; cobe3$source = "COBE v2"; cobe3$period = "2000-2009"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/COBE/anomalies_2010-2019_", cutoff, ".RData")); cobe4 = anom; cobe4$source = "COBE v2"; cobe4$period = "2010-2019"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/anomalies_1980-1989_", cutoff, ".RData")); er1 = anom; er1$source = "ERSST v5"; er1$period = "1980-1989"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/anomalies_1990-1999_", cutoff, ".RData")); er2 = anom; er2$source = "ERSST v5"; er2$period = "1990-1999"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/anomalies_2000-2009_", cutoff, ".RData")); er3 = anom; er3$source = "ERSST v5"; er3$period = "2000-2009"
-load(paste0("/Users/ktanaka/extreme_normalizations/results/ER/anomalies_2010-2019_", cutoff, ".RData")); er4 = anom; er4$source = "ERSST v5"; er4$period = "2010-2019"
+load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/HadI/extremes_1980-1989_", cutoff, ".RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1989"
+load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/HadI/extremes_1990-1999_", cutoff, ".RData")); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
+load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/HadI/extremes_2000-2009_", cutoff, ".RData")); hadi3 = anom; hadi3$source = "HadISST v1.1"; hadi3$period = "2000-2009"
+load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/HadI/extremes_2010-2019_", cutoff, ".RData")); hadi4 = anom; hadi4$source = "HadISST v1.1"; hadi4$period = "2010-2019"
+load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/COBE/extremes_1980-1989_", cutoff, ".RData")); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1989"
+load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/COBE/extremes_1990-1999_", cutoff, ".RData")); cobe2 = anom; cobe2$source = "COBE v2"; cobe2$period = "1990-1999"
+load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/COBE/extremes_2000-2009_", cutoff, ".RData")); cobe3 = anom; cobe3$source = "COBE v2"; cobe3$period = "2000-2009"
+load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/COBE/extremes_2010-2019_", cutoff, ".RData")); cobe4 = anom; cobe4$source = "COBE v2"; cobe4$period = "2010-2019"
+load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/ER/extremes_1980-1989_", cutoff, ".RData")); er1 = anom; er1$source = "ERSST v5"; er1$period = "1980-1989"
+load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/ER/extremes_1990-1999_", cutoff, ".RData")); er2 = anom; er2$source = "ERSST v5"; er2$period = "1990-1999"
+load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/ER/extremes_2000-2009_", cutoff, ".RData")); er3 = anom; er3$source = "ERSST v5"; er3$period = "2000-2009"
+load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/ER/extremes_2010-2019_", cutoff, ".RData")); er4 = anom; er4$source = "ERSST v5"; er4$period = "2010-2019"
 
 #all periods
 anom = rbind(hadi1, hadi2, hadi3, hadi4, 
@@ -84,8 +85,8 @@ anom = subset(anom, source %in% c("COBE v2", "HadISST v1.1"))
 latlon = anom[,c("x", "y")]
 
 coordinates(latlon)=~x+y
-statarea<-rgdal::readOGR("/Users/ktanaka/Google Drive/Research/GIS/LME66/LMEs66.shp")
-CRS.new<-CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0+datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")  #EPSG:102003
+statarea<-rgdal::readOGR(paste0("/Users/", Sys.info()[7], "/Google Drive/Research/GIS/LME66/LMEs66.shp"))
+CRS.new <- CRS("+proj=aeqd +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 proj4string(latlon) <- CRS.new 
 proj4string(statarea) <- CRS.new
 area <- over(latlon,statarea)
@@ -101,6 +102,7 @@ if (mode == "annual") {
   table(anom$LME_NAME)
   anom_i = subset(anom, LME_NAME %in% c("Northeast U.S. Continental Shelf"))
   anom_i = subset(anom, LME_NAME %in% c("California Current"))
+  anom_i = subset(anom, LME_NAME %in% c("Insular Pacific-Hawaiian"))
   
   xlims <- range(pretty(anom_i$x));ylims <- range(pretty(anom_i$y))
   
@@ -108,16 +110,17 @@ if (mode == "annual") {
     geom_tile(aes(x = x, y = y, fill = sum)) +
     annotation_map(map_data("world")) +
     coord_fixed(xlim = xlims,ylim = ylims) +
-    scale_fill_gradientn(colors = rev(ipcc_temp), "", breaks = c(0,0.5,1), limits = c(0,1)) +
+    # scale_fill_gradientn(colors = rev(ipcc_temp), "", breaks = c(0,0.5,1), limits = c(0,1)) +
+    scale_fill_gradientn(colors = matlab.like(100), "", breaks = c(0,0.5,1), limits = c(0,1)) +
     # scale_x_continuous(expand = c(-0.005, 0), "") +
     # scale_y_continuous(expand = c(-0.005, 0), "") +
-    scale_x_longitude(xmin=-180, xmax=180, step=10) +
-    scale_y_latitude(ymin=-180, ymax=180, step=10) +
-    facet_wrap( ~ period) +
-    theme_minimal() +
+    scale_x_longitude(breaks = NULL) +
+    scale_y_latitude(breaks = NULL) +
+    facet_wrap( ~ period, ncol = 4) +
+    ggdark::dark_theme_bw() +
     theme(
-      axis.title.x = element_blank(),
-      axis.title.y = element_blank(),
+      # axis.title.x = element_blank(),
+      # axis.title.y = element_blank(),
       # axis.text.x = element_blank(),
       # axis.text.y = element_blank(),
       # axis.ticks.x = element_blank(),
@@ -126,8 +129,8 @@ if (mode == "annual") {
       legend.justification = c(1,0)) + 
     ggtitle(unique(anom_i$LME_NAME))
   
-  pdf(paste0("/Users/ktanaka/Desktop/SST_Anomalies_Annual_", cutoff, ".pdf"), height = 5, width = 5)
-  # png(paste0("/Users/ktanaka/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".png"), height = 3, width = 9, units = "in", res = 500)
+  pdf(paste0("/Users/", Sys.info()[7], "/Desktop/SST_Anomalies_Annual_", cutoff, ".pdf"), height = 7, width = 10)
+  # png(paste0("/Users/", Sys.info()[7], "/Desktop/Fig1_", Sys.Date(), "_", cutoff, ".png"), height = 3, width = 9, units = "in", res = 500)
   print(p)
   dev.off()
   
@@ -176,8 +179,8 @@ if (mode == "seasonal") {
           legend.position = "right",
           legend.justification = c(1,0))
   
-  pdf(paste0("/Users/ktanaka/Desktop/SST_Anomalies_Season_", cutoff, ".pdf"), height = 5, width = 10)
-  # png(paste0("/Users/ktanaka/Desktop/Fig2_", Sys.Date(), "_", cutoff, ".png"), height = 6, width = 9, units = "in", res = 300)
+  pdf(paste0("/Users/", Sys.info()[7], "/Desktop/SST_Anomalies_Season_", cutoff, ".pdf"), height = 5, width = 10)
+  # png(paste0("/Users/", Sys.info()[7], "/Desktop/Fig2_", Sys.Date(), "_", cutoff, ".png"), height = 6, width = 9, units = "in", res = 300)
   print(p)
   dev.off()
   

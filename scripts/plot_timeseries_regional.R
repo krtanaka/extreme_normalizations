@@ -14,7 +14,7 @@ p = c(0.95, 0.98)[2]
 ### load area fraction time series results 1900-2019 ###
 ########################################################
 
-setwd(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/"))
+setwd(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/"))
 
 load(paste0("HadI/timeseries_global_", p, ".RData")); hadi_global = yy_anom; hadi_global$region = "Global"
 load(paste0("HadI/timeseries_global_no_polar_", p, ".RData")); hadi_sub_global = yy_anom; hadi_sub_global$region = "Sub_Global"
@@ -25,6 +25,7 @@ load(paste0("HadI/timeseries_north_pacific_", p, ".RData")); hadi_north_pacific 
 load(paste0("HadI/timeseries_south_atlantic_", p, ".RData")); hadi_south_atlantic = yy_anom; hadi_south_atlantic$region = "S.Atlantic"
 load(paste0("HadI/timeseries_south_pacific_", p, ".RData")); hadi_south_pacific = yy_anom; hadi_south_pacific$region = "S.Pacific"
 load(paste0("HadI/timeseries_southern_", p, ".RData")); hadi_southern_ocean = yy_anom; hadi_southern_ocean$region = "Southern"
+load(paste0("HadI/timeseries_gom_0.95.RData")); hadi_gom = yy_anom; hadi_gom$region = "Gulf of Maine"
 
 load(paste0("COBE/timeseries_global_", p, ".RData")); cobe_global = yy_anom; cobe_global$region = "Global"
 load(paste0("COBE/timeseries_global_no_polar_", p, ".RData")); cobe_sub_global = yy_anom; cobe_sub_global$region = "Sub_Global"
@@ -35,6 +36,7 @@ load(paste0("COBE/timeseries_north_pacific_", p, ".RData")); cobe_north_pacific 
 load(paste0("COBE/timeseries_south_atlantic_", p, ".RData")); cobe_south_atlantic = yy_anom; cobe_south_atlantic$region = "S.Atlantic"
 load(paste0("COBE/timeseries_south_pacific_", p, ".RData")); cobe_south_pacific = yy_anom; cobe_south_pacific$region = "S.Pacific"
 load(paste0("COBE/timeseries_southern_", p, ".RData")); cobe_southern_ocean = yy_anom; cobe_southern_ocean$region = "Southern"
+load(paste0("COBE/timeseries_gom_0.95.RData")); cobe_gom = yy_anom; cobe_gom$region = "Gulf of Maine"
 
 hadi = rbind(hadi_global, 
              hadi_sub_global,
@@ -44,8 +46,8 @@ hadi = rbind(hadi_global,
              hadi_north_pacific,
              hadi_south_atlantic, 
              hadi_south_pacific, 
-             hadi_southern_ocean)
-             # hadi_gom)
+             hadi_southern_ocean,
+             hadi_gom)
 
 cobe = rbind(cobe_global, 
              cobe_sub_global,
@@ -55,8 +57,8 @@ cobe = rbind(cobe_global,
              cobe_north_pacific,
              cobe_south_atlantic, 
              cobe_south_pacific, 
-             cobe_southern_ocean)
-             # cobe_gom)
+             cobe_southern_ocean,
+             cobe_gom)
 
 rm(hadi_global, 
    hadi_sub_global,
@@ -178,7 +180,7 @@ t = timeseries %>% mutate(period = ifelse(Year %in% c(1900:1959), "1st", "2nd"))
   mutate(percent = (sum/lag(sum)-1)*100)
 t
 
-readr::write_csv(t, "~/Dropbox (MBA)/PAPER Kisei heat extremes/figures/supplemental/TableS3.csv")
+readr::write_csv(t, "~/Dropbox/PAPER Kisei heat extremes/figures/supplemental/TableS3.csv")
 
 timeseries$linesize = ifelse(timeseries$region == "Global", 2, 1)
 
@@ -346,19 +348,21 @@ df1$region = factor(df1$region, levels = c("Global",
                                            "Southern",
                                            "Gulf of Maine"))
 
-pdf("~/Desktop/s6.pdf", height = 8, width = 10)
+pdf("~/Desktop/s6.pdf", height = 8, width = 8)
 df1 %>% 
-  # subset(region %in% c("Global", "Sub_Global")) %>% 
-  group_by(Year, region, data) %>% 
+  subset(region %in% c("Global", "Gulf of Maine")) %>%
+  group_by(Year, region) %>% 
   summarise(year_sum = mean(year_sum)) %>% 
-  ggplot(aes(x = Year, y = year_sum, color = data)) +
+  ggplot(aes(x = Year, y = year_sum, color = region)) +
   geom_point(alpha = 0.8, size = 2) +
   geom_line(alpha = 0.8) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "gray") +
   labs(x = "", y = "Area Fraction") +
-  cowplot::theme_cowplot(I(20)) +
-  facet_wrap( ~ region, scales = "free") + 
-  scale_color_brewer(palette = "Set1", "") + 
+  # cowplot::theme_cowplot(I(20)) +
+  ggdark::dark_theme_classic(I(24)) +
+  # facet_wrap( ~ region, scales = "free") + 
+  # scale_color_brewer(palette = "Set1", "") + 
+  scale_color_discrete("") + 
   scale_x_continuous(breaks = seq(1900, 2020, 60), limits = c(1900, 2020)) + 
   theme(legend.position = "top",
         # panel.spacing.x = unit(2, "lines"),

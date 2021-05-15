@@ -38,7 +38,7 @@ ipcc_col <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
 
 map = function(mode){
   
-  setwd(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/"))
+  setwd(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/"))
   
   load(paste0("HadI/extremes_1980-1989_", percentile, ".RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1989"
   load(paste0("HadI/extremes_1990-1999_", percentile, ".RData")); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
@@ -71,24 +71,28 @@ map = function(mode){
       mutate(sum = range01(sum)) %>% 
       subset(source %in% c("COBE v2", "HadISST v1.1")) %>%
       group_by(x, y, period) %>% 
-      summarise() + 
+      summarise(sum = mean(sum)) %>% 
       # subset(y %in% seq(-70, 70, by = 0.1)) %>%
       ggplot() + 
-      geom_point(aes(x, y, color = sum, fill = sum), size = 0.1) +
-      geom_polygon(data = world.df, aes(x = long, y = lat, group = group)) +
-      scale_color_gradientn(colors = rev(ipcc_temp), "", limits = c(0, 1), breaks = c(0, 0.5, 1)) +
-      scale_fill_gradientn(colors = rev(ipcc_temp), "", limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+      geom_point(aes(x, y, color = sum, fill = sum),  size = 0.8, alpha = 0.5, shape = 16) +
+      # geom_raster(aes(x, y, color = sum, fill = sum)) +
+      
+      geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id), color = "gray30", fill = "gray30", size = 0.001) +
+      # scale_color_gradientn(colors = rev(ipcc_col), "", limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+      # scale_fill_gradientn(colors = rev(ipcc_col), "", limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+      scale_color_gradientn(colors = matlab.like(10), "", limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+      scale_fill_gradientn(colors = matlab.like(10), "", limits = c(0, 1), breaks = c(0, 0.5, 1)) +
       scale_x_continuous(expand = c(-0.005, 0), "") +
       scale_y_continuous(expand = c(-0.005, 0), "") +
       # coord_sf(xlim = range(anom$x), ylim = range(anom$y)) +
-      facet_grid(source ~ period) +
-      theme_minimal() +
-      coord_map("ortho", orientation = c(0, 0, 0)) + #normal
+      facet_grid(~period) +
+      dark_theme_minimal() +
+      coord_map("ortho", orientation = c(0, 280, 0)) + #normal
       # coord_map("ortho", orientation = c(-90, 45, 0)) + #arctic centered, 0, 0, 0 gives you a normal look
       theme(axis.title.x = element_blank(),
             axis.title.y = element_blank(),
             axis.ticks = element_blank(), 
-            legend.position = "right")
+            legend.position = "bottom")
     
     p = anom %>% 
       # sample_frac(0.01) %>%
@@ -102,7 +106,7 @@ map = function(mode){
       geom_point(alpha = 0.5, shape = 16) +
       geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id), color = "gray20", fill = "gray20", size = 0.001) + 
       scale_color_gradientn(colors = rev(ipcc_col), "", limits = c(0,1), breaks = c(0,0.5,1)) +
-      coord_proj("+proj=wintri") +
+      # coord_proj("+proj=wintri") +
       # facet_grid(source ~ period) +
       # facet_grid(~ period) +
       theme_minimal(I(20)) +
@@ -141,7 +145,7 @@ map = function(mode){
             legend.position = "bottom",
             legend.justification = c(1,0))
     
-    pdf(paste0("/Users/", Sys.info()[7], "/Desktop/s2_", Sys.Date(), "_", percentile, ".pdf"), height = 12, width = 12)
+    pdf(paste0("/Users/", Sys.info()[7], "/Desktop/s2_", Sys.Date(), "_", percentile, ".pdf"), height = 4, width = 8)
     print(p)
     dev.off()
     
