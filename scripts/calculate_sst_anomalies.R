@@ -16,7 +16,7 @@ calculate_anomalies = function(period, data){
   # period = "2019"
   # data = "HadI"
   
-  setwd("~/Dropbox (MBA)/PAPER Kisei heat extremes")
+  setwd("~/Dropbox/PAPER Kisei heat extremes")
   
   load(paste0("data/", data, "_SST.RData"))
   

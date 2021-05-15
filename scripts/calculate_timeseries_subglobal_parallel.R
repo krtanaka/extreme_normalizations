@@ -21,7 +21,7 @@ calculate_anomalies = function(data){
 
   data = c("HadI", "COBE", "ER")[3]
   
-  setwd(paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/"))
+  setwd(paste0("/Users/", Sys.info()[7], "/Dropbox/PAPER Kisei heat extremes/data/"))
   
   load(paste0(data, "_SST.RData"))
   
@@ -46,7 +46,7 @@ calculate_anomalies = function(data){
   names(Target)
   latlon = Target[,c(1:2)]; plot(latlon, pch = ".")
   coordinates(latlon) = ~x+y
-  statarea <- rgdal::readOGR("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes/data/World_Seas_IHO_v1/World_Seas.shp")
+  statarea <- rgdal::readOGR("/Users/ktanaka/Dropbox/PAPER Kisei heat extremes/data/World_Seas_IHO_v1/World_Seas.shp")
   CRS.new <- CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96 +x_0=0 +y_0=0+datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0") #EPSG:102003
   proj4string(latlon) <- CRS.new
   proj4string(statarea) <- CRS.new

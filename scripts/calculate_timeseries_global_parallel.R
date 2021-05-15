@@ -21,7 +21,7 @@ calculate_anomalies = function(data){
 
   data = c("HadI", "COBE", "ER")[3]
   
-  setwd(paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes/data/"))
+  setwd(paste0("/Users/", Sys.info()[7], "/Dropbox/PAPER Kisei heat extremes/data/"))
   
   load(paste0(data, "_SST.RData"))
   
