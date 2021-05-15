@@ -17,7 +17,7 @@ library(lwgeom)
 ### plot historical baseines ###
 data = "COBE"
 
-setwd("~/Dropbox (MBA)/PAPER Kisei heat extremes")
+setwd("~/Dropbox/PAPER Kisei heat extremes/")
 
 load(paste0("data/", data, "_SST.RData"))
 

@@ -16,7 +16,7 @@ calculate_anomalies = function(period, data){
   # period = "1980-1989"
   # data = "COBE"
   
-  setwd(paste0("/Users/", Sys.info()[7], "/Dropbox (MBA)/PAPER Kisei heat extremes"))
+  setwd(paste0("/Users/", Sys.info()[7], "/Dropbox/PAPER Kisei heat extremes"))
   
   load(paste0("data/", data, "_SST.RData"))
   
