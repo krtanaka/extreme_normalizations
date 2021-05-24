@@ -107,8 +107,8 @@ calculate_anomalies = function(period, data){
 calculate_anomalies("2019", "HadI")
 calculate_anomalies("2019", "COBE")
 
-load("~/extreme_normalizations/results/COBE/anomalies_2019_ipcc.rdata"); cobe = anom; cobe$data = "COBE"; cobe$anom = rowMeans(cobe[3:14])
-load("~/extreme_normalizations/results/HadI/anomalies_2019_ipcc.rdata"); hadi = anom; hadi$data = "HadI"; hadi$anom = rowMeans(hadi[3:14])
+load("~/extreme_normalizations/outputs/COBE/anomalies_2019_ipcc.rdata"); cobe = anom; cobe$data = "COBE"; cobe$anom = rowMeans(cobe[3:14])
+load("~/extreme_normalizations/outputs/HadI/anomalies_2019_ipcc.rdata"); hadi = anom; hadi$data = "HadI"; hadi$anom = rowMeans(hadi[3:14])
 
 #IPCC Temperature colors
 ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),

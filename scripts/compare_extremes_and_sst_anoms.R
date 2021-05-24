@@ -13,8 +13,8 @@ library(patchwork)
 world <- fortify(rworldmap::getMap())
 range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 
-setwd("~/extreme_normalizations/results/")
-
+setwd("~/extreme_normalizations/outputs/")
+  
 # conventional SST anomalies for 2019
 load("COBE/sst_anomalies_2019.Rdata"); cobe_ipcc = anom; cobe_ipcc$data = "COBE"; cobe_ipcc$sum = rowMeans(cobe_ipcc[3:14])
 load("HadI/sst_anomalies_2019.Rdata"); hadi_ipcc = anom; hadi_ipcc$data = "HadI"; hadi_ipcc$sum = rowMeans(hadi_ipcc[3:14])
