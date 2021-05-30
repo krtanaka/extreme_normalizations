@@ -9,14 +9,14 @@ library(maps)
 
 rm(list = ls())
 
-cutoff = c(0.95, 0.975)[1]
+# cutoff = c(0.95, 0.975)[1]
 
 calculate_anomalies = function(period, data){
   
   # period = "2019"
   # data = "HadI"
   
-  setwd("~/Dropbox/PAPER Kisei heat extremes")
+  setwd("/Users/Kisei/Dropbox/PAPER Kisei heat extremes")
   
   load(paste0("data/", data, "_SST.RData"))
   
@@ -46,7 +46,7 @@ calculate_anomalies = function(period, data){
   if (period == "1990-1999") Target <- df[[1441:1560]] #Jan 1990 - Dec 1999
   if (period == "2000-2009") Target <- df[[1561:1680]] #Jan 2000 - Dec 2009
   if (period == "2010-2019") Target <- df[[1681:1800]] #Jan 2010 - Dec 2019
-  if (period == "2019") Target <- df[[1789:1800]] #
+  if (period == "2019") Target <- df[[1789:1800]] #Jan 2019-Dec 2019
 
   Target <- Target %>% rasterToPoints() %>% data.frame()
   if (data == "HadI") Target[Target == -1000] <- -1.8
@@ -98,7 +98,7 @@ calculate_anomalies = function(period, data){
   
   anom$sum = rowSums(anom[3:14])
   
-  save(anom, file = paste0("/Users/", Sys.info()[7], "/extreme_normalizations/", data, "_Normal_SST_Anomalies_2019.RData"))
+  save(anom, file = paste0("/Users/", Sys.info()[7], "/extreme_normalizations/", data, "_sst_anomalies_2019.RData"))
   
   beepr::beep(2)
   
@@ -107,8 +107,8 @@ calculate_anomalies = function(period, data){
 calculate_anomalies("2019", "HadI")
 calculate_anomalies("2019", "COBE")
 
-load("~/extreme_normalizations/outputs/COBE/anomalies_2019_ipcc.rdata"); cobe = anom; cobe$data = "COBE"; cobe$anom = rowMeans(cobe[3:14])
-load("~/extreme_normalizations/outputs/HadI/anomalies_2019_ipcc.rdata"); hadi = anom; hadi$data = "HadI"; hadi$anom = rowMeans(hadi[3:14])
+load("/Users/Kisei/extreme_normalizations/outputs/COBE/sst_anomalies_2019.Rdata"); cobe = anom; cobe$data = "COBE"; cobe$anom = rowMeans(cobe[3:14])
+load("/Users/Kisei/extreme_normalizations/outputs/HadI/sst_anomalies_2019.RData"); hadi = anom; hadi$data = "HadI"; hadi$anom = rowMeans(hadi[3:14])
 
 #IPCC Temperature colors
 ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
