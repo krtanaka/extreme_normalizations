@@ -5,35 +5,26 @@ library(rgdal)
 
 rm(list = ls())
 
-lme <- readOGR("/Users/ktanaka/Google Drive/Research/GIS/LME66/LMEs66.shp")
+lme <- readOGR("/Users/kisei/Google Drive/research/gis/LME66/LMEs66.shp")
 lme <- rmapshaper::ms_simplify(lme, keep = 0.01, keep_shapes = F)
 lme <- lme %>% st_as_sf()  
 
 world <- fortify(rworldmap::getMap())
 
-png("/Users/Kisei/Desktop/LME.png", units = "in", res = 100, height = 10, width = 10)
+png("/Users/Kisei/Desktop/LME.png", units = "in", res = 500, height = 15, width = 10)
 lme %>% 
   # subset(LME_NAME %in% c("East Brazil Shelf", "Somali Coastal Current", "Sulu-Celebes Sea")) %>%
   # subset(LME_NAME %in% c("California Current", "Humboldt Current", "Canadian High Arctic - North Greenland")) %>% 
   ggplot() + 
   geom_sf(aes(group = LME_NAME, fill = LME_NAME), color = "NA", show.legend = T) + 
   scale_fill_viridis_d("") + 
-  theme_pubr() + 
+  theme_void() + 
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),color = "gray60", fill = "gray40", size = 0.001) + 
-  guides(fill = guide_legend(nrow = 8), "") + 
+  guides(fill = guide_legend(nrow = 30), "") + 
   theme(legend.position = "bottom")
-
-lme %>% 
-  # subset(LME_NAME %in% c("East Brazil Shelf", "Somali Coastal Current", "Sulu-Celebes Sea")) %>%
-  subset(LME_NAME %in% c("California Current", "Humboldt Current", "Canadian High Arctic - North Greenland")) %>%
-  ggplot() + 
-  geom_sf(aes(group = LME_NAME, fill = LME_NAME), color = "NA", show.legend = T) + 
-  scale_fill_viridis_d("") + 
-  geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),color = "gray60", fill = "gray40", size = 0.001)
-
 dev.off()
 
-eez <- readOGR(dsn = "/Users/ktanaka/clim_geo_disp/data/EEZ_land_union", layer = "EEZ_land_v2_201410")
+eez <- readOGR(dsn = "/Users/kisei/clim_geo_disp/data/EEZ_land_union", layer = "EEZ_land_v2_201410")
 eez <- rmapshaper::ms_simplify(eez, keep = 0.01, keep_shapes = F)
 eez <- eez %>% st_as_sf() 
 
