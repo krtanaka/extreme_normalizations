@@ -12,8 +12,8 @@ library(colorRamps)
 # plot(bgcp)
 # save(bgcp, file = "~/extreme_normalizations/data/bgcp_raster_0.25.RData")
 
-load("~/extreme_normalizations/data/bgcp_raster_0.25.RData")
-load("~/extreme_normalizations/outputs/HadI/extremes_1980-1989_0.98.RData")
+load("data/bgcp_raster_0.25.RData")
+load("outputs/HadI/extremes_1980-1989_0.98.RData")
 anom = anom[, c(1:2, 15)]
 x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 1, crs = "+proj=longlat +datum=WGS84")
 anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -31,7 +31,7 @@ bgcp = merge(anom, bgcp, all = T)
 bgcp$bgcp = round(bgcp$bgcp, 0)
 bgcp$bgcp = as.factor(as.character(bgcp$bgcp))
 
-bgcp_names <- read_csv("~/extreme_normalizations/data/NAME_BGCP_2019_REYGONDEAU.csv")
+bgcp_names <- read_csv("data/NAME_BGCP_2019_REYGONDEAU.csv")
 bgcp_names = bgcp_names[,c("NAME", "BGCP")]
 colnames(bgcp_names) = c("name", "bgcp")
 bgcp = merge(bgcp, bgcp_names)
