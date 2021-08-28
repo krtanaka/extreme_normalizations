@@ -50,8 +50,8 @@ rank_joy_bgcp = function(){
     
     # i = 1
     
-    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/bgcp_raster_0.25.RData"))
-    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/HadI/extremes_", period[[i]], "_", percentile, ".RData"))
+    load("data/bgcp_raster_0.25.RData")
+    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/HadI/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 1, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
