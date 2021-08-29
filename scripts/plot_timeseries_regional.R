@@ -98,7 +98,7 @@ exceeded_times = df %>%
   group_by(Year, region) %>% 
   summarise(year_sum = mean(year_sum)) %>% 
   mutate(y = ifelse(year_sum > 0.5, 1, 0)) %>% 
-  select(Year, region, y) %>% 
+  dplyr::select(Year, region, y) %>% 
   subset(y > 0) 
 
 exceeded_times$region = factor(exceeded_times$region, levels = c(
@@ -350,7 +350,7 @@ df1$region = factor(df1$region, levels = c("Global",
 
 pdf("~/Desktop/s6.pdf", height = 8, width = 8)
 df1 %>% 
-  subset(region %in% c("Global", "Gulf of Maine")) %>%
+  # subset(region %in% c("Global", "Gulf of Maine")) %>%
   group_by(Year, region) %>% 
   summarise(year_sum = mean(year_sum)) %>% 
   ggplot(aes(x = Year, y = year_sum, color = region)) +
