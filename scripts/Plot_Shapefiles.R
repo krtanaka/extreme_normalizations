@@ -13,38 +13,37 @@ lme <- lme %>% st_as_sf()
 
 world <- fortify(rworldmap::getMap())
 
-png("/Users/Kisei/Desktop/LME.png", units = "in", res = 500, height = 15, width = 10)
+png("/Users/Kisei/Desktop/LME.png", units = "in", res = 100, height = 18, width = 30)
 
 lme %>% 
   # subset(LME_NAME %in% c("East Brazil Shelf", "Somali Coastal Current", "Sulu-Celebes Sea")) %>%
   # subset(LME_NAME %in% c("California Current", "Humboldt Current", "Canadian High Arctic - North Greenland")) %>% 
   ggplot() + 
   geom_sf(aes(group = LME_NAME, fill = LME_NAME), color = "NA", show.legend = T) + 
-  scale_fill_viridis_d("") + 
+  scale_fill_discrete("") +
   theme_void() + 
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),color = "gray60", fill = "gray40", size = 0.001) + 
-  guides(fill = guide_legend(nrow = 30), "") + 
+  guides(fill = guide_legend(nrow = 5), "") + 
   theme(legend.position = "bottom")
 
 dev.off()
 
 ### plot EEZ ###
-
 eez <- readOGR(dsn = "/Users/kisei/climate_geographic_disparity/data/EEZ_land_union", layer = "EEZ_land_v2_201410")
 eez <- rmapshaper::ms_simplify(eez, keep = 0.01, keep_shapes = F)
 eez <- eez %>% st_as_sf() 
 
-png("/Users/Kisei/Desktop/EEZ.png", units = "in", res = 500, height = 20, width = 10)
+png("/Users/Kisei/Desktop/EEZ.png", units = "in", res = 100, height = 20, width = 30)
 
 eez %>%
   # subset(Country %in% c("Maldives", "Tanzania", "Liberia")) %>%
   # subset(Country %in% c("Kiribati", "Ecuador", "Peru")) %>%
   ggplot() + 
   geom_sf(aes(group = Country, fill = Country), color = "NA", show.legend = T) + 
-  scale_fill_viridis_d("") + 
+  scale_fill_discrete("") + 
   theme_void() + 
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id), color = "gray60", fill = "gray40", size = 0.001) + 
-  guides(fill = guide_legend(nrow = 100), "") + 
+  guides(fill = guide_legend(nrow = 20), "") + 
   theme(legend.position = "bottom")
 
 dev.off()
@@ -76,7 +75,7 @@ colnames(bgcp_names) = c("name", "bgcp")
 bgcp = merge(bgcp, bgcp_names)
 bgcp$bgcp = bgcp$name
 
-png("/Users/Kisei/Desktop/BGCP.png", units = "in", res = 500, height = 20, width = 10)
+png("/Users/Kisei/Desktop/BGCP.png", units = "in", res = 100, height = 17, width = 30)
 
 p = bgcp %>% 
   # subset(bgcp %in% c("Indian monsoon gyre", "Western tropical Atlantic", "Northwest Arabian Sea upwelling")) %>%
@@ -86,13 +85,14 @@ p = bgcp %>%
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
            color = "gray60", fill = "gray40", size = 0.001) + 
   # geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),color = "gray60", fill = "gray40", size = 0.001) + 
-  scale_fill_viridis_d("") +
+  scale_fill_discrete("") +
   coord_fixed() + 
   theme_void() + 
-  guides(fill = guide_legend(nrow = 20), "") + 
+  guides(fill = guide_legend(nrow = 5), "") + 
   theme(legend.position = "bottom")
 
 print(p)
+
 dev.off()
 
 
