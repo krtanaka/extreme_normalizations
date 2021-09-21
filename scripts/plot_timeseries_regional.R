@@ -308,7 +308,7 @@ if (p == 0.98) {
   
   p1/p2
   
-  pdf(paste0('~/Dropbox (MBA)/PAPER Kisei heat extremes/figures/Fig3_', p, '_', Sys.Date(), '.pdf'), height = 11, width = 10)
+  pdf(paste0('~/Dropbox/PAPER Kisei heat extremes/figures/Fig3_', p, '_', Sys.Date(), '.pdf'), height = 11, width = 10)
   p1/p2
   dev.off()
   
