@@ -51,7 +51,7 @@ rank_joy_bgcp = function(){
     # i = 1
     
     load("data/bgcp_raster_0.25.RData")
-    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/outputs/HadI/extremes_", period[[i]], "_", percentile, ".RData"))
+    load(paste0("outputs/HadI/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 1, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -63,7 +63,7 @@ rank_joy_bgcp = function(){
     bgcp = merge(anom, bgcp, all = T)
     bgcp$bgcp = round(bgcp$bgcp, 0)
     bgcp$bgcp = as.factor(as.character(bgcp$bgcp))
-    bgcp_names <- read_csv(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/NAME_BGCP_2019_REYGONDEAU.csv"))
+    bgcp_names <- read_csv(paste0("data/NAME_BGCP_2019_REYGONDEAU.csv"))
     bgcp_names = bgcp_names[,c("NAME", "BGCP")]
     colnames(bgcp_names) = c("name", "bgcp")
     bgcp = merge(bgcp, bgcp_names)
@@ -85,8 +85,8 @@ rank_joy_bgcp = function(){
     hadi = df
     hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
-    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/bgcp_raster_0.25.RData"))
-    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/COBE/extremes_", period[[i]], "_", percentile, ".RData"))
+    load(paste0("data/bgcp_raster_0.25.RData"))
+    load(paste0("outputs/COBE/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 1, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -98,7 +98,7 @@ rank_joy_bgcp = function(){
     bgcp = merge(anom, bgcp, all = T)
     bgcp$bgcp = round(bgcp$bgcp, 0)
     bgcp$bgcp = as.factor(as.character(bgcp$bgcp))
-    bgcp_names <- read_csv(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/NAME_BGCP_2019_REYGONDEAU.csv"))
+    bgcp_names <- read_csv(paste0("data/NAME_BGCP_2019_REYGONDEAU.csv"))
     bgcp_names = bgcp_names[,c("NAME", "BGCP")]
     colnames(bgcp_names) = c("name", "bgcp")
     bgcp = merge(bgcp, bgcp_names)
@@ -120,8 +120,8 @@ rank_joy_bgcp = function(){
     cobe = df
     cobe$source = "COBE v2"; cobe$period = period[[i]]
     
-    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/bgcp_raster_0.25.RData"))
-    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/ER/extremes_", period[[i]], "_", percentile, ".RData"))
+    load(paste0("data/bgcp_raster_0.25.RData"))
+    load(paste0("outputs/ER/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     x <- raster(xmn  =-180, xmx = 180, ymn = -90, ymx = 90, res = 2, crs = "+proj=longlat +datum=WGS84")
     anom <- rasterize(anom[, c('x', 'y')], x, anom[, 'sum'], fun = mean)
@@ -133,7 +133,7 @@ rank_joy_bgcp = function(){
     bgcp = merge(anom, bgcp, all = T)
     bgcp$bgcp = round(bgcp$bgcp, 0)
     bgcp$bgcp = as.factor(as.character(bgcp$bgcp))
-    bgcp_names <- read_csv(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/data/NAME_BGCP_2019_REYGONDEAU.csv"))
+    bgcp_names <- read_csv(paste0("data/NAME_BGCP_2019_REYGONDEAU.csv"))
     bgcp_names = bgcp_names[,c("NAME", "BGCP")]
     colnames(bgcp_names) = c("name", "bgcp")
     bgcp = merge(bgcp, bgcp_names)
@@ -274,7 +274,7 @@ rank_joy_bgcp = function(){
   summary = cbind(s1, s2, s3, s4)
   summary =  summary[!is.na(summary$Unit),]
 
-  write_csv(summary, paste0("~/Desktop/bgcp_", percentile, ".csv"))
+  write_csv(summary, paste0("outputs/bgcp_", percentile, ".csv"))
   
   all_unit = tas_combined %>%
     mutate(location_id = paste0(x, "_", y)) %>%
@@ -302,7 +302,7 @@ rank_joy_bgcp = function(){
           panel.grid.minor.y = element_blank(),
           legend.position = "none")
   
-  pdf(paste0("~/Desktop/joy_bgcp_", percentile, ".pdf"), height = 10, width = 10)
+  pdf(paste0("outputs/joy_bgcp_", percentile, ".pdf"), height = 10, width = 10)
   print(p)
   dev.off()
   
@@ -331,7 +331,7 @@ bgcp_sub = subset(bgcp, bgcp %in% sub) #subset
 bgcp_sub = bgcp_sub %>% group_by(bgcp) %>% mutate(m = median(sum)) %>% arrange(bgcp, m)
 bgcp_sub = bgcp_sub[,c("bgcp", "sum")]; bgcp_sub = as.data.frame(bgcp_sub); bgcp_sub = bgcp_sub[1:2]; colnames(bgcp_sub)[1] = "UNIT"; bgcp_sub$class = "BGCP"
 
-pdf(paste0("~/Desktop/Fig2_BGCP.", percentile, "_", Sys.Date(), ".pdf"), width = 8, height = 6)
+pdf(paste0("outputs/Fig2_BGCP.", percentile, "_", Sys.Date(), ".pdf"), width = 8, height = 6)
 p = bgcp_sub %>%  
   mutate(UNIT = gsub("\xca", "", UNIT)) %>% 
   mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>%

@@ -23,8 +23,8 @@ period = c("1980-1989", "1990-1999", "2000-2009", "2010-2019")
 range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 
 # coarse shape files, see prep_shapefile.R
-load(paste0('/Users/', Sys.info()[7], '/extreme_normalizations/data/eez_sf_dataframe_0.001.RData'))
-load(paste0('/Users/', Sys.info()[7], '/extreme_normalizations/data/lme_sf_dataframe_0.001.RData'))
+load(paste0('data/eez_sf_dataframe_0.001.RData'))
+load(paste0('data/lme_sf_dataframe_0.001.RData'))
 
 #IPCC - Temperature -
 ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
@@ -58,7 +58,7 @@ rank_joy_lme_eez = function(region){
     
     # i = 1
     
-    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/HadI/extremes_", period[[i]], "_", percentile, ".RData"))
+    load(paste0("outputs/HadI/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     summary(tas)
@@ -79,7 +79,7 @@ rank_joy_lme_eez = function(region){
     hadi = merge(hadi, df)
     hadi$source = "HadISST v1.1"; hadi$period = period[[i]]
     
-    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/COBE/extremes_", period[[i]], "_", percentile, ".RData"))
+    load(paste0("outputs/COBE/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     # cobe <- st_intersection(tas, shape)
@@ -99,7 +99,7 @@ rank_joy_lme_eez = function(region){
     cobe = merge(cobe, df)
     cobe$source = "COBE v2"; cobe$period = period[[i]]
     
-    load(paste0("/Users/", Sys.info()[7], "/extreme_normalizations/results/ER/extremes_", period[[i]], "_", percentile, ".RData"))
+    load(paste0("outputs/ER/extremes_", period[[i]], "_", percentile, ".RData"))
     anom = anom[, c(1:2, 15)]
     tas <- st_as_sf(x = anom, coords = c("x", "y"), crs = "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0" )
     # er <- st_intersection(tas, shape)
@@ -229,7 +229,7 @@ rank_joy_lme_eez = function(region){
   summary = cbind(s1, s2, s3, s4)
   summary =  summary[!is.na(summary$Unit),]
   
-  write_csv(summary, paste0("/Users/", Sys.info()[7], "/Desktop/", region, "_", percentile, ".csv"))
+  write_csv(summary, paste0("outputs/", region, "_", percentile, ".csv"))
   
   
   
@@ -263,7 +263,7 @@ rank_joy_lme_eez = function(region){
           panel.grid.minor.y = element_blank(),
           legend.position = "none")
   
-  pdf(paste0("~/Desktop/joy_", region, "_", percentile, ".pdf"), height = 10, width = 10)
+  pdf(paste0("outputs/joy_", region, "_", percentile, ".pdf"), height = 10, width = 10)
   print(p)
   dev.off()
   
@@ -293,7 +293,7 @@ lme_sub = subset(lme, UNIT %in% sub) #subset
 lme_sub = lme_sub %>% group_by(UNIT) %>% mutate(m = median(sum)) %>% arrange(UNIT, m)
 lme_sub = lme_sub[,c("UNIT", "sum")]; lme_sub = as.data.frame(lme_sub); lme_sub = lme_sub[1:2]; lme_sub$class = "LME"
 
-pdf(paste0("~/Desktop/Fig2_LME.", percentile, "_", Sys.Date(), ".pdf"), width = 8, height = 6)
+pdf(paste0("outputs/Fig2_LME.", percentile, "_", Sys.Date(), ".pdf"), width = 8, height = 6)
 p = lme_sub %>% 
   mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>%
   ggplot(aes(x = sum, y = UNIT, fill = UNIT)) +
