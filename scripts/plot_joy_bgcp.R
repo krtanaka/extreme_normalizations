@@ -280,17 +280,22 @@ rank_joy_bgcp = function(){
     mutate(location_id = paste0(x, "_", y)) %>%
     select(bgcp, period, location_id, sum) %>%
     group_by(bgcp, period, location_id) %>%
-    summarise(sum = median(sum, na.rm = T))
+    summarise(sum = median(sum, na.rm = T)) %>% 
+    group_by(bgcp, period) %>% 
+    mutate(median = median(sum))
+  
+  ipcc_temp_expand = colorRampPalette(rev(ipcc_temp))
+  ipcc_temp_expand = ipcc_temp_expand(length(unique(all_unit$median)))
   
   p = all_unit %>% 
-    ggplot(aes(x = sum, y = bgcp, fill = bgcp)) +
-    geom_joy(scale = 5, alpha = 0.8, size = 0.1, bandwidth = 0.03) +
+    ggplot(aes(x = sum, y = bgcp, fill = as.factor(median))) +
+    geom_joy(scale = 5, alpha = 0.8, size = 0.1, bandwidth = 0.03, show.legend = F) +
     theme_minimal() +
     scale_y_discrete(expand = c(0, 0)) +
     scale_x_continuous(expand = c(-0.05, 0.1),
                        limits = c(0, 1),
                        breaks = c(0.25,  0.75)) +
-    scale_fill_cyclical(values = ipcc_temp_expand)+
+    scale_fill_cyclical(values = ipcc_temp_expand) +
     facet_wrap(.~period, ncol = 4) +
     ylab(NULL) + xlab(NULL) +
     coord_fixed(ratio = 0.1) +
@@ -302,7 +307,7 @@ rank_joy_bgcp = function(){
           panel.grid.minor.y = element_blank(),
           legend.position = "none")
   
-  pdf(paste0("outputs/joy_bgcp_", percentile, ".pdf"), height = 10, width = 10)
+  png(paste0("outputs/joy_bgcp_", percentile, ".png"), height = 10, width = 10, units = "in", res = 500)
   print(p)
   dev.off()
   
@@ -332,6 +337,8 @@ bgcp_sub = bgcp_sub %>% group_by(bgcp) %>% mutate(m = median(sum)) %>% arrange(b
 bgcp_sub = bgcp_sub[,c("bgcp", "sum")]; bgcp_sub = as.data.frame(bgcp_sub); bgcp_sub = bgcp_sub[1:2]; colnames(bgcp_sub)[1] = "UNIT"; bgcp_sub$class = "BGCP"
 
 pdf(paste0("outputs/Fig2_BGCP.", percentile, "_", Sys.Date(), ".pdf"), width = 8, height = 6)
+# png(paste0("outputs/Fig2_BGCP.", percentile, "_", Sys.Date(), ".png"), width = 12, height = 8, res = 500, units = "in")
+
 p = bgcp_sub %>%  
   mutate(UNIT = gsub("\xca", "", UNIT)) %>% 
   mutate(UNIT = forcats::fct_reorder(UNIT, sum)) %>%

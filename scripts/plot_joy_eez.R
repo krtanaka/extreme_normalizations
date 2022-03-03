@@ -126,13 +126,13 @@ rank_joy_lme_eez = function(region){
     
   }
   
-  # #pick large EEZs
-  # pdf(paste0("~/Desktop/joy_", region, "_selected_", percentile, ".pdf"), height = 10, width = 10)
-  # 
-  # big_eezs = tas_combined %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 2000)
-  # big_eezs = as.data.frame(big_eezs)
-  # big_eezs = big_eezs[, 1, drop = FALSE]
-  # tas_combined_sub = subset(tas_combined, UNIT %in% dplyr::pull(big_eezs))
+  #pick large EEZs
+  pdf(paste0("~/Desktop/joy_", region, "_selected_", percentile, ".pdf"), height = 10, width = 10)
+
+  big_eezs = tas_combined %>% group_by(UNIT) %>% summarise(m = median(sum), freq = n()) %>% filter(freq > 2000)
+  big_eezs = as.data.frame(big_eezs)
+  big_eezs = big_eezs[, 1, drop = FALSE]
+  tas_combined_sub = subset(tas_combined, UNIT %in% dplyr::pull(big_eezs))
   # 
   # p = tas_combined_sub %>% 
   #   mutate(location_id = as.character(geometry)) %>% 
