@@ -106,26 +106,20 @@ ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
                rgb(5, 48, 97, maxColorValue = 255, alpha = 255))
 
 p1 = ggplot(Baseline, aes(x, y, color = mean)) + 
-  geom_point() + 
+  geom_point(show.legend = F) + 
   scale_color_gradientn(colors = rev(ipcc_temp), "") +
-  theme_minimal() + 
+  theme_void() + 
   geom_point(data = Baseline[ll,], aes(x, y), color = "green", size = 5, stroke = 2, shape = 8) +
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
            color = "gray40", fill = "gray40", size = 0.001) +
-  # coord_proj("+proj=wintri") +
-  # scale_x_continuous(expand = c(-0.005, 0), "") +
-  # scale_y_continuous(expand = c(-0.005, 0), "") +
-  theme(legend.position = "none", 
-        axis.title = element_blank(),
-        axis.text = element_blank(), 
-        axis.ticks = element_blank())
+  scale_x_continuous(expand = c(-0.005, 0), "") +
+  scale_y_continuous(expand = c(-0.005, 0), "")
 
 p2 = ggplot(baseline_12, aes(baseline, fill = factor(m))) + 
   geom_density(aes(y = ..density..),position = "identity", size = 0.01) + 
   facet_wrap(~m, scales = 'free_x', nrow = 1) + 
-  geom_vline(data = q_12, aes(xintercept = q)) + 
+  geom_vline(data = q_12, aes(xintercept = q), size = 2) + 
   coord_flip() + 
-  # theme_pubr() + 
   ggdark::dark_theme_bw(I(20)) +
   xlab("SST (deg C)") + 
   scale_x_reverse() + 
@@ -140,6 +134,10 @@ p2 = ggplot(baseline_12, aes(baseline, fill = factor(m))) +
         panel.background = element_blank(),
         axis.line = element_line(colour = "white"))
 
+png(paste0("~/Desktop/Climatologies_", ll, ".png"), height = 12, width = 8, units = "in", res = 500)
+cowplot::plot_grid(p1, p2, ncol = 1)
+dev.off()
+
 pdf(paste0("~/Desktop/Climatologies_", ll, ".pdf"), height = 6, width = 6)
 # cowplot::plot_grid(p1, p2, ncol = 1)
 p1
@@ -149,4 +147,4 @@ pdf(paste0("~/Desktop/Climatologies_", ll, ".pdf"), height = 2, width = 6)
 # cowplot::plot_grid(p1, p2, ncol = 1)
 p2
 dev.off()
-
+   
