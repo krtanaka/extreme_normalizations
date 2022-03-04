@@ -14,31 +14,31 @@ ipcc_temp <- c(rgb(103, 0, 31, maxColorValue = 255, alpha = 255),
                rgb(33, 102, 172, maxColorValue = 255, alpha = 255),
                rgb(5, 48, 97, maxColorValue = 255, alpha = 255))
 
-setwd("~/extreme_normalizations/results/")
+setwd("~/extreme_normalizations/outputs/")
 
 #historical extremes based on 1870-1919 reference period
-cutoff = c(0.95, 0.975)[1]
-load(paste0("HadI/anomalies_1980-1989_", cutoff, ".RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1989"
-load(paste0("HadI/anomalies_1990-1999_", cutoff, ".RData")); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
-load(paste0("HadI/anomalies_2000-2009_", cutoff, ".RData")); hadi3 = anom; hadi3$source = "HadISST v1.1"; hadi3$period = "2000-2009"
-load(paste0("HadI/anomalies_2010-2019_", cutoff, ".RData")); hadi4 = anom; hadi4$source = "HadISST v1.1"; hadi4$period = "2010-2019"
-load(paste0("COBE/anomalies_1980-1989_", cutoff, ".RData")); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1989"
-load(paste0("COBE/anomalies_1990-1999_", cutoff, ".RData")); cobe2 = anom; cobe2$source = "COBE v2"; cobe2$period = "1990-1999"
-load(paste0("COBE/anomalies_2000-2009_", cutoff, ".RData")); cobe3 = anom; cobe3$source = "COBE v2"; cobe3$period = "2000-2009"
-load(paste0("COBE/anomalies_2010-2019_", cutoff, ".RData")); cobe4 = anom; cobe4$source = "COBE v2"; cobe4$period = "2010-2019"
+cutoff = c(0.95, 0.98)[1]
+load(paste0("HadI/extremes_1980-1989_", cutoff, ".RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1989"
+load(paste0("HadI/extremes_1990-1999_", cutoff, ".RData")); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
+load(paste0("HadI/extremes_2000-2009_", cutoff, ".RData")); hadi3 = anom; hadi3$source = "HadISST v1.1"; hadi3$period = "2000-2009"
+load(paste0("HadI/extremes_2010-2019_", cutoff, ".RData")); hadi4 = anom; hadi4$source = "HadISST v1.1"; hadi4$period = "2010-2019"
+load(paste0("COBE/extremes_1980-1989_", cutoff, ".RData")); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1989"
+load(paste0("COBE/extremes_1990-1999_", cutoff, ".RData")); cobe2 = anom; cobe2$source = "COBE v2"; cobe2$period = "1990-1999"
+load(paste0("COBE/extremes_2000-2009_", cutoff, ".RData")); cobe3 = anom; cobe3$source = "COBE v2"; cobe3$period = "2000-2009"
+load(paste0("COBE/extremes_2010-2019_", cutoff, ".RData")); cobe4 = anom; cobe4$source = "COBE v2"; cobe4$period = "2010-2019"
 
 a1 = rbind(hadi1, hadi2, hadi3, hadi4, cobe1, cobe2, cobe3, cobe4)
 
 #historical extremes based on 1956-2005 reference period
-cutoff = c(0.95, 0.975)[1]
-load(paste0("HadI/1956-2005_baseline/anomalies_1980-1989_", cutoff, ".RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1989"
-load(paste0("HadI/1956-2005_baseline/anomalies_1990-1999_", cutoff, ".RData")); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
-load(paste0("HadI/1956-2005_baseline/anomalies_2000-2009_", cutoff, ".RData")); hadi3 = anom; hadi3$source = "HadISST v1.1"; hadi3$period = "2000-2009"
-load(paste0("HadI/1956-2005_baseline/anomalies_2010-2019_", cutoff, ".RData")); hadi4 = anom; hadi4$source = "HadISST v1.1"; hadi4$period = "2010-2019"
-load(paste0("COBE/1956-2005_baseline/anomalies_1980-1989_", cutoff, ".RData")); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1989"
-load(paste0("COBE/1956-2005_baseline/anomalies_1990-1999_", cutoff, ".RData")); cobe2 = anom; cobe2$source = "COBE v2"; cobe2$period = "1990-1999"
-load(paste0("COBE/1956-2005_baseline/anomalies_2000-2009_", cutoff, ".RData")); cobe3 = anom; cobe3$source = "COBE v2"; cobe3$period = "2000-2009"
-load(paste0("COBE/1956-2005_baseline/anomalies_2010-2019_", cutoff, ".RData")); cobe4 = anom; cobe4$source = "COBE v2"; cobe4$period = "2010-2019"
+cutoff = c(0.95, 0.98)[1]
+load(paste0("HadI/1956-2005_baseline/extremes_1980-1989_", cutoff, ".RData")); hadi1 = anom; hadi1$source = "HadISST v1.1"; hadi1$period = "1980-1989"
+load(paste0("HadI/1956-2005_baseline/extremes_1990-1999_", cutoff, ".RData")); hadi2 = anom; hadi2$source = "HadISST v1.1"; hadi2$period = "1990-1999"
+load(paste0("HadI/1956-2005_baseline/extremes_2000-2009_", cutoff, ".RData")); hadi3 = anom; hadi3$source = "HadISST v1.1"; hadi3$period = "2000-2009"
+load(paste0("HadI/1956-2005_baseline/extremes_2010-2019_", cutoff, ".RData")); hadi4 = anom; hadi4$source = "HadISST v1.1"; hadi4$period = "2010-2019"
+load(paste0("COBE/1956-2005_baseline/extremes_1980-1989_", cutoff, ".RData")); cobe1 = anom; cobe1$source = "COBE v2"; cobe1$period = "1980-1989"
+load(paste0("COBE/1956-2005_baseline/extremes_1990-1999_", cutoff, ".RData")); cobe2 = anom; cobe2$source = "COBE v2"; cobe2$period = "1990-1999"
+load(paste0("COBE/1956-2005_baseline/extremes_2000-2009_", cutoff, ".RData")); cobe3 = anom; cobe3$source = "COBE v2"; cobe3$period = "2000-2009"
+load(paste0("COBE/1956-2005_baseline/extremes_2010-2019_", cutoff, ".RData")); cobe4 = anom; cobe4$source = "COBE v2"; cobe4$period = "2010-2019"
 
 a2 = rbind(hadi1, hadi2, hadi3, hadi4, cobe1, cobe2, cobe3, cobe4)
 
