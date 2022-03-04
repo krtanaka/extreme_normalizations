@@ -21,8 +21,8 @@ setwd("~/Dropbox/PAPER Kisei heat extremes/")
 
 load(paste0("data/", data, "_SST.RData"))
 
-e = extent(-120, -100, 30, 40)
-df = crop(df, e); rm(e)
+# e = extent(-160, -140, 30, 40)
+# df = crop(df, e); rm(e)
 
 # set baseline Jan 1870 - Dec 1929, 50 years
 Baseline <- df[[1:600]] 
@@ -45,7 +45,7 @@ last_month = first_month+11
 target = Target[,first_month:last_month]; names(target) # target year
 ll_anom = NULL
 
-ll = 5000
+ll = 25000
 
 monthly_anom = NULL
 
@@ -63,7 +63,7 @@ for (m in 1:12) { # every month
   baseline = as.data.frame(baseline)
   baseline = baseline[,1]
   
-  q = quantile(baseline, prob = 0.975)
+  q = quantile(baseline, prob = 0.98)
   # hist(baseline, breaks = 60, col = matlab.like(60), lty = "blank")
   # abline(v = q)
   
@@ -109,10 +109,10 @@ p1 = ggplot(Baseline, aes(x, y, color = mean)) +
   geom_point() + 
   scale_color_gradientn(colors = rev(ipcc_temp), "") +
   theme_minimal() + 
-  geom_point(data = Baseline[ll,], aes(x, y), color = "red", size = 5, shape = 15) +
+  geom_point(data = Baseline[ll,], aes(x, y), color = "green", size = 5, stroke = 2, shape = 8) +
   geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
            color = "gray40", fill = "gray40", size = 0.001) +
-  coord_proj("+proj=wintri") +
+  # coord_proj("+proj=wintri") +
   # scale_x_continuous(expand = c(-0.005, 0), "") +
   # scale_y_continuous(expand = c(-0.005, 0), "") +
   theme(legend.position = "none", 
