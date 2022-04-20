@@ -129,8 +129,8 @@ world <- fortify(rworldmap::getMap())
 
 anom %>% ggplot(aes(x, y, fill = anom)) +  
   geom_raster() + 
-  geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
-           color = "gray20", fill = "gray20", size = 0.001) +
+  # geom_map(data = world, map = world, aes(x = long, y = lat, map_id = id),
+  #          color = "gray20", fill = "gray20", size = 0.001) +
   scale_fill_gradientn(colors = rev(ipcc_temp), "") +
   scale_x_continuous(expand = c(-0.005, 0), "") +
   scale_y_continuous(expand = c(-0.005, 0), "") +
