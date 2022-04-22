@@ -37,7 +37,7 @@ world <- fortify(getMap())
 
 range01 <- function(x){(x-min(x))/(max(x)-min(x))}
 
-meow <- readOGR(dsn = paste0("/Users/", Sys.info()[7], "/Downloads/MEOW"), layer = "meow_ecos")
+meow <- readOGR(dsn = paste0("/Users/", Sys.info()[7], "/Desktop/data/Downloads/MEOW"), layer = "meow_ecos")
 meow <- meow %>% st_as_sf()  
 
 lme <- readOGR("/Users/", Sys.info()[7], "/Google Drive/Research/GIS/LME66/LMEs66.shp")
