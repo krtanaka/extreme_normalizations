@@ -39,10 +39,7 @@ plot_clim = function(data, mode){
   # data = c("HadI", "COBE", "ER")[1]
   # mode = "mean"
   
-  # setwd("/Users/Kisei/Dropbox/PAPER Kisei heat extremes")
-  setwd("/Users/ktanaka/Dropbox (MBA)/PAPER Kisei heat extremes")
-  
-  load(paste0("data/", data, "_SST.RData"))
+  load(paste0("/Users/", Sys.info()[7], "/Desktop/data/", data, "_SST.RData"))
   
   # e = extent(-140, -100, 30, 40)
   # df = crop(df, e); rm(e)

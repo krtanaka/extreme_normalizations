@@ -17,9 +17,7 @@ library(lwgeom)
 ### plot historical baseines ###
 data = "COBE"
 
-setwd("~/Dropbox/PAPER Kisei heat extremes/")
-
-load(paste0("data/", data, "_SST.RData"))
+load(paste0("/Users/", Sys.info()[7], "/Desktop/data/", data, "_SST.RData"))
 
 # e = extent(-160, -140, 30, 40)
 # df = crop(df, e); rm(e)
