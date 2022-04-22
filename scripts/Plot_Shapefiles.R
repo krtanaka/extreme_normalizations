@@ -98,7 +98,7 @@ dev.off()
 
 
 ### plot world seas ###
-ws <- readOGR("/Users/Kisei/Dropbox/PAPER Kisei heat extremes/data/World_Seas_IHO_v1/World_Seas.shp")
+ws <- readOGR("data/World_Seas_IHO_v1/World_Seas.shp")
 ws <- rmapshaper::ms_simplify(ws, keep = 0.1, keep_shapes = F)
 ws <- ws %>% st_as_sf()  
 
