@@ -2,6 +2,7 @@ library(readr)
 library(dplyr)
 library(ggplot2)
 library(rgdal)
+library(sf)
 
 rm(list = ls())
 
@@ -13,7 +14,7 @@ lme <- lme %>% st_as_sf()
 
 world <- fortify(rworldmap::getMap())
 
-png("/Users/Kisei/Desktop/LME.png", units = "in", res = 100, height = 18, width = 30)
+png(paste0("/Users/", Sys.info()[7], "/Desktop/LME.png"), units = "in", res = 100, height = 18, width = 30)
 
 lme %>% 
   # subset(LME_NAME %in% c("East Brazil Shelf", "Somali Coastal Current", "Sulu-Celebes Sea")) %>%
