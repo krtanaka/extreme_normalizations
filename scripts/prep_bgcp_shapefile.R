@@ -5,7 +5,7 @@ library(dplyr)
 library(ggjoy)
 library(colorRamps)
 
-# bgcp <- read_csv("~/extreme_normalizations/data/BGCP_2019_REYGONDEAU.csv")
+# bgcp <- read_csv("data/BGCP_2019_REYGONDEAU.csv")
 # qplot(bgcp$Longitude, bgcp$Latitude, color = bgcp$BGCP)
 # x <- raster(xmn = -180, xmx = 180, ymn = -90, ymx = 90, res = 0.25, crs = "+proj=longlat +datum=WGS84")
 # bgcp <- rasterize(bgcp[, c('Longitude', 'Latitude')], x, bgcp[, 'BGCP'], fun = mean)
