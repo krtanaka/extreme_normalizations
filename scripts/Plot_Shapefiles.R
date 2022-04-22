@@ -30,7 +30,7 @@ lme %>%
 dev.off()
 
 ### plot EEZ ###
-eez <- readOGR(dsn = "/Users/kisei/climate_geographic_disparity/data/EEZ_land_union", layer = "EEZ_land_v2_201410")
+eez <- readOGR(dsn = "data/EEZ_land_union", layer = "EEZ_land_v2_201410")
 eez <- rmapshaper::ms_simplify(eez, keep = 0.01, keep_shapes = F)
 eez <- eez %>% st_as_sf() 
 
