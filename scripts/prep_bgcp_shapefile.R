@@ -3,6 +3,7 @@ rm(list = ls())
 library(readr)
 library(dplyr)
 library(ggjoy)
+library(ggplot2)
 library(colorRamps)
 
 # bgcp <- read_csv("data/BGCP_2019_REYGONDEAU.csv")

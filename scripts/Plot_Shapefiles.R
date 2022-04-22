@@ -7,7 +7,7 @@ rm(list = ls())
 
 ### plot LME shapefile
 
-lme <- readOGR("/Users/kisei/Google Drive/research/gis/LME66/LMEs66.shp")
+lme <- readOGR("data/LME66/LMEs66.shp")
 lme <- rmapshaper::ms_simplify(lme, keep = 0.01, keep_shapes = F)
 lme <- lme %>% st_as_sf()  
 
